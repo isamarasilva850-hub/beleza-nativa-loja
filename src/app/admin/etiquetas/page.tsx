@@ -4,7 +4,7 @@ import { useState } from "react";
 import { products } from "@/data/products";
 
 export default function Etiquetas() {
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [search, setSearch] = useState("");
   const [etiquetaType, setEtiquetaType] = useState<"preco" | "codigo" | "completa">("preco");
 
@@ -12,7 +12,7 @@ export default function Etiquetas() {
     p.name.toLowerCase().includes(search.toLowerCase()) || p.ref.toLowerCase().includes(search.toLowerCase())
   );
 
-  const toggleProduct = (id: string) => {
+  const toggleProduct = (id: number) => {
     setSelectedProducts((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   };
 
