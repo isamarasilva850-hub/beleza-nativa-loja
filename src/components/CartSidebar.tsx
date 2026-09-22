@@ -155,7 +155,8 @@ export default function CartSidebar() {
   if (showReceipt && receiptData) {
     const uniqueProducts = getUniqueProducts(receiptData.items);
     const storeUrl = typeof window !== "undefined" ? window.location.origin : "";
-    const catalogLink = `${storeUrl}`;
+    const productRefs = uniqueProducts.map(p => p.ref).join(',');
+    const catalogLink = `${storeUrl}?catalogo=${encodeURIComponent(receiptData.name)}&refs=${productRefs}`;
 
     return (
       <>
