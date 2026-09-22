@@ -1,6 +1,9 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
+import { deductStock, buildPalmiraMessage, getStockQuantity } from "@/lib/stock";
+
+const CART_KEY = "belezanativa_cart";
 
 export interface CartItem {
   productId: number;
@@ -24,21 +27,59 @@ interface CartContextType {
   removeItem: (productId: number, color: string, size: string) => void;
   updateQuantity: (productId: number, color: string, size: string, quantity: number) => void;
   clearCart: () => void;
+  checkout: (revendedora: string) => void;
   totalItems: number;
   totalPrice: number;
   minOrder: number;
+  checkStock: (ref: string, color: string, size: string) => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const PALMIRA_PHONE = "5535997380503";
+const STORE_PHONE = "5535992100072";
+const ORDERS_KEY = "belezanativa_orders";
+
+function getNextOrderNumber(): number {
+  const orders = localStorage.getItem(ORDERS_KEY);
+  const list = orders ? JSON.parse(orders) : [];
+  return list.length > 0 ? Math.max(...list.map((o: any) => o.number || 0)) + 1 : 1;
+}
+
+function loadCart(): CartItem[] {
+  try {
+    const saved = localStorage.getItem(CART_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const minOrder = 600;
+
+  useEffect(() => {
+    setItems(loadCart());
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(CART_KEY, JSON.stringify(items));
+    } catch {}
+  }, [items, hydrated]);
 
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
   const toggleCart = useCallback(() => setIsOpen((prev) => !prev), []);
+
+  const checkStock = useCallback((ref: string, color: string, size: string) => {
+    return getStockQuantity(ref, color, size);
+  }, []);
 
   const addItem = useCallback(
     (newItem: Omit<CartItem, "quantity">, quantity = 1) => {
@@ -96,6 +137,78 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => setItems([]), []);
 
+  const checkout = useCallback((revendedora: string) => {
+    if (items.length === 0) return;
+
+    const orderNumber = getNextOrderNumber();
+
+    const orderLines = items.map(
+      (item) =>
+        `${item.ref} - ${item.name} | ${item.color} | ${item.size} | Qtd: ${item.quantity} | R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}`
+    );
+
+    const totalPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const totalQty = items.reduce((sum, i) => sum + i.quantity, 0);
+
+    const storeMsg = [
+      `📦 *PEDIDO #${orderNumber}*`,
+      `Revendedora: ${revendedora}`,
+      "",
+      ...orderLines,
+      "",
+      `*Total: R$ ${totalPrice.toFixed(2).replace(".", ",")}*`,
+      `Itens: ${totalQty}`,
+    ].join("\n");
+
+    const palmiraMsg = buildPalmiraMessage(
+      items.map((i) => ({ ref: i.ref, name: i.name, color: i.color, size: i.size, quantity: i.quantity })),
+      orderNumber,
+      revendedora
+    );
+
+    deductStock(
+      items.map((i) => ({ ref: i.ref, color: i.color, size: i.size, quantity: i.quantity }))
+    );
+
+    const order = {
+      number: orderNumber,
+      date: new Date().toISOString(),
+      revendedora,
+      items: items.map((i) => ({
+        ref: i.ref,
+        name: i.name,
+        color: i.color,
+        size: i.size,
+        quantity: i.quantity,
+        unitPrice: i.price,
+        total: i.price * i.quantity,
+      })),
+      total: totalPrice,
+      totalItems: totalQty,
+      status: "pendente",
+    };
+
+    const orders = localStorage.getItem(ORDERS_KEY);
+    const list = orders ? JSON.parse(orders) : [];
+    list.push(order);
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(list));
+
+    window.open(
+      `https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(storeMsg)}`,
+      "_blank"
+    );
+
+    setTimeout(() => {
+      window.open(
+        `https://wa.me/${PALMIRA_PHONE}?text=${encodeURIComponent(palmiraMsg)}`,
+        "_blank"
+      );
+    }, 1500);
+
+    setItems([]);
+    setIsOpen(false);
+  }, [items]);
+
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
   const totalPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
@@ -111,9 +224,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         removeItem,
         updateQuantity,
         clearCart,
+        checkout,
         totalItems,
         totalPrice,
         minOrder,
+        checkStock,
       }}
     >
       {children}
