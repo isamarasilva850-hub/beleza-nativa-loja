@@ -368,11 +368,9 @@ export default function CartSidebar() {
                           </div>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <p className="text-sm font-bold text-gray-800">
-                            R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}
-                          </p>
+                          <p className="text-sm font-bold text-gray-400">_______</p>
                           <p className="text-[10px] text-gray-400 mt-0.5">
-                            {item.quantity}x R$ {item.price.toFixed(2).replace(".", ",")}
+                            {item.quantity}x
                           </p>
                         </div>
                       </div>
@@ -383,9 +381,7 @@ export default function CartSidebar() {
                   <div className="border-t border-dashed border-gray-200 pt-3">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-bold text-gray-700">TOTAL DO PEDIDO</span>
-                      <span className="text-xl font-bold text-[#7BC9C2]">
-                        R$ {receiptData.total.toFixed(2).replace(".", ",")}
-                      </span>
+                      <span className="text-xl font-bold text-gray-400">_______</span>
                     </div>
                   </div>
 
