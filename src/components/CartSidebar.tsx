@@ -84,10 +84,12 @@ export default function CartSidebar() {
   const [receiptTab, setReceiptTab] = useState<"resumo" | "artes">("artes");
   const [copiedRef, setCopiedRef] = useState<string | null>(null);
   const [legendaMode, setLegendaMode] = useState<Record<string, "completa" | "curta">>({});
+  const [tipoCompra, setTipoCompra] = useState<"revenda" | "uso_proprio">("revenda");
 
   if (!isOpen && !showReceipt) return null;
 
-  const canCheckout = totalPrice >= minOrder;
+  const minOrderAdjusted = tipoCompra === "revenda" ? 600 : 0;
+  const canCheckout = totalPrice >= minOrderAdjusted;
 
   const handleCheckout = () => {
     setShowConfirm(true);
@@ -546,7 +548,9 @@ export default function CartSidebar() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
-                {`PEDIDO MÍNIMO DE R$ ${minOrder.toFixed(2).replace(".", ",")}`}
+                {minOrderAdjusted > 0
+                  ? `PEDIDO MÍNIMO DE R$ ${minOrderAdjusted.toFixed(2).replace(".", ",")}`
+                  : "Valor total suficiente"}
               </>
             )}
           </button>
@@ -578,7 +582,33 @@ export default function CartSidebar() {
               </p>
             </div>
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">Seu nome</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de compra</label>
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => setTipoCompra("revenda")}
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-colors ${
+                  tipoCompra === "revenda"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 text-gray-600 border border-gray-200"
+                }`}
+              >
+                Revenda (Min. R$ 600)
+              </button>
+              <button
+                onClick={() => setTipoCompra("uso_proprio")}
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-colors ${
+                  tipoCompra === "uso_proprio"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 text-gray-600 border border-gray-200"
+                }`}
+              >
+                Uso Próprio
+              </button>
+            </div>
+
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {tipoCompra === "revenda" ? "Nome da revendedora" : "Seu nome"}
+            </label>
             <input
               type="text"
               placeholder="Nome da revendedora..."
