@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 
 interface Order {
-  id: string;
+  number: number;
   date: string;
-  customer: string;
-  items: { name: string; qty: number; price: number }[];
+  revendedora: string;
+  items: { ref: string; name: string; color: string; size: string; quantity: number; unitPrice: number; total: number }[];
   total: number;
+  totalItems: number;
   status: string;
-  vendedor: string;
 }
 
 export default function VendasTempoReal() {
@@ -94,26 +94,26 @@ export default function VendasTempoReal() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Pedido</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Cliente</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Vendedor</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Revendedora</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500">Data</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500">Itens</th>
                   <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500">Total</th>
                   <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredOrders.map((o) => (
-                  <tr key={o.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-700">#{o.id}</td>
-                    <td className="px-4 py-3 text-gray-600">{o.customer}</td>
-                    <td className="px-4 py-3 text-gray-600">{o.vendedor || "—"}</td>
+                  <tr key={o.number} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-mono font-medium text-[#7BC9C2]">#{o.number}</td>
+                    <td className="px-4 py-3 text-gray-700">{o.revendedora}</td>
                     <td className="px-4 py-3 text-gray-500">{new Date(o.date).toLocaleString("pt-BR")}</td>
+                    <td className="px-4 py-3 text-right text-gray-500">{o.totalItems}</td>
                     <td className="px-4 py-3 text-right font-bold text-gray-700">R$ {o.total.toFixed(2).replace(".", ",")}</td>
                     <td className="px-4 py-3 text-center">
                       <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
-                        o.status === "confirmado" ? "bg-green-100 text-green-700" :
-                        o.status === "enviado" ? "bg-blue-100 text-blue-700" :
-                        o.status === "entregue" ? "bg-purple-100 text-purple-700" :
+                        o.status === "confirmado" ? "bg-blue-100 text-blue-700" :
+                        o.status === "enviado" ? "bg-purple-100 text-purple-700" :
+                        o.status === "entregue" ? "bg-green-100 text-green-700" :
                         o.status === "cancelado" ? "bg-red-100 text-red-700" :
                         "bg-yellow-100 text-yellow-700"
                       }`}>

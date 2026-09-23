@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import CartSidebar from "@/components/CartSidebar";
 import { CartProvider } from "@/context/CartContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 export default function LojaLayout({
   children,
@@ -10,12 +11,14 @@ export default function LojaLayout({
   children: React.ReactNode;
 }) {
   return (
-    <CartProvider>
-      <Header />
-      <main className="flex-1">{children}</main>
-      <Footer />
-      <WhatsAppButton />
-      <CartSidebar />
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <Header />
+        <main className="flex-1">{children}</main>
+        <Footer />
+        <WhatsAppButton />
+        <CartSidebar />
+      </CartProvider>
+    </AuthProvider>
   );
 }

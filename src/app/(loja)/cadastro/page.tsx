@@ -3,8 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function Cadastro() {
+  const { register, isLoggedIn } = useAuth();
+  const router = useRouter();
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     name: "",
     company: "",
@@ -24,12 +29,39 @@ export default function Cadastro() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+
     if (form.password !== form.confirmPassword) {
-      alert("As senhas não coincidem!");
+      setError("As senhas não coincidem!");
       return;
     }
+
+    if (form.password.length < 4) {
+      setError("A senha deve ter pelo menos 4 caracteres.");
+      return;
+    }
+
+    const ok = register({
+      email: form.email,
+      name: form.name,
+      phone: form.phone,
+      company: form.company || undefined,
+      cnpj: form.cnpj || undefined,
+      city: form.city || undefined,
+      state: form.state || undefined,
+      address: form.address || undefined,
+      cep: form.cep || undefined,
+      password: form.password,
+      createdAt: new Date().toISOString(),
+    });
+
+    if (!ok) {
+      setError("Este e-mail já está cadastrado. Faça login.");
+      return;
+    }
+
     const msg = [
-      "Olá! Gostaria de me cadastrar como revendedora.",
+      "Nova revendedora cadastrada no site!",
       "",
       `Nome: ${form.name}`,
       form.company ? `Empresa: ${form.company}` : "",
@@ -42,17 +74,42 @@ export default function Cadastro() {
     ]
       .filter(Boolean)
       .join("\n");
+
     window.open(
       `https://wa.me/5535992100072?text=${encodeURIComponent(msg)}`,
       "_blank"
     );
+
+    router.push("/");
   };
+
+  if (isLoggedIn) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center bg-gray-50 px-4">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-4">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Cadastro realizado!</h1>
+          <p className="text-sm text-gray-500 mb-6">Você já está logada e pode ver os preços de atacado.</p>
+          <Link
+            href="/"
+            className="inline-block px-6 py-3 bg-[#7BC9C2] text-white rounded-lg font-bold text-sm hover:bg-[#6ab8b1] transition-colors"
+          >
+            IR PARA A LOJA
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center bg-gray-50 px-4 py-8">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
-          <Image src="/logo.png" alt="Beleza Nativa" width={180} height={60} className="mx-auto mb-4" />
+          <Image src="/logo-bn.png" alt="Beleza Nativa" width={180} height={60} className="mx-auto mb-4 rounded-lg" />
           <h1 className="text-2xl font-bold text-gray-800">Cadastro de Revendedora</h1>
           <p className="text-sm text-gray-500 mt-1">
             Preencha seus dados para se tornar uma parceira Beleza Nativa
@@ -61,7 +118,6 @@ export default function Cadastro() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Personal Info */}
             <div>
               <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">Dados Pessoais</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -96,7 +152,6 @@ export default function Cadastro() {
               </div>
             </div>
 
-            {/* Contact */}
             <div>
               <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">Contato</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -124,7 +179,6 @@ export default function Cadastro() {
               </div>
             </div>
 
-            {/* Address */}
             <div>
               <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">Endereço</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -169,7 +223,6 @@ export default function Cadastro() {
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">Senha de Acesso</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -196,11 +249,15 @@ export default function Cadastro() {
               </div>
             </div>
 
+            {error && (
+              <p className="text-sm text-red-500 text-center">{error}</p>
+            )}
+
             <button
               type="submit"
               className="w-full py-3 bg-[#7BC9C2] text-white rounded-lg font-bold text-sm hover:bg-[#6ab8b1] transition-colors"
             >
-              CADASTRAR VIA WHATSAPP
+              CADASTRAR
             </button>
           </form>
 

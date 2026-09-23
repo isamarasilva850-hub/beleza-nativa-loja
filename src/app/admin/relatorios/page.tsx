@@ -21,7 +21,7 @@ export default function Relatorios() {
   const totalRevenue = orders.reduce((s: number, o: any) => s + (o.total || 0), 0);
   const totalOrders = orders.length;
   const ticketMedio = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-  const activePartners = partners.filter((p: any) => p.active !== false).length;
+  const activePartners = partners.filter((p: any) => p.status === "ativo").length;
   const convertedLeads = leads.filter((l: any) => l.status === "convertido").length;
   const conversionRate = leads.length > 0 ? ((convertedLeads / leads.length) * 100).toFixed(1) : "0";
 

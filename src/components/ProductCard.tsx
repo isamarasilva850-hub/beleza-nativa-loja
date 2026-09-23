@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/data/products";
+import { useAuth } from "@/context/AuthContext";
 
 interface ProductCardProps {
   product: Product;
@@ -11,6 +12,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const hasImage = product.images.length > 0 && !product.images[0].includes("basica-1");
   const retailPrice = product.price * 2;
+  const { isLoggedIn } = useAuth();
 
   return (
     <Link
@@ -41,7 +43,20 @@ export default function ProductCard({ product }: ProductCardProps) {
           R$ {retailPrice.toFixed(2).replace(".", ",")}
         </p>
         <p className="text-[10px] text-gray-400 -mt-0.5 mb-1">para uso próprio</p>
-        <p className="text-[10px] text-primary -mt-0.5 mb-2">Logue-se para ver o preço de revenda</p>
+
+        {isLoggedIn ? (
+          <p className="text-sm font-bold text-primary -mt-0.5 mb-2">
+            R$ {product.price.toFixed(2).replace(".", ",")} <span className="text-[10px] font-normal">para revenda</span>
+          </p>
+        ) : (
+          <Link
+            href="/minha-conta"
+            className="text-[10px] text-primary hover:underline -mt-0.5 mb-2 block"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Logue-se para ver o preço de revenda
+          </Link>
+        )}
 
         <div className="flex gap-1 mb-2">
           {product.variants.map((v, i) => (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface OrderItem {
   ref: string;
@@ -8,16 +8,17 @@ interface OrderItem {
   color: string;
   size: string;
   quantity: number;
-  price: number;
+  unitPrice: number;
+  total: number;
 }
 
 interface Order {
-  id: string;
+  number: number;
   date: string;
-  client: string;
-  phone: string;
+  revendedora: string;
   items: OrderItem[];
   total: number;
+  totalItems: number;
   status: "pendente" | "confirmado" | "enviado" | "entregue" | "cancelado";
 }
 
@@ -29,15 +30,30 @@ const statusColors: Record<string, string> = {
   cancelado: "bg-red-100 text-red-600",
 };
 
+const ORDERS_KEY = "belezanativa_orders";
+
 export default function AdminPedidos() {
-  const [orders] = useState<Order[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("belezanativa_orders");
-      if (saved) return JSON.parse(saved);
-    }
-    return [];
-  });
+  const [orders, setOrders] = useState<Order[]>([]);
   const [statusFilter, setStatusFilter] = useState("");
+  const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(ORDERS_KEY);
+    if (saved) setOrders(JSON.parse(saved));
+  }, []);
+
+  const saveOrders = (updated: Order[]) => {
+    setOrders(updated);
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(updated));
+  };
+
+  const updateStatus = (orderNumber: number, newStatus: Order["status"]) => {
+    saveOrders(
+      orders.map((o) =>
+        o.number === orderNumber ? { ...o, status: newStatus } : o
+      )
+    );
+  };
 
   const filtered = orders.filter((o) => !statusFilter || o.status === statusFilter);
 
@@ -48,9 +64,8 @@ export default function AdminPedidos() {
         <span className="text-sm text-gray-500">{orders.length} pedidos</span>
       </div>
 
-      {/* Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
-        {["pendente", "confirmado", "enviado", "entregue", "cancelado"].map((status) => {
+        {(["pendente", "confirmado", "enviado", "entregue", "cancelado"] as const).map((status) => {
           const count = orders.filter((o) => o.status === status).length;
           return (
             <button
@@ -67,41 +82,83 @@ export default function AdminPedidos() {
         })}
       </div>
 
-      {/* Orders List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {filtered.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-100">
-                <tr className="text-left text-gray-600">
-                  <th className="px-4 py-3 font-semibold">Pedido</th>
-                  <th className="px-4 py-3 font-semibold">Data</th>
-                  <th className="px-4 py-3 font-semibold">Cliente</th>
-                  <th className="px-4 py-3 font-semibold">Itens</th>
-                  <th className="px-4 py-3 font-semibold">Total</th>
-                  <th className="px-4 py-3 font-semibold">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((order) => (
-                  <tr key={order.id} className="border-b border-gray-50 hover:bg-gray-50">
-                    <td className="px-4 py-3 font-mono text-xs font-semibold text-[#7BC9C2]">#{order.id}</td>
-                    <td className="px-4 py-3 text-xs text-gray-500">{order.date}</td>
-                    <td className="px-4 py-3">
-                      <p className="text-xs font-medium text-gray-800">{order.client}</p>
-                      <p className="text-xs text-gray-400">{order.phone}</p>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-gray-500">{order.items.length} itens</td>
-                    <td className="px-4 py-3 text-xs font-semibold text-gray-700">R$ {order.total.toFixed(2).replace(".", ",")}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium capitalize ${statusColors[order.status]}`}>
-                        {order.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="divide-y divide-gray-100">
+            {filtered.map((order) => (
+              <div key={order.number}>
+                <div
+                  className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 cursor-pointer"
+                  onClick={() => setExpandedOrder(expandedOrder === order.number ? null : order.number)}
+                >
+                  <span className="font-mono text-xs font-semibold text-[#7BC9C2] w-16">#{order.number}</span>
+                  <span className="text-xs text-gray-500 w-32">
+                    {new Date(order.date).toLocaleDateString("pt-BR")}
+                  </span>
+                  <span className="text-xs font-medium text-gray-800 flex-1">{order.revendedora}</span>
+                  <span className="text-xs text-gray-500 w-16">{order.totalItems} itens</span>
+                  <span className="text-xs font-semibold text-gray-700 w-24 text-right">
+                    R$ {order.total.toFixed(2).replace(".", ",")}
+                  </span>
+                  <span className={`inline-block px-2 py-1 rounded text-xs font-medium capitalize ${statusColors[order.status]}`}>
+                    {order.status}
+                  </span>
+                  <svg
+                    className={`w-4 h-4 text-gray-400 transition-transform ${expandedOrder === order.number ? "rotate-180" : ""}`}
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+
+                {expandedOrder === order.number && (
+                  <div className="px-4 pb-4 bg-gray-50/50">
+                    <div className="flex items-center gap-2 mb-3 pt-2">
+                      <span className="text-xs font-medium text-gray-500">Alterar status:</span>
+                      {(["pendente", "confirmado", "enviado", "entregue", "cancelado"] as const).map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => updateStatus(order.number, s)}
+                          className={`px-2 py-1 rounded text-[10px] font-medium capitalize transition-colors ${
+                            order.status === s
+                              ? statusColors[s]
+                              : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="text-gray-500 border-b border-gray-200">
+                          <th className="text-left py-1.5 font-medium">Ref</th>
+                          <th className="text-left py-1.5 font-medium">Produto</th>
+                          <th className="text-left py-1.5 font-medium">Cor</th>
+                          <th className="text-left py-1.5 font-medium">Tam</th>
+                          <th className="text-right py-1.5 font-medium">Qtd</th>
+                          <th className="text-right py-1.5 font-medium">Unit.</th>
+                          <th className="text-right py-1.5 font-medium">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {order.items.map((item, i) => (
+                          <tr key={i} className="border-b border-gray-100">
+                            <td className="py-1.5 font-mono text-gray-500">{item.ref}</td>
+                            <td className="py-1.5 text-gray-700">{item.name}</td>
+                            <td className="py-1.5 text-gray-500">{item.color}</td>
+                            <td className="py-1.5 text-gray-500">{item.size}</td>
+                            <td className="py-1.5 text-right text-gray-700">{item.quantity}</td>
+                            <td className="py-1.5 text-right text-gray-500">R$ {item.unitPrice.toFixed(2).replace(".", ",")}</td>
+                            <td className="py-1.5 text-right font-semibold text-gray-700">R$ {item.total.toFixed(2).replace(".", ",")}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         ) : (
           <div className="text-center py-16 text-gray-400">

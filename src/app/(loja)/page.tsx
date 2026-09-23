@@ -81,7 +81,7 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <div className="md:hidden relative w-full" style={{ aspectRatio: "1/1" }}>
+        <div className="md:hidden relative w-full" style={{ paddingBottom: "100%" }}>
           {banners.map((banner, i) => (
             <div
               key={i}
@@ -95,6 +95,7 @@ export default function Home() {
                 className="object-cover"
                 sizes="100vw"
                 priority={i === 0}
+                unoptimized
               />
             </div>
           ))}

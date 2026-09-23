@@ -26,10 +26,10 @@ export default function Vendedores() {
   }, []);
 
   const getStats = (name: string) => {
-    const myOrders = orders.filter((o: any) => o.vendedor === name);
-    const myPartners = partners.filter((p: any) => p.vendedor === name);
-    const myLeads = leads.filter((l: any) => l.vendedor === name);
-    const myAgenda = agenda.filter((a: any) => a.vendedor === name);
+    const myOrders = orders.filter((o: any) => (o.vendedor || o.revendedora || "").toLowerCase().includes(name.toLowerCase()));
+    const myPartners = partners.filter((p: any) => (p.vendedor || "").toLowerCase().includes(name.toLowerCase()));
+    const myLeads = leads.filter((l: any) => (l.vendedor || "").toLowerCase().includes(name.toLowerCase()));
+    const myAgenda = agenda.filter((a: any) => (a.vendedor || "").toLowerCase().includes(name.toLowerCase()));
     const revenue = myOrders.reduce((s: number, o: any) => s + (o.total || 0), 0);
     const converted = myLeads.filter((l: any) => l.status === "convertido").length;
 

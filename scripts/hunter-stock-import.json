@@ -1,0 +1,3302 @@
+[
+  {
+    "ref": "125",
+    "color": "Laranja",
+    "size": "P",
+    "quantity": 5
+  },
+  {
+    "ref": "125",
+    "color": "Laranja",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "125",
+    "color": "Laranja",
+    "size": "GG",
+    "quantity": 9
+  },
+  {
+    "ref": "136",
+    "color": "Pink",
+    "size": "M",
+    "quantity": 3
+  },
+  {
+    "ref": "136",
+    "color": "Pink",
+    "size": "G",
+    "quantity": 6
+  },
+  {
+    "ref": "136",
+    "color": "Pink",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "137",
+    "color": "Oliva",
+    "size": "P",
+    "quantity": 5
+  },
+  {
+    "ref": "137",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "137",
+    "color": "Oliva",
+    "size": "M",
+    "quantity": 8
+  },
+  {
+    "ref": "137",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 8
+  },
+  {
+    "ref": "137",
+    "color": "Oliva",
+    "size": "G",
+    "quantity": 13
+  },
+  {
+    "ref": "137",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 12
+  },
+  {
+    "ref": "160",
+    "color": "Pink",
+    "size": "P",
+    "quantity": 11
+  },
+  {
+    "ref": "160",
+    "color": "Rosa",
+    "size": "P",
+    "quantity": 11
+  },
+  {
+    "ref": "160",
+    "color": "Pink",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "160",
+    "color": "Rosa",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "163",
+    "color": "Estampado",
+    "size": "G",
+    "quantity": 7
+  },
+  {
+    "ref": "166",
+    "color": "Verde",
+    "size": "M",
+    "quantity": 6
+  },
+  {
+    "ref": "166",
+    "color": "Dourado",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "166",
+    "color": "Roxo",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "166",
+    "color": "Verde",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "166",
+    "color": "Dourado",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "166",
+    "color": "Roxo",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "166",
+    "color": "Verde",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "166",
+    "color": "Dourado",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "166",
+    "color": "Roxo",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "168",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "168",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "174",
+    "color": "Estampado",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "174",
+    "color": "Estampado",
+    "size": "M",
+    "quantity": 3
+  },
+  {
+    "ref": "174",
+    "color": "Estampado",
+    "size": "GG",
+    "quantity": 1
+  },
+  {
+    "ref": "188",
+    "color": "Azul Marinho",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "188",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "188",
+    "color": "Azul Marinho",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "188",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 3
+  },
+  {
+    "ref": "191",
+    "color": "Pele",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "191",
+    "color": "Dourado",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "191",
+    "color": "Pele",
+    "size": "GG",
+    "quantity": 3
+  },
+  {
+    "ref": "191",
+    "color": "Dourado",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "209",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "212",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 6
+  },
+  {
+    "ref": "212",
+    "color": "Verde",
+    "size": "P",
+    "quantity": 5
+  },
+  {
+    "ref": "212",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "212",
+    "color": "Verde",
+    "size": "M",
+    "quantity": 1
+  },
+  {
+    "ref": "214",
+    "color": "Verde Neon",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "214",
+    "color": "Azul",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "214",
+    "color": "Amarelo",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "214",
+    "color": "Verde Neon",
+    "size": "M",
+    "quantity": 10
+  },
+  {
+    "ref": "214",
+    "color": "Azul",
+    "size": "M",
+    "quantity": 9
+  },
+  {
+    "ref": "214",
+    "color": "Amarelo",
+    "size": "M",
+    "quantity": 9
+  },
+  {
+    "ref": "214",
+    "color": "Verde Neon",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "214",
+    "color": "Azul",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "214",
+    "color": "Amarelo",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "214",
+    "color": "Verde Neon",
+    "size": "GG",
+    "quantity": 6
+  },
+  {
+    "ref": "214",
+    "color": "Azul",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "214",
+    "color": "Amarelo",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "218",
+    "color": "Verde Neon",
+    "size": "P",
+    "quantity": 6
+  },
+  {
+    "ref": "218",
+    "color": "Azul Marinho",
+    "size": "P",
+    "quantity": 6
+  },
+  {
+    "ref": "218",
+    "color": "Verde Neon",
+    "size": "M",
+    "quantity": 6
+  },
+  {
+    "ref": "218",
+    "color": "Azul Marinho",
+    "size": "M",
+    "quantity": 6
+  },
+  {
+    "ref": "218",
+    "color": "Verde Neon",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "218",
+    "color": "Azul Marinho",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "218",
+    "color": "Verde Neon",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "218",
+    "color": "Azul Marinho",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "220",
+    "color": "Estampado",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "220",
+    "color": "Estampado",
+    "size": "M",
+    "quantity": 7
+  },
+  {
+    "ref": "220",
+    "color": "Estampado",
+    "size": "G",
+    "quantity": 16
+  },
+  {
+    "ref": "220",
+    "color": "Estampado",
+    "size": "GG",
+    "quantity": 14
+  },
+  {
+    "ref": "221",
+    "color": "Estampado",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "221",
+    "color": "Estampado",
+    "size": "GG",
+    "quantity": 7
+  },
+  {
+    "ref": "226",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "226",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 12
+  },
+  {
+    "ref": "228",
+    "color": "Estampado",
+    "size": "G",
+    "quantity": 8
+  },
+  {
+    "ref": "229",
+    "color": "Vermelho",
+    "size": "M",
+    "quantity": 3
+  },
+  {
+    "ref": "229",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "229",
+    "color": "Verde",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "229",
+    "color": "Vermelho",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "230",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "230",
+    "color": "Verde",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "230",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 8
+  },
+  {
+    "ref": "230",
+    "color": "Verde",
+    "size": "M",
+    "quantity": 8
+  },
+  {
+    "ref": "230",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 7
+  },
+  {
+    "ref": "230",
+    "color": "Verde",
+    "size": "G",
+    "quantity": 7
+  },
+  {
+    "ref": "230",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "230",
+    "color": "Verde",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "235",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "235",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 26
+  },
+  {
+    "ref": "235",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 16
+  },
+  {
+    "ref": "235",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 22
+  },
+  {
+    "ref": "236",
+    "color": "Estampado",
+    "size": "GG",
+    "quantity": 8
+  },
+  {
+    "ref": "244",
+    "color": "Estampado",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "244",
+    "color": "Estampado",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "248",
+    "color": "Branco",
+    "size": "P",
+    "quantity": 14
+  },
+  {
+    "ref": "248",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 14
+  },
+  {
+    "ref": "248",
+    "color": "Branco",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "248",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "248",
+    "color": "Branco",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "248",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "248",
+    "color": "Branco",
+    "size": "GG",
+    "quantity": 14
+  },
+  {
+    "ref": "248",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 14
+  },
+  {
+    "ref": "256",
+    "color": "Estampado",
+    "size": "P",
+    "quantity": 11
+  },
+  {
+    "ref": "256",
+    "color": "Estampado",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "256",
+    "color": "Estampado",
+    "size": "GG",
+    "quantity": 1
+  },
+  {
+    "ref": "265",
+    "color": "Estampado",
+    "size": "M",
+    "quantity": 3
+  },
+  {
+    "ref": "265",
+    "color": "Estampado",
+    "size": "G",
+    "quantity": 24
+  },
+  {
+    "ref": "329",
+    "color": "Sortido",
+    "size": "M",
+    "quantity": 6
+  },
+  {
+    "ref": "329",
+    "color": "Sortido",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "329",
+    "color": "Sortido",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "332",
+    "color": "Sortido",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "332",
+    "color": "Sortido",
+    "size": "M",
+    "quantity": 8
+  },
+  {
+    "ref": "332",
+    "color": "Sortido",
+    "size": "G",
+    "quantity": 6
+  },
+  {
+    "ref": "332",
+    "color": "Sortido",
+    "size": "GG",
+    "quantity": 7
+  },
+  {
+    "ref": "410",
+    "color": "Azul Marinho",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "410",
+    "color": "Base",
+    "size": "M",
+    "quantity": 3
+  },
+  {
+    "ref": "410",
+    "color": "Azul Marinho",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "410",
+    "color": "Base",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "410",
+    "color": "Azul Marinho",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "410",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 3
+  },
+  {
+    "ref": "430",
+    "color": "Branco",
+    "size": "P",
+    "quantity": 5
+  },
+  {
+    "ref": "430",
+    "color": "Pele",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "430",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "430",
+    "color": "Branco",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "430",
+    "color": "Pele",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "430",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "430",
+    "color": "Branco",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "433",
+    "color": "Base",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "433",
+    "color": "Vermelho",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "433",
+    "color": "Base",
+    "size": "M",
+    "quantity": 11
+  },
+  {
+    "ref": "433",
+    "color": "Vermelho",
+    "size": "M",
+    "quantity": 10
+  },
+  {
+    "ref": "433",
+    "color": "Base",
+    "size": "G",
+    "quantity": 13
+  },
+  {
+    "ref": "433",
+    "color": "Vermelho",
+    "size": "G",
+    "quantity": 12
+  },
+  {
+    "ref": "433",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 14
+  },
+  {
+    "ref": "433",
+    "color": "Vermelho",
+    "size": "GG",
+    "quantity": 14
+  },
+  {
+    "ref": "443",
+    "color": "Base",
+    "size": "P",
+    "quantity": 10
+  },
+  {
+    "ref": "443",
+    "color": "Branco",
+    "size": "P",
+    "quantity": 7
+  },
+  {
+    "ref": "443",
+    "color": "Pele",
+    "size": "P",
+    "quantity": 7
+  },
+  {
+    "ref": "443",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 7
+  },
+  {
+    "ref": "443",
+    "color": "Base",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "443",
+    "color": "Branco",
+    "size": "M",
+    "quantity": 1
+  },
+  {
+    "ref": "443",
+    "color": "Pele",
+    "size": "M",
+    "quantity": 1
+  },
+  {
+    "ref": "443",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 1
+  },
+  {
+    "ref": "443",
+    "color": "Base",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "443",
+    "color": "Branco",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "443",
+    "color": "Pele",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "443",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "443",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 7
+  },
+  {
+    "ref": "443",
+    "color": "Branco",
+    "size": "GG",
+    "quantity": 5
+  },
+  {
+    "ref": "443",
+    "color": "Pele",
+    "size": "GG",
+    "quantity": 5
+  },
+  {
+    "ref": "443",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 5
+  },
+  {
+    "ref": "466",
+    "color": "Base",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "466",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "466",
+    "color": "Base",
+    "size": "G",
+    "quantity": 5
+  },
+  {
+    "ref": "466",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 5
+  },
+  {
+    "ref": "501",
+    "color": "Base",
+    "size": "M",
+    "quantity": 6
+  },
+  {
+    "ref": "501",
+    "color": "Pele",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "501",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "501",
+    "color": "Base",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "501",
+    "color": "Pele",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "501",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "501",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "501",
+    "color": "Pele",
+    "size": "GG",
+    "quantity": 3
+  },
+  {
+    "ref": "501",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 3
+  },
+  {
+    "ref": "510",
+    "color": "Vinho",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "510",
+    "color": "Branco",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "510",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "510",
+    "color": "Vinho",
+    "size": "M",
+    "quantity": 7
+  },
+  {
+    "ref": "510",
+    "color": "Branco",
+    "size": "M",
+    "quantity": 7
+  },
+  {
+    "ref": "510",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 7
+  },
+  {
+    "ref": "510",
+    "color": "Vinho",
+    "size": "G",
+    "quantity": 11
+  },
+  {
+    "ref": "510",
+    "color": "Branco",
+    "size": "G",
+    "quantity": 9
+  },
+  {
+    "ref": "510",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 9
+  },
+  {
+    "ref": "510",
+    "color": "Vinho",
+    "size": "GG",
+    "quantity": 6
+  },
+  {
+    "ref": "510",
+    "color": "Branco",
+    "size": "GG",
+    "quantity": 6
+  },
+  {
+    "ref": "510",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 6
+  },
+  {
+    "ref": "515",
+    "color": "Vinho",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "515",
+    "color": "Base",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "515",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "515",
+    "color": "Vinho",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "515",
+    "color": "Base",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "515",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "515",
+    "color": "Vinho",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "515",
+    "color": "Base",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "515",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "515",
+    "color": "Vinho",
+    "size": "GG",
+    "quantity": 9
+  },
+  {
+    "ref": "515",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 8
+  },
+  {
+    "ref": "515",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 8
+  },
+  {
+    "ref": "517",
+    "color": "Base",
+    "size": "M",
+    "quantity": 12
+  },
+  {
+    "ref": "517",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 11
+  },
+  {
+    "ref": "517",
+    "color": "Base",
+    "size": "G",
+    "quantity": 12
+  },
+  {
+    "ref": "517",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 12
+  },
+  {
+    "ref": "517",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 11
+  },
+  {
+    "ref": "517",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 10
+  },
+  {
+    "ref": "524",
+    "color": "Azul",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "524",
+    "color": "Pele",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "524",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "524",
+    "color": "Azul",
+    "size": "M",
+    "quantity": 1
+  },
+  {
+    "ref": "524",
+    "color": "Pele",
+    "size": "M",
+    "quantity": 1
+  },
+  {
+    "ref": "524",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 1
+  },
+  {
+    "ref": "524",
+    "color": "Azul",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "524",
+    "color": "Pele",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "524",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "524",
+    "color": "Azul",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "524",
+    "color": "Pele",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "524",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "526",
+    "color": "Branco",
+    "size": "M",
+    "quantity": 6
+  },
+  {
+    "ref": "526",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 6
+  },
+  {
+    "ref": "526",
+    "color": "Branco",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "526",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "526",
+    "color": "Branco",
+    "size": "GG",
+    "quantity": 1
+  },
+  {
+    "ref": "529",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "529",
+    "color": "Verde",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "529",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "529",
+    "color": "Verde",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "529",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "529",
+    "color": "Verde",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "530",
+    "color": "Sortido",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "530",
+    "color": "Sortido",
+    "size": "GG",
+    "quantity": 7
+  },
+  {
+    "ref": "531",
+    "color": "Azul",
+    "size": "P",
+    "quantity": 7
+  },
+  {
+    "ref": "531",
+    "color": "Branco",
+    "size": "P",
+    "quantity": 5
+  },
+  {
+    "ref": "531",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 5
+  },
+  {
+    "ref": "531",
+    "color": "Rosa",
+    "size": "P",
+    "quantity": 5
+  },
+  {
+    "ref": "531",
+    "color": "Goiaba",
+    "size": "P",
+    "quantity": 5
+  },
+  {
+    "ref": "531",
+    "color": "Azul",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "531",
+    "color": "Azul",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "535",
+    "color": "Branco",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "535",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "535",
+    "color": "Vermelho",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "535",
+    "color": "Branco",
+    "size": "GG",
+    "quantity": 1
+  },
+  {
+    "ref": "535",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 1
+  },
+  {
+    "ref": "535",
+    "color": "Vermelho",
+    "size": "GG",
+    "quantity": 1
+  },
+  {
+    "ref": "537",
+    "color": "Vinho",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "537",
+    "color": "Vinho",
+    "size": "M",
+    "quantity": 1
+  },
+  {
+    "ref": "537",
+    "color": "Vinho",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "537",
+    "color": "Branco",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "537",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "537",
+    "color": "Rosa",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "537",
+    "color": "Vinho",
+    "size": "GG",
+    "quantity": 8
+  },
+  {
+    "ref": "537",
+    "color": "Branco",
+    "size": "GG",
+    "quantity": 7
+  },
+  {
+    "ref": "537",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 7
+  },
+  {
+    "ref": "537",
+    "color": "Rosa",
+    "size": "GG",
+    "quantity": 7
+  },
+  {
+    "ref": "541",
+    "color": "Rosa",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "541",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "541",
+    "color": "Rosa",
+    "size": "GG",
+    "quantity": 1
+  },
+  {
+    "ref": "542",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 1
+  },
+  {
+    "ref": "542",
+    "color": "Base",
+    "size": "M",
+    "quantity": 1
+  },
+  {
+    "ref": "542",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 6
+  },
+  {
+    "ref": "542",
+    "color": "Base",
+    "size": "G",
+    "quantity": 6
+  },
+  {
+    "ref": "547",
+    "color": "Vinho",
+    "size": "M",
+    "quantity": 1
+  },
+  {
+    "ref": "551",
+    "color": "Vinho",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "554",
+    "color": "Base",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "554",
+    "color": "Vinho",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "554",
+    "color": "Branco",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "554",
+    "color": "Pele",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "554",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "554",
+    "color": "Base",
+    "size": "M",
+    "quantity": 12
+  },
+  {
+    "ref": "554",
+    "color": "Vinho",
+    "size": "M",
+    "quantity": 9
+  },
+  {
+    "ref": "554",
+    "color": "Branco",
+    "size": "M",
+    "quantity": 9
+  },
+  {
+    "ref": "554",
+    "color": "Pele",
+    "size": "M",
+    "quantity": 9
+  },
+  {
+    "ref": "554",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 9
+  },
+  {
+    "ref": "554",
+    "color": "Base",
+    "size": "G",
+    "quantity": 10
+  },
+  {
+    "ref": "554",
+    "color": "Vinho",
+    "size": "G",
+    "quantity": 9
+  },
+  {
+    "ref": "554",
+    "color": "Branco",
+    "size": "G",
+    "quantity": 9
+  },
+  {
+    "ref": "554",
+    "color": "Pele",
+    "size": "G",
+    "quantity": 9
+  },
+  {
+    "ref": "554",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 9
+  },
+  {
+    "ref": "554",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 9
+  },
+  {
+    "ref": "554",
+    "color": "Vinho",
+    "size": "GG",
+    "quantity": 9
+  },
+  {
+    "ref": "554",
+    "color": "Branco",
+    "size": "GG",
+    "quantity": 9
+  },
+  {
+    "ref": "554",
+    "color": "Pele",
+    "size": "GG",
+    "quantity": 9
+  },
+  {
+    "ref": "554",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 9
+  },
+  {
+    "ref": "562",
+    "color": "Branco",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "562",
+    "color": "Branco",
+    "size": "GG",
+    "quantity": 1
+  },
+  {
+    "ref": "569",
+    "color": "Vinho",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "569",
+    "color": "Base",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "569",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "569",
+    "color": "Vinho",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "569",
+    "color": "Base",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "569",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "569",
+    "color": "Vinho",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "569",
+    "color": "Vinho",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "578",
+    "color": "Vinho",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "578",
+    "color": "Branco",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "578",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "578",
+    "color": "Vinho",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "578",
+    "color": "Branco",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "578",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "583",
+    "color": "Vinho",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "583",
+    "color": "Branco",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "583",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "583",
+    "color": "Vinho",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "583",
+    "color": "Branco",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "583",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "583",
+    "color": "Vinho",
+    "size": "G",
+    "quantity": 5
+  },
+  {
+    "ref": "583",
+    "color": "Branco",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "583",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "583",
+    "color": "Vinho",
+    "size": "GG",
+    "quantity": 6
+  },
+  {
+    "ref": "583",
+    "color": "Branco",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "583",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "588",
+    "color": "Vinho",
+    "size": "P",
+    "quantity": 7
+  },
+  {
+    "ref": "588",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 7
+  },
+  {
+    "ref": "588",
+    "color": "Vinho",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "588",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "588",
+    "color": "Vinho",
+    "size": "GG",
+    "quantity": 5
+  },
+  {
+    "ref": "588",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 5
+  },
+  {
+    "ref": "031",
+    "color": "Vinho",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "031",
+    "color": "Vinho",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "031",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "031",
+    "color": "Rosa",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "031",
+    "color": "Vinho",
+    "size": "G",
+    "quantity": 5
+  },
+  {
+    "ref": "031",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "031",
+    "color": "Rosa",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "031",
+    "color": "Vinho",
+    "size": "GG",
+    "quantity": 10
+  },
+  {
+    "ref": "031",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 9
+  },
+  {
+    "ref": "031",
+    "color": "Rosa",
+    "size": "GG",
+    "quantity": 9
+  },
+  {
+    "ref": "052",
+    "color": "Ciano",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "052",
+    "color": "Ciano",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "052",
+    "color": "Ciano",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "052",
+    "color": "Base",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "052",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "052",
+    "color": "Ciano",
+    "size": "GG",
+    "quantity": 8
+  },
+  {
+    "ref": "052",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 7
+  },
+  {
+    "ref": "052",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 7
+  },
+  {
+    "ref": "039",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 12
+  },
+  {
+    "ref": "039",
+    "color": "Vermelho",
+    "size": "M",
+    "quantity": 12
+  },
+  {
+    "ref": "039",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 14
+  },
+  {
+    "ref": "039",
+    "color": "Vermelho",
+    "size": "G",
+    "quantity": 14
+  },
+  {
+    "ref": "054",
+    "color": "Base",
+    "size": "P",
+    "quantity": 8
+  },
+  {
+    "ref": "054",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 7
+  },
+  {
+    "ref": "054",
+    "color": "Verde",
+    "size": "P",
+    "quantity": 7
+  },
+  {
+    "ref": "054",
+    "color": "Base",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "054",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 3
+  },
+  {
+    "ref": "054",
+    "color": "Verde",
+    "size": "M",
+    "quantity": 3
+  },
+  {
+    "ref": "054",
+    "color": "Base",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "054",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "054",
+    "color": "Verde",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "054",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 3
+  },
+  {
+    "ref": "054",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "054",
+    "color": "Verde",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "055",
+    "color": "Vinho",
+    "size": "P",
+    "quantity": 6
+  },
+  {
+    "ref": "055",
+    "color": "Pele",
+    "size": "P",
+    "quantity": 6
+  },
+  {
+    "ref": "055",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 6
+  },
+  {
+    "ref": "055",
+    "color": "Pink",
+    "size": "P",
+    "quantity": 6
+  },
+  {
+    "ref": "055",
+    "color": "Vermelho",
+    "size": "P",
+    "quantity": 6
+  },
+  {
+    "ref": "055",
+    "color": "Vinho",
+    "size": "M",
+    "quantity": 11
+  },
+  {
+    "ref": "055",
+    "color": "Pele",
+    "size": "M",
+    "quantity": 11
+  },
+  {
+    "ref": "055",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 11
+  },
+  {
+    "ref": "055",
+    "color": "Pink",
+    "size": "M",
+    "quantity": 11
+  },
+  {
+    "ref": "055",
+    "color": "Vermelho",
+    "size": "M",
+    "quantity": 11
+  },
+  {
+    "ref": "055",
+    "color": "Vinho",
+    "size": "G",
+    "quantity": 13
+  },
+  {
+    "ref": "055",
+    "color": "Pele",
+    "size": "G",
+    "quantity": 13
+  },
+  {
+    "ref": "055",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 13
+  },
+  {
+    "ref": "055",
+    "color": "Pink",
+    "size": "G",
+    "quantity": 13
+  },
+  {
+    "ref": "055",
+    "color": "Vermelho",
+    "size": "G",
+    "quantity": 13
+  },
+  {
+    "ref": "055",
+    "color": "Vinho",
+    "size": "GG",
+    "quantity": 14
+  },
+  {
+    "ref": "055",
+    "color": "Pele",
+    "size": "GG",
+    "quantity": 11
+  },
+  {
+    "ref": "055",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 11
+  },
+  {
+    "ref": "055",
+    "color": "Pink",
+    "size": "GG",
+    "quantity": 11
+  },
+  {
+    "ref": "055",
+    "color": "Vermelho",
+    "size": "GG",
+    "quantity": 11
+  },
+  {
+    "ref": "057",
+    "color": "Base",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "057",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "057",
+    "color": "Marrom",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "057",
+    "color": "Base",
+    "size": "M",
+    "quantity": 8
+  },
+  {
+    "ref": "057",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 6
+  },
+  {
+    "ref": "057",
+    "color": "Marrom",
+    "size": "M",
+    "quantity": 6
+  },
+  {
+    "ref": "057",
+    "color": "Base",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "057",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "057",
+    "color": "Marrom",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "057",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "057",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "057",
+    "color": "Marrom",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "059",
+    "color": "Vermelho",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "059",
+    "color": "Base",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "059",
+    "color": "Vinho",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "059",
+    "color": "Branco",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "059",
+    "color": "Verde",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "059",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "059",
+    "color": "Cereja",
+    "size": "P",
+    "quantity": 1
+  },
+  {
+    "ref": "059",
+    "color": "Vermelho",
+    "size": "M",
+    "quantity": 1
+  },
+  {
+    "ref": "059",
+    "color": "Vermelho",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "059",
+    "color": "Vermelho",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "059",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "059",
+    "color": "Vinho",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "059",
+    "color": "Branco",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "059",
+    "color": "Verde",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "059",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "059",
+    "color": "Cereja",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "062",
+    "color": "Azul Marinho",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "062",
+    "color": "Base",
+    "size": "M",
+    "quantity": 3
+  },
+  {
+    "ref": "062",
+    "color": "Branco",
+    "size": "M",
+    "quantity": 3
+  },
+  {
+    "ref": "062",
+    "color": "Pele",
+    "size": "M",
+    "quantity": 3
+  },
+  {
+    "ref": "062",
+    "color": "Oliva",
+    "size": "M",
+    "quantity": 3
+  },
+  {
+    "ref": "062",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 3
+  },
+  {
+    "ref": "062",
+    "color": "Marrom",
+    "size": "M",
+    "quantity": 3
+  },
+  {
+    "ref": "062",
+    "color": "Azul Marinho",
+    "size": "G",
+    "quantity": 7
+  },
+  {
+    "ref": "062",
+    "color": "Base",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "062",
+    "color": "Branco",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "062",
+    "color": "Pele",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "062",
+    "color": "Oliva",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "062",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "062",
+    "color": "Marrom",
+    "size": "G",
+    "quantity": 2
+  },
+  {
+    "ref": "062",
+    "color": "Azul Marinho",
+    "size": "GG",
+    "quantity": 3
+  },
+  {
+    "ref": "062",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "062",
+    "color": "Branco",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "062",
+    "color": "Pele",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "062",
+    "color": "Oliva",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "062",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "062",
+    "color": "Marrom",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "067",
+    "color": "Cinza",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "079",
+    "color": "Amarelo",
+    "size": "P",
+    "quantity": 5
+  },
+  {
+    "ref": "079",
+    "color": "Azul",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "079",
+    "color": "Vermelho",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "079",
+    "color": "Verde",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "079",
+    "color": "Creme",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "079",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "079",
+    "color": "Amarelo",
+    "size": "M",
+    "quantity": 7
+  },
+  {
+    "ref": "079",
+    "color": "Azul",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "079",
+    "color": "Vermelho",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "079",
+    "color": "Verde",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "079",
+    "color": "Creme",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "079",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "079",
+    "color": "Amarelo",
+    "size": "G",
+    "quantity": 7
+  },
+  {
+    "ref": "079",
+    "color": "Azul",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "079",
+    "color": "Vermelho",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "079",
+    "color": "Verde",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "079",
+    "color": "Creme",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "079",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "079",
+    "color": "Amarelo",
+    "size": "GG",
+    "quantity": 8
+  },
+  {
+    "ref": "079",
+    "color": "Azul",
+    "size": "GG",
+    "quantity": 6
+  },
+  {
+    "ref": "079",
+    "color": "Vermelho",
+    "size": "GG",
+    "quantity": 6
+  },
+  {
+    "ref": "079",
+    "color": "Verde",
+    "size": "GG",
+    "quantity": 6
+  },
+  {
+    "ref": "079",
+    "color": "Creme",
+    "size": "GG",
+    "quantity": 6
+  },
+  {
+    "ref": "079",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 6
+  },
+  {
+    "ref": "089",
+    "color": "Base",
+    "size": "P",
+    "quantity": 7
+  },
+  {
+    "ref": "089",
+    "color": "Pele",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "089",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "089",
+    "color": "Marrom",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "089",
+    "color": "Vermelho",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "089",
+    "color": "Base",
+    "size": "M",
+    "quantity": 7
+  },
+  {
+    "ref": "089",
+    "color": "Pele",
+    "size": "M",
+    "quantity": 7
+  },
+  {
+    "ref": "089",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 7
+  },
+  {
+    "ref": "089",
+    "color": "Marrom",
+    "size": "M",
+    "quantity": 7
+  },
+  {
+    "ref": "089",
+    "color": "Vermelho",
+    "size": "M",
+    "quantity": 7
+  },
+  {
+    "ref": "089",
+    "color": "Base",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "089",
+    "color": "Pele",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "089",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "089",
+    "color": "Marrom",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "089",
+    "color": "Vermelho",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "089",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "089",
+    "color": "Pele",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "089",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "089",
+    "color": "Marrom",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "089",
+    "color": "Vermelho",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "084",
+    "color": "Sortido",
+    "size": "P",
+    "quantity": 13
+  },
+  {
+    "ref": "084",
+    "color": "Sortido",
+    "size": "M",
+    "quantity": 29
+  },
+  {
+    "ref": "084",
+    "color": "Sortido",
+    "size": "G",
+    "quantity": 27
+  },
+  {
+    "ref": "091",
+    "color": "Base",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "091",
+    "color": "Rosa",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "091",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "091",
+    "color": "Verde",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "091",
+    "color": "Base",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "091",
+    "color": "Rosa",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "091",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "091",
+    "color": "Verde",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "091",
+    "color": "Base",
+    "size": "G",
+    "quantity": 1
+  },
+  {
+    "ref": "091",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 6
+  },
+  {
+    "ref": "091",
+    "color": "Rosa",
+    "size": "GG",
+    "quantity": 3
+  },
+  {
+    "ref": "091",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 3
+  },
+  {
+    "ref": "091",
+    "color": "Verde",
+    "size": "GG",
+    "quantity": 3
+  },
+  {
+    "ref": "096",
+    "color": "Base",
+    "size": "P",
+    "quantity": 5
+  },
+  {
+    "ref": "096",
+    "color": "Pele",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "096",
+    "color": "Rosa",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "096",
+    "color": "Oliva",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "096",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "096",
+    "color": "Verde",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "096",
+    "color": "Pink",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "096",
+    "color": "Base",
+    "size": "M",
+    "quantity": 10
+  },
+  {
+    "ref": "096",
+    "color": "Pele",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "096",
+    "color": "Rosa",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "096",
+    "color": "Oliva",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "096",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "096",
+    "color": "Verde",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "096",
+    "color": "Pink",
+    "size": "M",
+    "quantity": 5
+  },
+  {
+    "ref": "096",
+    "color": "Base",
+    "size": "G",
+    "quantity": 11
+  },
+  {
+    "ref": "096",
+    "color": "Pele",
+    "size": "G",
+    "quantity": 10
+  },
+  {
+    "ref": "096",
+    "color": "Rosa",
+    "size": "G",
+    "quantity": 10
+  },
+  {
+    "ref": "096",
+    "color": "Oliva",
+    "size": "G",
+    "quantity": 10
+  },
+  {
+    "ref": "096",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 10
+  },
+  {
+    "ref": "096",
+    "color": "Verde",
+    "size": "G",
+    "quantity": 10
+  },
+  {
+    "ref": "096",
+    "color": "Pink",
+    "size": "G",
+    "quantity": 10
+  },
+  {
+    "ref": "096",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 11
+  },
+  {
+    "ref": "096",
+    "color": "Pele",
+    "size": "GG",
+    "quantity": 5
+  },
+  {
+    "ref": "096",
+    "color": "Rosa",
+    "size": "GG",
+    "quantity": 5
+  },
+  {
+    "ref": "096",
+    "color": "Oliva",
+    "size": "GG",
+    "quantity": 5
+  },
+  {
+    "ref": "096",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 5
+  },
+  {
+    "ref": "096",
+    "color": "Verde",
+    "size": "GG",
+    "quantity": 5
+  },
+  {
+    "ref": "096",
+    "color": "Pink",
+    "size": "GG",
+    "quantity": 5
+  },
+  {
+    "ref": "025",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 3
+  },
+  {
+    "ref": "025",
+    "color": "Vermelho",
+    "size": "P",
+    "quantity": 2
+  },
+  {
+    "ref": "025",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "025",
+    "color": "Vermelho",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "025",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 6
+  },
+  {
+    "ref": "025",
+    "color": "Vermelho",
+    "size": "G",
+    "quantity": 5
+  },
+  {
+    "ref": "025",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "025",
+    "color": "Vermelho",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "041",
+    "color": "Cereja",
+    "size": "P",
+    "quantity": 6
+  },
+  {
+    "ref": "041",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 5
+  },
+  {
+    "ref": "041",
+    "color": "Vermelho",
+    "size": "P",
+    "quantity": 5
+  },
+  {
+    "ref": "041",
+    "color": "Cereja",
+    "size": "M",
+    "quantity": 4
+  },
+  {
+    "ref": "041",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "041",
+    "color": "Vermelho",
+    "size": "M",
+    "quantity": 2
+  },
+  {
+    "ref": "041",
+    "color": "Cereja",
+    "size": "G",
+    "quantity": 9
+  },
+  {
+    "ref": "041",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 7
+  },
+  {
+    "ref": "041",
+    "color": "Vermelho",
+    "size": "G",
+    "quantity": 7
+  },
+  {
+    "ref": "041",
+    "color": "Cereja",
+    "size": "GG",
+    "quantity": 4
+  },
+  {
+    "ref": "041",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "041",
+    "color": "Vermelho",
+    "size": "GG",
+    "quantity": 2
+  },
+  {
+    "ref": "073",
+    "color": "Base",
+    "size": "P",
+    "quantity": 5
+  },
+  {
+    "ref": "073",
+    "color": "Branco",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "073",
+    "color": "Dourado",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "073",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 4
+  },
+  {
+    "ref": "073",
+    "color": "Base",
+    "size": "M",
+    "quantity": 10
+  },
+  {
+    "ref": "073",
+    "color": "Branco",
+    "size": "M",
+    "quantity": 8
+  },
+  {
+    "ref": "073",
+    "color": "Dourado",
+    "size": "M",
+    "quantity": 8
+  },
+  {
+    "ref": "073",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 8
+  },
+  {
+    "ref": "073",
+    "color": "Base",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "073",
+    "color": "Branco",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "073",
+    "color": "Dourado",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "073",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 4
+  },
+  {
+    "ref": "073",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 5
+  },
+  {
+    "ref": "073",
+    "color": "Branco",
+    "size": "GG",
+    "quantity": 3
+  },
+  {
+    "ref": "073",
+    "color": "Dourado",
+    "size": "GG",
+    "quantity": 3
+  },
+  {
+    "ref": "073",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 3
+  },
+  {
+    "ref": "061",
+    "color": "Azul Marinho",
+    "size": "M",
+    "quantity": 8
+  },
+  {
+    "ref": "061",
+    "color": "Base",
+    "size": "M",
+    "quantity": 6
+  },
+  {
+    "ref": "061",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 6
+  },
+  {
+    "ref": "061",
+    "color": "Rosa",
+    "size": "M",
+    "quantity": 6
+  },
+  {
+    "ref": "061",
+    "color": "Azul Marinho",
+    "size": "G",
+    "quantity": 3
+  },
+  {
+    "ref": "051",
+    "color": "Azul",
+    "size": "P",
+    "quantity": 10
+  },
+  {
+    "ref": "051",
+    "color": "Base",
+    "size": "P",
+    "quantity": 9
+  },
+  {
+    "ref": "051",
+    "color": "Preto",
+    "size": "P",
+    "quantity": 9
+  },
+  {
+    "ref": "051",
+    "color": "Azul",
+    "size": "M",
+    "quantity": 9
+  },
+  {
+    "ref": "051",
+    "color": "Base",
+    "size": "M",
+    "quantity": 7
+  },
+  {
+    "ref": "051",
+    "color": "Preto",
+    "size": "M",
+    "quantity": 7
+  },
+  {
+    "ref": "051",
+    "color": "Azul",
+    "size": "G",
+    "quantity": 8
+  },
+  {
+    "ref": "051",
+    "color": "Base",
+    "size": "G",
+    "quantity": 8
+  },
+  {
+    "ref": "051",
+    "color": "Preto",
+    "size": "G",
+    "quantity": 8
+  },
+  {
+    "ref": "051",
+    "color": "Azul",
+    "size": "GG",
+    "quantity": 9
+  },
+  {
+    "ref": "051",
+    "color": "Base",
+    "size": "GG",
+    "quantity": 8
+  },
+  {
+    "ref": "051",
+    "color": "Preto",
+    "size": "GG",
+    "quantity": 8
+  },
+  {
+    "ref": "029",
+    "color": "Estampado",
+    "size": "P",
+    "quantity": 6
+  },
+  {
+    "ref": "029",
+    "color": "Estampado",
+    "size": "G",
+    "quantity": 1
+  }
+]

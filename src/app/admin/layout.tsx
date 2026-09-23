@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const sections = [
   {
@@ -58,9 +58,62 @@ const sections = [
   },
 ];
 
+const ADMIN_KEY = "belezanativa_admin_auth";
+const ADMIN_PASS = "bn2026";
+
+function AdminGate({ onAuth }: { onAuth: () => void }) {
+  const [pass, setPass] = useState("");
+  const [error, setError] = useState(false);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (pass === ADMIN_PASS) {
+      sessionStorage.setItem(ADMIN_KEY, "1");
+      onAuth();
+    } else {
+      setError(true);
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm space-y-4">
+        <div className="text-center">
+          <div className="w-14 h-14 bg-[#7BC9C2] rounded-xl flex items-center justify-center text-white font-bold text-xl mx-auto mb-3">BN</div>
+          <h1 className="text-lg font-bold text-gray-800">Painel Administrativo</h1>
+          <p className="text-sm text-gray-500">Digite a senha para acessar</p>
+        </div>
+        <input
+          type="password"
+          value={pass}
+          onChange={e => { setPass(e.target.value); setError(false); }}
+          placeholder="Senha"
+          className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7BC9C2] ${error ? "border-red-400" : "border-gray-300"}`}
+          autoFocus
+        />
+        {error && <p className="text-xs text-red-500 text-center">Senha incorreta</p>}
+        <button type="submit" className="w-full bg-[#7BC9C2] hover:bg-[#5fb3ac] text-white py-3 rounded-lg text-sm font-semibold transition-colors">
+          Entrar
+        </button>
+        <Link href="/" className="block text-center text-xs text-gray-400 hover:text-gray-600">← Voltar à loja</Link>
+      </form>
+    </div>
+  );
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    setAuthenticated(sessionStorage.getItem(ADMIN_KEY) === "1");
+    setChecking(false);
+  }, []);
+
+  if (checking) return null;
+  if (!authenticated) return <AdminGate onAuth={() => setAuthenticated(true)} />;
 
   return (
     <div className="flex h-screen bg-gray-50">
