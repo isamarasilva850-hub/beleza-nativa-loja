@@ -6,6 +6,7 @@ import { products } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import Sidebar from "@/components/Sidebar";
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 
 const banners = [
   { src: "/banners/banner-desktop-1.jpg", mobileSrc: "/banners/banner-principal-1.jpg", alt: "Sua beleza começa por dentro" },
@@ -14,6 +15,7 @@ const banners = [
 ];
 
 export default function Home() {
+  const searchParams = useSearchParams();
   const [currentBanner, setCurrentBanner] = useState(0);
   const hoveringRef = useRef(false);
   const [filters, setFilters] = useState({
@@ -33,6 +35,16 @@ export default function Home() {
   const prevBanner = useCallback(() => {
     setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
   }, []);
+
+  useEffect(() => {
+    const genero = searchParams.get("genero");
+    const categoria = searchParams.get("categoria");
+    setFilters((prev) => ({
+      ...prev,
+      gender: genero || null,
+      category: categoria || null,
+    }));
+  }, [searchParams]);
 
   useEffect(() => {
     const tick = () => {
