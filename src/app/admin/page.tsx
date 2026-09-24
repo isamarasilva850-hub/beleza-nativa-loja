@@ -16,6 +16,8 @@ export default function AdminDashboard() {
   const [stockTotal, setStockTotal] = useState(0);
   const [partnersCount, setPartnersCount] = useState(0);
   const [ordersCount, setOrdersCount] = useState(0);
+  const [crmClientes, setCrmClientes] = useState(0);
+  const [crmLeads, setCrmLeads] = useState(0);
 
   useEffect(() => {
     const stock = localStorage.getItem("belezanativa_stock");
@@ -27,6 +29,12 @@ export default function AdminDashboard() {
     if (partners) setPartnersCount(JSON.parse(partners).filter((p: { status: string }) => p.status === "ativo").length);
     const orders = localStorage.getItem("belezanativa_orders");
     if (orders) setOrdersCount(JSON.parse(orders).length);
+
+    // CRM Data
+    const crmClientes = localStorage.getItem("belezanativa_crm_clientes");
+    if (crmClientes) setCrmClientes(JSON.parse(crmClientes).length);
+    const crmLeads = localStorage.getItem("belezanativa_crm_leads");
+    if (crmLeads) setCrmLeads(JSON.parse(crmLeads).length);
   }, []);
 
   const today = new Date();
@@ -37,7 +45,7 @@ export default function AdminDashboard() {
       <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <div className="flex items-center gap-3">
             <div className="bg-blue-500 w-10 h-10 rounded-lg flex items-center justify-center">
@@ -86,10 +94,19 @@ export default function AdminDashboard() {
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-800">{stockTotal}</p>
-              <p className="text-xs text-gray-500">Peças em Estoque</p>
+              <p className="text-xs text-gray-500">Peças</p>
             </div>
           </div>
         </div>
+        <Link href="/admin/crm" className="bg-gradient-to-br from-[#7BC9C2] to-[#5fb3ac] rounded-xl shadow-sm border border-[#7BC9C2]/30 p-4 text-white hover:shadow-md transition-all">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xl">📊</div>
+            <div>
+              <p className="text-2xl font-bold">{crmClientes + crmLeads}</p>
+              <p className="text-xs opacity-90">CRM (C+L)</p>
+            </div>
+          </div>
+        </Link>
       </div>
 
       {/* Funil de Vendas */}
