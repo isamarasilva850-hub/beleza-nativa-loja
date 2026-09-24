@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/data/products";
 import { useAuth } from "@/context/AuthContext";
+import { useEffect, useState } from "react";
 
 interface ProductCardProps {
   product: Product;
@@ -13,6 +14,21 @@ export default function ProductCard({ product }: ProductCardProps) {
   const hasImage = product.images.length > 0 && !product.images[0].includes("basica-1");
   const retailPrice = product.price * 2;
   const { isLoggedIn } = useAuth();
+  const [colorOverrides, setColorOverrides] = useState<any[]>([]);
+
+  useEffect(() => {
+    try {
+      const overrides = JSON.parse(localStorage.getItem("belezanativa_color_overrides") || "[]");
+      setColorOverrides(overrides);
+    } catch {}
+  }, []);
+
+  const getColorName = (originalColor: string) => {
+    const override = colorOverrides.find(
+      (o: any) => o.productRef === product.ref && o.originalColor === originalColor
+    );
+    return override ? override.newColor : originalColor;
+  };
 
   return (
     <Link
@@ -64,7 +80,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               key={`${v.color}-${i}`}
               className="w-5 h-5 rounded-full border border-gray-300"
               style={{ backgroundColor: v.colorHex }}
-              title={v.color}
+              title={getColorName(v.color)}
             />
           ))}
         </div>
