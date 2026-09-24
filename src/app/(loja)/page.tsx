@@ -92,12 +92,13 @@ export default function Home() {
   }, [searchParams]);
 
   useEffect(() => {
+    let timerId: NodeJS.Timeout;
     const tick = () => {
       nextBanner();
       const speed = hoveringRef.current ? 1500 : 5000;
       timerId = setTimeout(tick, speed);
     };
-    let timerId = setTimeout(tick, 5000);
+    timerId = setTimeout(tick, 5000);
     return () => clearTimeout(timerId);
   }, [nextBanner]);
 
