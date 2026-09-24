@@ -112,9 +112,15 @@ export default function AdminProdutosUpload() {
         nome: formData.name,
         descricao: `${formData.color ? `Cor: ${formData.color}` : ''} | Gênero: ${formData.gender}`,
         grupo_id: grupoId,
-        preco_venda: parseFloat(formData.price),
+        subgrupo_id: null,
+        marca_id: null,
+        unidade_medida_id: null,
         preco_custo: parseFloat(formData.price) * 0.5,
+        preco_venda: parseFloat(formData.price),
         estoque_minimo: 5,
+        peso: 0,
+        codigo_barras: null,
+        ncm: null,
       };
 
       const productRes = await fetch("/api/erp", {

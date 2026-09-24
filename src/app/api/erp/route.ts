@@ -1,26 +1,35 @@
 export async function POST(req: Request) {
   try {
-    const { method, path, body } = await req.json();
+    const body = await req.json();
+    const { method, path, body: erpBody } = body;
     const erpUrl = `http://localhost:3000${path}`;
 
-    console.log(`[ERP Proxy] ${method} ${erpUrl}`, JSON.stringify(body).substring(0, 100));
-
-    const response = await fetch(erpUrl, {
-      method,
+    const erpResponse = await fetch(erpUrl, {
+      method: method || "POST",
       headers: { "Content-Type": "application/json" },
-      body: method !== "GET" ? JSON.stringify(body) : undefined,
+      body: JSON.stringify(erpBody),
     });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`ERP error: ${response.status} - ${errText}`);
+    const responseText = await erpResponse.text();
+
+    if (!erpResponse.ok) {
+      throw new Error(`ERP responded with ${erpResponse.status}: ${responseText}`);
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = { success: true };
+    }
+
     return Response.json(data);
   } catch (error) {
-    console.error("ERP proxy error:", error);
-    return Response.json({ error: String(error) }, { status: 500 });
+    console.error("[ERP Proxy Error]", error);
+    return Response.json(
+      { error: error instanceof Error ? error.message : String(error) },
+      { status: 500 }
+    );
   }
 }
 
