@@ -104,7 +104,7 @@ export default function AdminProdutosUpload() {
       };
 
       const grupoNome = mapCategoryToGrupo[formData.category] || "Lingerie";
-      const grupos = await fetch("http://localhost:3000/api/cadastro/grupos").then(r => r.json());
+      const grupos = await fetch("/api/erp?path=/api/cadastro/grupos").then(r => r.json());
       let grupoId = grupos.find((g: any) => g.nome === grupoNome)?.id || grupos[0]?.id;
 
       const productPayload = {
@@ -117,26 +117,34 @@ export default function AdminProdutosUpload() {
         estoque_minimo: 5,
       };
 
-      const productRes = await fetch("http://localhost:3000/api/cadastro/produtos", {
+      const productRes = await fetch("/api/erp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(productPayload),
+        body: JSON.stringify({
+          method: "POST",
+          path: "/api/cadastro/produtos",
+          body: productPayload,
+        }),
       });
 
       if (!productRes.ok) throw new Error("Erro ao criar produto na ERP");
 
       const { id: productId } = await productRes.json();
 
-      const estoque_res = await fetch("http://localhost:3000/api/estoque/movimentos", {
+      const estoque_res = await fetch("/api/erp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          produto_id: productId,
-          tipo_movimento: "entrada_inicial",
-          entrada_saida: "E",
-          quantidade: parseInt(formData.quantity),
-          custo_unitario: parseFloat(formData.price) * 0.5,
-          observacao: `Entrada via Upload - ${formData.color || "Padrão"}`,
+          method: "POST",
+          path: "/api/estoque/movimentos",
+          body: {
+            produto_id: productId,
+            tipo_movimento: "entrada_inicial",
+            entrada_saida: "E",
+            quantidade: parseInt(formData.quantity),
+            custo_unitario: parseFloat(formData.price) * 0.5,
+            observacao: `Entrada via Upload - ${formData.color || "Padrão"}`,
+          },
         }),
       });
 
