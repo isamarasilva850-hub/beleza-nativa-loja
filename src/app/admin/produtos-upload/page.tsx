@@ -81,7 +81,7 @@ export default function AdminProdutosUpload() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -96,42 +96,71 @@ export default function AdminProdutosUpload() {
       return;
     }
 
-    const newProduct = {
-      ref: formData.ref,
-      name: formData.name,
-      category: formData.category,
-      gender: formData.gender,
-      price: parseFloat(formData.price),
-      image: formData.image,
-      variant: {
-        color: formData.color || "Padrão",
-        colorHex: formData.colorHex,
-        sizes: formData.sizes,
-      },
-      quantity: parseInt(formData.quantity),
-      timestamp: new Date().toISOString(),
-    };
+    try {
+      const mapCategoryToGrupo: Record<string, string> = {
+        "Lingerie": "Lingerie",
+        "Moda Praia": "Moda Praia",
+        "Pijama": "Acessorios",
+      };
 
-    const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
-    uploads.push(newProduct);
-    localStorage.setItem("belezanativa_product_uploads", JSON.stringify(uploads));
+      const grupoNome = mapCategoryToGrupo[formData.category] || "Lingerie";
+      const grupos = await fetch("http://localhost:3000/api/cadastro/grupos").then(r => r.json());
+      let grupoId = grupos.find((g: any) => g.nome === grupoNome)?.id || grupos[0]?.id;
 
-    setSuccess(`✅ Produto "${formData.name}" enviado com sucesso!`);
-    setFormData({
-      ref: "",
-      name: "",
-      category: "Lingerie",
-      gender: "Feminino",
-      price: "",
-      color: "",
-      colorHex: "#000000",
-      sizes: [],
-      quantity: "",
-      image: "",
-    });
-    setPreview("");
+      const productPayload = {
+        codigo: formData.ref,
+        nome: formData.name,
+        descricao: `${formData.color ? `Cor: ${formData.color}` : ''} | Gênero: ${formData.gender}`,
+        grupo_id: grupoId,
+        preco_venda: parseFloat(formData.price),
+        preco_custo: parseFloat(formData.price) * 0.5,
+        estoque_minimo: 5,
+      };
 
-    setTimeout(() => setSuccess(""), 3000);
+      const productRes = await fetch("http://localhost:3000/api/cadastro/produtos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productPayload),
+      });
+
+      if (!productRes.ok) throw new Error("Erro ao criar produto na ERP");
+
+      const { id: productId } = await productRes.json();
+
+      const estoque_res = await fetch("http://localhost:3000/api/estoque/movimentos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          produto_id: productId,
+          tipo_movimento: "entrada_inicial",
+          entrada_saida: "E",
+          quantidade: parseInt(formData.quantity),
+          custo_unitario: parseFloat(formData.price) * 0.5,
+          observacao: `Entrada via Upload - ${formData.color || "Padrão"}`,
+        }),
+      });
+
+      if (!estoque_res.ok) throw new Error("Erro ao registrar estoque");
+
+      setSuccess(`✅ Produto "${formData.name}" criado na ERP com sucesso!`);
+      setFormData({
+        ref: "",
+        name: "",
+        category: "Lingerie",
+        gender: "Feminino",
+        price: "",
+        color: "",
+        colorHex: "#000000",
+        sizes: [],
+        quantity: "",
+        image: "",
+      });
+      setPreview("");
+
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      setError(`Erro ao enviar: ${(err as Error).message}`);
+    }
   };
 
   return (
