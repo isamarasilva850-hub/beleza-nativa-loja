@@ -165,15 +165,17 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
           </div>
 
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-semibold text-gray-700">Tamanho:</p>
-              <button
-                onClick={() => setShowSizeChart(true)}
-                className="text-xs text-primary hover:underline font-semibold"
-              >
-                📏 Ver tabela
-              </button>
-            </div>
+            <button
+              onClick={() => setShowSizeChart(true)}
+              className="w-full py-4 bg-gradient-to-r from-[#7BC9C2] to-[#6ab8b1] text-white rounded-lg font-bold text-lg hover:shadow-lg transition-shadow flex items-center justify-center gap-2"
+            >
+              <span className="text-2xl">📏</span>
+              VER TABELA DE TAMANHOS
+            </button>
+          </div>
+
+          <div className="mb-6">
+            <p className="text-sm font-semibold text-gray-700 mb-2">Tamanho:</p>
             <div className="flex flex-wrap gap-2">
               {variant.sizes.map((size) => {
                 const stock = getStock(variant.color, size);

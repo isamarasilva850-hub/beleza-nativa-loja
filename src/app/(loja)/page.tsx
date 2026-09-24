@@ -8,6 +8,18 @@ import Sidebar from "@/components/Sidebar";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
+interface UploadedProduct {
+  ref: string;
+  name: string;
+  category: string;
+  gender: string;
+  price: number;
+  image: string;
+  variant: { color: string; colorHex: string; sizes: string[] };
+  quantity: number;
+  timestamp: string;
+}
+
 const banners = [
   { src: "/banners/banner-desktop-1.jpg", mobileSrc: "/banners/banner-principal-1.jpg", alt: "Sua beleza começa por dentro" },
   { src: "/banners/banner-desktop-2.jpg", mobileSrc: "/banners/banner-principal-2.jpg", alt: "Conforto, renda e confiança em cada detalhe" },
@@ -27,6 +39,14 @@ export default function Home() {
     sortBy: null as string | null,
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [uploadedProducts, setUploadedProducts] = useState<UploadedProduct[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
+      setUploadedProducts(uploads);
+    }
+  }, []);
 
   const nextBanner = useCallback(() => {
     setCurrentBanner((prev) => (prev + 1) % banners.length);
@@ -280,12 +300,40 @@ export default function Home() {
             <Sidebar onFilterChange={(f) => setFilters(f)} />
           </div>
           <div className="flex-1">
+            {uploadedProducts.length > 0 && (
+              <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm font-semibold text-green-700">
+                  ✨ {uploadedProducts.length} produto(s) novo(s) adicionado(s) por Palmira!
+                </p>
+              </div>
+            )}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
+              {uploadedProducts.map((upload, idx) => (
+                <div key={`upload-${idx}`} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+                  <div className="aspect-square bg-gray-200 relative overflow-hidden">
+                    <img src={upload.image} alt={upload.name} className="w-full h-full object-cover" />
+                    <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
+                      NOVO
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <p className="text-xs text-gray-500 font-mono mb-1">REF {upload.ref}</p>
+                    <h3 className="font-semibold text-gray-800 text-sm mb-1 line-clamp-2">{upload.name}</h3>
+                    <p className="text-xs text-gray-500 mb-2">{upload.gender}</p>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="w-5 h-5 rounded-full border-2 border-gray-200" style={{ backgroundColor: upload.variant.colorHex }} title={upload.variant.color} />
+                      <span className="text-xs text-gray-500">{upload.variant.sizes.join(", ")}</span>
+                    </div>
+                    <p className="text-lg font-bold text-primary">R$ {upload.price.toFixed(2).replace(".", ",")}</p>
+                    <p className="text-xs text-gray-500 mt-1">Est: {upload.quantity} un.</p>
+                  </div>
+                </div>
+              ))}
             </div>
-            {filteredProducts.length === 0 && (
+            {filteredProducts.length === 0 && uploadedProducts.length === 0 && (
               <div className="text-center py-12 text-gray-400">
                 <p className="text-lg">Nenhum produto encontrado</p>
                 <p className="text-sm mt-1">Tente alterar os filtros</p>
