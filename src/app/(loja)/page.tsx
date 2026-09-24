@@ -46,27 +46,10 @@ export default function Home() {
 
     const loadProductsFromERP = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/cadastro/produtos");
-        if (!res.ok) throw new Error("Erro ao carregar produtos");
-        const data = await res.json();
-
-        const formatted = data.map((p: any) => ({
-          ref: p.codigo,
-          name: p.nome,
-          category: "Lingerie",
-          gender: "Feminino",
-          price: p.preco_venda || 0,
-          image: "",
-          variant: { color: "Padrão", colorHex: "#7BC9C2", sizes: ["P", "M", "G", "GG"] },
-          quantity: p.estoque_atual || 0,
-          timestamp: p.created_at,
-        }));
-
-        setUploadedProducts(formatted);
-      } catch (err) {
-        console.log("ERP não disponível, usando localStorage");
         const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
         setUploadedProducts(uploads);
+      } catch (err) {
+        console.log("Erro ao carregar produtos do localStorage");
       }
     };
 
