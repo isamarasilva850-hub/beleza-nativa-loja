@@ -92,7 +92,7 @@ export default function CartSidebar() {
   const [receiptTab, setReceiptTab] = useState<"resumo" | "artes">("artes");
   const [copiedRef, setCopiedRef] = useState<string | null>(null);
   const [legendaMode, setLegendaMode] = useState<Record<string, "completa" | "curta">>({});
-  const [tipoCompra, setTipoCompra] = useState<"revenda" | "uso_proprio">("revenda");
+  const [tipoCompra] = useState<"revenda" | "uso_proprio">("uso_proprio");
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
   const [isFirstPurchase, setIsFirstPurchase] = useState(false);
@@ -109,7 +109,7 @@ export default function CartSidebar() {
 
   if (!isOpen && !showReceipt) return null;
 
-  const minOrderAdjusted = tipoCompra === "revenda" ? 600 : 0;
+  const minOrderAdjusted = 0;
   const discountAmount = appliedCoupon ? totalPrice * appliedCoupon.discount : 0;
   const finalPrice = totalPrice - discountAmount;
   const canCheckout = finalPrice >= minOrderAdjusted;
@@ -639,29 +639,6 @@ export default function CartSidebar() {
               </p>
             </div>
 
-            <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de compra</label>
-            <div className="flex gap-2 mb-4">
-              <button
-                onClick={() => setTipoCompra("revenda")}
-                className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-colors ${
-                  tipoCompra === "revenda"
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-100 text-gray-600 border border-gray-200"
-                }`}
-              >
-                Revenda (Min. R$ 600)
-              </button>
-              <button
-                onClick={() => setTipoCompra("uso_proprio")}
-                className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-colors ${
-                  tipoCompra === "uso_proprio"
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-100 text-gray-600 border border-gray-200"
-                }`}
-              >
-                Uso Próprio
-              </button>
-            </div>
 
             <label className="flex items-center gap-2 mb-4 cursor-pointer">
               <input
@@ -673,12 +650,10 @@ export default function CartSidebar() {
               <span className="text-sm text-gray-700 font-medium">É minha primeira compra na loja</span>
             </label>
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {tipoCompra === "revenda" ? "Nome da revendedora" : "Seu nome"}
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Seu nome</label>
             <input
               type="text"
-              placeholder="Nome da revendedora..."
+              placeholder="Seu nome..."
               value={revendedora}
               onChange={(e) => setRevendedora(e.target.value)}
               className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2] mb-4"
