@@ -1,9 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
+
+interface Order {
+  number: number;
+  date: string;
+  totalItems: number;
+  total: number;
+  items?: any[];
+}
 
 export default function MinhaConta() {
   const { isLoggedIn, user, login, logout } = useAuth();
@@ -11,6 +19,14 @@ export default function MinhaConta() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [remember, setRemember] = useState(false);
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && isLoggedIn) {
+      const savedOrders = JSON.parse(localStorage.getItem("belezanativa_orders") || "[]");
+      setOrders(savedOrders.sort((a: Order, b: Order) => b.number - a.number));
+    }
+  }, [isLoggedIn]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +96,37 @@ export default function MinhaConta() {
             </button>
           </div>
 
-          <div className="mt-4 text-center">
+          {orders.length > 0 && (
+            <div className="mt-8 w-full max-w-4xl">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">📋 Histórico de Pedidos</h2>
+              <div className="space-y-3">
+                {orders.map((order) => (
+                  <div key={order.number} className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-xs text-gray-500 font-semibold mb-1">PEDIDO Nº</p>
+                        <p className="text-lg font-bold text-gray-800">#{order.number}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 font-semibold mb-1">DATA</p>
+                        <p className="text-sm text-gray-700">{order.date}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 font-semibold mb-1">ITENS</p>
+                        <p className="text-lg font-bold text-gray-800">{order.totalItems}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-500 font-semibold mb-1">TOTAL</p>
+                        <p className="text-lg font-bold text-primary">R$ {order.total.toFixed(2).replace(".", ",")}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-8 text-center">
             <Link href="/" className="text-sm text-gray-400 hover:text-gray-600">
               ← Voltar à loja
             </Link>

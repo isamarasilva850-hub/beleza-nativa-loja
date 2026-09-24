@@ -104,15 +104,40 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
             <p className="text-xs text-gray-400 mt-1">Preço de varejo (uso próprio)</p>
 
             {isLoggedIn ? (
-              <div className="mt-2 bg-primary/10 border border-primary/20 rounded-lg px-3 py-2">
-                <p className="text-lg font-bold text-primary">
-                  R$ {product.price.toFixed(2).replace(".", ",")}
-                </p>
-                <p className="text-xs text-primary/70">Preço de revenda (atacado)</p>
-              </div>
+              <>
+                <div className="mt-2 bg-primary/10 border border-primary/20 rounded-lg px-3 py-2">
+                  <p className="text-lg font-bold text-primary">
+                    R$ {product.price.toFixed(2).replace(".", ",")}
+                  </p>
+                  <p className="text-xs text-primary/70">Preço de revenda (atacado)</p>
+                </div>
+
+                <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-xs font-bold text-gray-600 mb-3">💰 SEU LUCRO</p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Lucro por unidade:</span>
+                      <span className="text-lg font-bold text-green-600">
+                        R$ {(retailPrice - product.price).toFixed(2).replace(".", ",")}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center pt-2 border-t border-green-200">
+                      <span className="text-sm text-gray-600">Margem de lucro:</span>
+                      <span className="text-lg font-bold text-green-600">
+                        {((((retailPrice - product.price) / retailPrice) * 100).toFixed(1)).replace(".", ",")}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-green-200">
+                    <p className="text-[11px] text-green-700">
+                      Você compra por R$ {product.price.toFixed(2).replace(".", ",")} e suas clientes pagam R$ {retailPrice.toFixed(2).replace(".", ",")}
+                    </p>
+                  </div>
+                </div>
+              </>
             ) : (
               <Link href="/minha-conta" className="text-xs text-primary mt-1 hover:underline block">
-                Logue-se para ver o preço de revenda
+                Logue-se para ver o preço de revenda e seu lucro
               </Link>
             )}
           </div>

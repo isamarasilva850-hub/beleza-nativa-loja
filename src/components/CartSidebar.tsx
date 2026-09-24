@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useCart, CartItem } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import { products } from "@/data/products";
 import { getArteLegenda } from "@/data/artes-legendas";
 
@@ -24,6 +25,12 @@ interface UniqueProduct {
   sizes: string[];
   category: string;
 }
+
+const VALID_COUPONS: Record<string, { discount: number; label: string }> = {
+  "PRIMEIRA_COMPRA": { discount: 0.05, label: "5% de desconto" },
+  "REVENDEDOR10": { discount: 0.10, label: "10% de desconto" },
+  "BN50": { discount: 0.05, label: "5% de desconto" },
+};
 
 function getUniqueProducts(items: CartItem[]): UniqueProduct[] {
   const map: Record<string, UniqueProduct> = {};
@@ -76,6 +83,7 @@ export default function CartSidebar() {
     checkout,
     checkStock,
   } = useCart();
+  const { isLoggedIn, user } = useAuth();
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [revendedora, setRevendedora] = useState("");
@@ -85,11 +93,38 @@ export default function CartSidebar() {
   const [copiedRef, setCopiedRef] = useState<string | null>(null);
   const [legendaMode, setLegendaMode] = useState<Record<string, "completa" | "curta">>({});
   const [tipoCompra, setTipoCompra] = useState<"revenda" | "uso_proprio">("revenda");
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [isFirstPurchase, setIsFirstPurchase] = useState(false);
+
+  const handleFirstPurchaseChange = () => {
+    if (!isFirstPurchase) {
+      setIsFirstPurchase(true);
+      setAppliedCoupon({ code: "PRIMEIRA_COMPRA", discount: 0.10 });
+    } else {
+      setIsFirstPurchase(false);
+      setAppliedCoupon(null);
+    }
+  };
 
   if (!isOpen && !showReceipt) return null;
 
   const minOrderAdjusted = tipoCompra === "revenda" ? 600 : 0;
-  const canCheckout = totalPrice >= minOrderAdjusted;
+  const discountAmount = appliedCoupon ? totalPrice * appliedCoupon.discount : 0;
+  const finalPrice = totalPrice - discountAmount;
+  const canCheckout = finalPrice >= minOrderAdjusted;
+
+  const applyCoupon = () => {
+    const coupon = VALID_COUPONS[couponCode.toUpperCase()];
+    if (coupon) {
+      setAppliedCoupon({ code: couponCode.toUpperCase(), discount: coupon.discount });
+      setCouponCode("");
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+  };
 
   const handleCheckout = () => {
     setShowConfirm(true);
@@ -519,13 +554,35 @@ export default function CartSidebar() {
 
         {/* Footer */}
         <div className="border-t border-gray-200 p-4">
+          {appliedCoupon && (
+            <div className={`mb-4 p-3 rounded-lg text-sm ${
+              isNewCustomer
+                ? "bg-green-50 border border-green-200 text-green-700"
+                : "bg-blue-50 border border-blue-200 text-blue-700"
+            }`}>
+              <p className="font-bold mb-1">
+                {isNewCustomer ? "🎉 Primeira compra!" : "✨ Cupom aplicado!"}
+              </p>
+              <p className="text-xs">
+                Desconto de {(appliedCoupon.discount * 100).toFixed(0)}% - Código: {appliedCoupon.code}
+              </p>
+            </div>
+          )}
+
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-gray-600">
               {totalItems} {totalItems === 1 ? "item" : "itens"} na sacola
             </span>
-            <span className="text-lg font-bold text-primary-dark">
-              R$ {totalPrice.toFixed(2).replace(".", ",")}
-            </span>
+            <div className="text-right">
+              {discountAmount > 0 && (
+                <div className="text-xs text-green-600 font-semibold mb-1">
+                  Desconto: -R$ {discountAmount.toFixed(2).replace(".", ",")}
+                </div>
+              )}
+              <span className="text-lg font-bold text-primary-dark">
+                R$ {finalPrice.toFixed(2).replace(".", ",")}
+              </span>
+            </div>
           </div>
           <button
             disabled={!canCheckout}
@@ -605,6 +662,16 @@ export default function CartSidebar() {
                 Uso Próprio
               </button>
             </div>
+
+            <label className="flex items-center gap-2 mb-4 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isFirstPurchase}
+                onChange={handleFirstPurchaseChange}
+                className="w-4 h-4 rounded border-gray-300 text-green-500 cursor-pointer"
+              />
+              <span className="text-sm text-gray-700 font-medium">É minha primeira compra na loja</span>
+            </label>
 
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {tipoCompra === "revenda" ? "Nome da revendedora" : "Seu nome"}
