@@ -192,7 +192,35 @@ export default function AdminDashboard() {
       </div>
 
       {/* Menu de Gestão - replica Via Shop sections */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* CRM Completo - DESTAQUE */}
+        <Link href="/admin/crm" className="bg-gradient-to-br from-[#7BC9C2] to-[#5fb3ac] rounded-xl shadow-lg border border-[#7BC9C2]/30 p-6 text-white hover:shadow-xl transition-all hover:scale-105">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-bold mb-1">CRM Completo</h3>
+              <p className="text-xs opacity-90">Gerencie clientes e leads</p>
+            </div>
+            <div className="text-4xl">📊</div>
+          </div>
+          <div className="space-y-2 text-xs opacity-90">
+            <div className="flex items-center gap-2">
+              <span>✓</span>
+              <span>Dashboard de KPIs</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>✓</span>
+              <span>Pipeline de Leads</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>✓</span>
+              <span>Carteira de Clientes</span>
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-white/20 text-xs font-semibold">
+            Clique para acessar →
+          </div>
+        </Link>
+
         {/* Gestão de Produtos */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
           <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider mb-3 flex items-center gap-2">
