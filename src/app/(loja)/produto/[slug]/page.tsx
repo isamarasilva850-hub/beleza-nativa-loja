@@ -151,7 +151,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
                     key={size}
                     onClick={() => !outOfStock && setSelectedSize(size)}
                     disabled={outOfStock}
-                    className={`relative min-w-[48px] px-3 py-2 rounded-lg text-sm font-semibold border transition-all ${
+                    className={`relative min-w-[60px] px-3 py-2 rounded-lg text-sm font-semibold border transition-all ${
                       outOfStock
                         ? "border-gray-200 bg-gray-50 text-gray-300 cursor-not-allowed line-through"
                         : isSelected
@@ -159,12 +159,14 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
                         : "border-gray-200 bg-white text-gray-700 hover:border-primary"
                     }`}
                   >
-                    {size}
-                    {!notConfigured && !outOfStock && stock <= 3 && (
-                      <span className="absolute -top-1.5 -right-1.5 bg-amber-500 text-white text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                        {stock}
+                    <div className="flex items-center justify-center gap-1">
+                      <span>{size}</span>
+                      <span className={`text-xs font-normal ${
+                        outOfStock ? "text-gray-400" : stock <= 3 ? "text-amber-600 font-bold" : "text-gray-500"
+                      }`}>
+                        ({notConfigured ? "?" : stock})
                       </span>
-                    )}
+                    </div>
                   </button>
                 );
               })}
