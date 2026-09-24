@@ -19,6 +19,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [stockMap, setStockMap] = useState<Record<string, number>>({});
+  const [showSizeChart, setShowSizeChart] = useState(false);
 
   useEffect(() => {
     if (!product) return;
@@ -164,7 +165,15 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
           </div>
 
           <div className="mb-6">
-            <p className="text-sm font-semibold text-gray-700 mb-2">Tamanho:</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-semibold text-gray-700">Tamanho:</p>
+              <button
+                onClick={() => setShowSizeChart(true)}
+                className="text-xs text-primary hover:underline font-semibold"
+              >
+                📏 Ver tabela
+              </button>
+            </div>
             <div className="flex flex-wrap gap-2">
               {variant.sizes.map((size) => {
                 const stock = getStock(variant.color, size);
@@ -248,6 +257,83 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
             </button>
           </div>
 
+
+          {showSizeChart && (
+            <>
+              <div className="fixed inset-0 bg-black/50 z-50" onClick={() => setShowSizeChart(false)} />
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <div className="sticky top-0 bg-[#7BC9C2] text-white px-6 py-4 flex items-center justify-between">
+                    <h2 className="text-lg font-bold">📏 Guia de Tamanhos</h2>
+                    <button onClick={() => setShowSizeChart(false)} className="text-2xl hover:opacity-70">&times;</button>
+                  </div>
+
+                  <div className="p-6 space-y-6">
+                    <div>
+                      <h3 className="font-bold text-gray-800 mb-3">Como medir:</h3>
+                      <ul className="space-y-2 text-sm text-gray-600">
+                        <li><strong>Busto:</strong> Meça ao redor do peito, na parte mais saliente, sem apertar</li>
+                        <li><strong>Cintura:</strong> Meça a circunferência mais fina da sua cintura</li>
+                        <li><strong>Quadril:</strong> Meça a circunferência mais saliente do quadril</li>
+                      </ul>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm border-collapse">
+                        <thead>
+                          <tr className="bg-gray-100">
+                            <th className="border border-gray-300 px-3 py-2 text-left font-bold">Tamanho</th>
+                            <th className="border border-gray-300 px-3 py-2 text-center font-bold">Busto</th>
+                            <th className="border border-gray-300 px-3 py-2 text-center font-bold">Cintura</th>
+                            <th className="border border-gray-300 px-3 py-2 text-center font-bold">Quadril</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-gray-700">
+                          <tr>
+                            <td className="border border-gray-300 px-3 py-2 font-bold bg-blue-50">P</td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">80-85cm</td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">62-67cm</td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">88-93cm</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-gray-300 px-3 py-2 font-bold bg-blue-50">M</td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">86-91cm</td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">68-73cm</td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">94-99cm</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-gray-300 px-3 py-2 font-bold bg-blue-50">G</td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">92-97cm</td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">74-79cm</td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">100-105cm</td>
+                          </tr>
+                          <tr>
+                            <td className="border border-gray-300 px-3 py-2 font-bold bg-blue-50">GG</td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">98-103cm</td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">80-85cm</td>
+                            <td className="border border-gray-300 px-3 py-2 text-center">106-111cm</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <p className="text-xs text-blue-700">
+                        <strong>💡 Dica:</strong> Se você está entre dois tamanhos, escolha o maior para mais conforto!
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => setShowSizeChart(false)}
+                      className="w-full py-2 bg-[#7BC9C2] text-white rounded-lg font-bold text-sm hover:bg-[#6ab8b1]"
+                    >
+                      Fechar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="space-y-4 border-t border-gray-100 pt-6">
             {product.description && (
