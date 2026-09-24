@@ -556,12 +556,12 @@ export default function CartSidebar() {
         <div className="border-t border-gray-200 p-4">
           {appliedCoupon && (
             <div className={`mb-4 p-3 rounded-lg text-sm ${
-              isNewCustomer
+              isFirstPurchase
                 ? "bg-green-50 border border-green-200 text-green-700"
                 : "bg-blue-50 border border-blue-200 text-blue-700"
             }`}>
               <p className="font-bold mb-1">
-                {isNewCustomer ? "🎉 Primeira compra!" : "✨ Cupom aplicado!"}
+                {isFirstPurchase ? "🎉 Primeira compra!" : "✨ Cupom aplicado!"}
               </p>
               <p className="text-xs">
                 Desconto de {(appliedCoupon.discount * 100).toFixed(0)}% - Código: {appliedCoupon.code}

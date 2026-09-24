@@ -9,7 +9,7 @@ const geistSans = Geist({
 
 export const metadata: Metadata = {
   title: "Beleza Nativa - Lingerie e Moda Praia | Atacado",
-  description: "Beleza Nativa - Lingerie e Moda Praia. Atacado para todo Brasil. Pedido mínimo R$ 600,00.",
+  description: "Beleza Nativa - Lingerie e Moda Praia. Atacado para todo Brasil.",
 };
 
 export default function RootLayout({

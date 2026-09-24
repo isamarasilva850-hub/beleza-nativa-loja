@@ -149,7 +149,10 @@ export default function CRM() {
     if (!formCliente.nome) return;
     const novo: Cliente = {
       id: Date.now().toString(),
-      ...formCliente,
+      nome: formCliente.nome,
+      email: formCliente.email,
+      telefone: formCliente.telefone,
+      tipo: formCliente.tipo as "varejo" | "revenda" | "atacado",
       comissao: formCliente.comissao || 0,
       status: "ativo",
       dataCadastro: new Date().toISOString().split("T")[0],
@@ -165,7 +168,13 @@ export default function CRM() {
     if (!formLead.nome) return;
     const novo: Lead = {
       id: Date.now().toString(),
-      ...formLead,
+      nome: formLead.nome,
+      email: formLead.email,
+      telefone: formLead.telefone,
+      origem: formLead.origem as "whatsapp" | "instagram" | "indicacao" | "site" | "outro",
+      valor: formLead.valor,
+      notas: formLead.notas,
+      vendedor: formLead.vendedor,
       status: "novo",
       dataCadastro: new Date().toISOString().split("T")[0],
     };
@@ -178,9 +187,12 @@ export default function CRM() {
     if (!formAtividade.descricao || !formAtividade.clienteId) return;
     const novo: Atividade = {
       id: Date.now().toString(),
-      ...formAtividade,
+      tipo: formAtividade.tipo as "chamada" | "email" | "mensagem" | "reuniao" | "visita",
+      clienteId: formAtividade.clienteId,
       clienteNome: clientes.find(c => c.id === formAtividade.clienteId)?.nome || "",
+      descricao: formAtividade.descricao,
       data: new Date().toISOString().split("T")[0],
+      usuario: formAtividade.usuario,
     };
     setAtividades([novo, ...atividades]);
     setFormAtividade({ tipo: "chamada", clienteId: "", descricao: "", usuario: "Isamara" });
