@@ -5,7 +5,7 @@ import Link from "next/link";
 import { products } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import Sidebar from "@/components/Sidebar";
-import { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
 interface UploadedProduct {
