@@ -62,6 +62,7 @@ const sections = [
 
 const ADMIN_KEY = "belezanativa_admin_auth";
 const ADMIN_PASS = "bn2026";
+// Force rebuild 2026-09-24
 
 function AdminGate({ onAuth }: { onAuth: () => void }) {
   const [pass, setPass] = useState("");
