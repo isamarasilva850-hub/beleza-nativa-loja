@@ -145,6 +145,7 @@ export default function AdminProdutosUpload() {
           path: "/api/estoque/movimentos",
           body: {
             produto_id: productId,
+            produto_grade_id: null,
             tipo_movimento: "entrada_inicial",
             entrada_saida: "E",
             quantidade: parseInt(formData.quantity),
