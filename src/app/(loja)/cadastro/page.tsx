@@ -60,6 +60,24 @@ export default function Cadastro() {
       return;
     }
 
+    // Salvar também no localStorage para aparecer no admin
+    const partners = JSON.parse(localStorage.getItem("belezanativa_partners") || "[]");
+    partners.push({
+      id: Date.now().toString(36),
+      name: form.name,
+      company: form.company || "",
+      cnpj: form.cnpj || "",
+      phone: form.phone,
+      email: form.email,
+      city: form.city || "",
+      state: form.state || "",
+      status: "ativo" as const,
+      createdAt: new Date().toLocaleDateString("pt-BR"),
+      totalOrders: 0,
+      totalSpent: 0,
+    });
+    localStorage.setItem("belezanativa_partners", JSON.stringify(partners));
+
     const msg = [
       "Nova revendedora cadastrada no site!",
       "",
