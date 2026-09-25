@@ -220,12 +220,20 @@ export default function AdminParceiros() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => toggleStatus(p.id)}
-                        className="text-xs text-[#7BC9C2] hover:underline"
-                      >
-                        {p.status === "ativo" ? "Desativar" : "Ativar"}
-                      </button>
+                      <div className="flex gap-2">
+                        <a
+                          href={`/admin/parceiros/${p.id}`}
+                          className="text-xs text-blue-500 hover:underline"
+                        >
+                          📦 Catálogo
+                        </a>
+                        <button
+                          onClick={() => toggleStatus(p.id)}
+                          className="text-xs text-[#7BC9C2] hover:underline"
+                        >
+                          {p.status === "ativo" ? "Desativar" : "Ativar"}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
