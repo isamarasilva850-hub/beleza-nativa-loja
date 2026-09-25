@@ -81,8 +81,8 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
           onClick={() => toggle("collections")}
           className="flex items-center justify-between w-full text-left"
         >
-          <span className="text-xs font-bold text-gray-700 tracking-wide">COLEÇÕES</span>
-          <span className="text-gray-400 text-sm">{openSections.collections ? "−" : "+"}</span>
+          <span className="text-xs font-bold text-gray-900 tracking-wide">COLEÇÕES</span>
+          <span className="text-gray-600 text-sm">{openSections.collections ? "−" : "+"}</span>
         </button>
         {openSections.collections && (
           <ul className="mt-2 space-y-1">
@@ -91,7 +91,7 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
                 <button
                   onClick={() => handleFilter("collection", c)}
                   className={`text-xs hover:text-primary transition-colors ${
-                    selectedCollection === c ? "text-primary font-semibold" : "text-gray-600"
+                    selectedCollection === c ? "text-primary font-semibold" : "text-gray-800"
                   }`}
                 >
                   {c.toUpperCase()}
@@ -108,8 +108,8 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
           onClick={() => toggle("genders")}
           className="flex items-center justify-between w-full text-left"
         >
-          <span className="text-xs font-bold text-gray-700 tracking-wide">GÊNEROS</span>
-          <span className="text-gray-400 text-sm">{openSections.genders ? "−" : "+"}</span>
+          <span className="text-xs font-bold text-gray-900 tracking-wide">GÊNEROS</span>
+          <span className="text-gray-600 text-sm">{openSections.genders ? "−" : "+"}</span>
         </button>
         {openSections.genders && (
           <ul className="mt-2 space-y-1">
@@ -118,7 +118,7 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
                 <button
                   onClick={() => handleFilter("gender", g)}
                   className={`text-xs hover:text-primary transition-colors ${
-                    selectedGender === g ? "text-primary font-semibold" : "text-gray-600"
+                    selectedGender === g ? "text-primary font-semibold" : "text-gray-800"
                   }`}
                 >
                   {g.toUpperCase()}
@@ -135,8 +135,8 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
           onClick={() => toggle("categories")}
           className="flex items-center justify-between w-full text-left"
         >
-          <span className="text-xs font-bold text-gray-700 tracking-wide">CATEGORIAS</span>
-          <span className="text-gray-400 text-sm">{openSections.categories ? "−" : "+"}</span>
+          <span className="text-xs font-bold text-gray-900 tracking-wide">CATEGORIAS</span>
+          <span className="text-gray-600 text-sm">{openSections.categories ? "−" : "+"}</span>
         </button>
         {openSections.categories && (
           <ul className="mt-2 space-y-1">
@@ -145,7 +145,7 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
                 <button
                   onClick={() => handleFilter("category", c)}
                   className={`text-xs hover:text-primary transition-colors ${
-                    selectedCategory === c ? "text-primary font-semibold" : "text-gray-600"
+                    selectedCategory === c ? "text-primary font-semibold" : "text-gray-800"
                   }`}
                 >
                   {c.toUpperCase()}
@@ -162,8 +162,8 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
           onClick={() => toggle("sizes")}
           className="flex items-center justify-between w-full text-left"
         >
-          <span className="text-xs font-bold text-gray-700 tracking-wide">TAMANHOS</span>
-          <span className="text-gray-400 text-sm">{openSections.sizes ? "−" : "+"}</span>
+          <span className="text-xs font-bold text-gray-900 tracking-wide">TAMANHOS</span>
+          <span className="text-gray-600 text-sm">{openSections.sizes ? "−" : "+"}</span>
         </button>
         {openSections.sizes && (
           <div className="mt-2 flex flex-wrap gap-1">
@@ -174,7 +174,7 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
                 className={`px-2 py-1 text-[10px] border rounded transition-colors ${
                   selectedSize === s
                     ? "border-primary bg-primary text-white"
-                    : "border-gray-300 text-gray-600 hover:border-primary"
+                    : "border-gray-400 text-gray-900 hover:border-primary"
                 }`}
               >
                 {s}
@@ -190,14 +190,14 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
           onClick={() => toggle("prices")}
           className="flex items-center justify-between w-full text-left"
         >
-          <span className="text-xs font-bold text-gray-700 tracking-wide">PREÇOS</span>
-          <span className="text-gray-400 text-sm">{openSections.prices ? "−" : "+"}</span>
+          <span className="text-xs font-bold text-gray-900 tracking-wide">PREÇOS</span>
+          <span className="text-gray-600 text-sm">{openSections.prices ? "−" : "+"}</span>
         </button>
         {openSections.prices && (
           <ul className="mt-2 space-y-1">
             {priceRanges.map((r) => (
               <li key={r}>
-                <button className="text-xs text-gray-600 hover:text-primary transition-colors">
+                <button className="text-xs text-gray-800 hover:text-primary transition-colors">
                   {r}
                 </button>
               </li>
@@ -219,7 +219,7 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
           <ul className="mt-2 space-y-1">
             {sortOptions.map((o) => (
               <li key={o}>
-                <button className="text-xs text-gray-600 hover:text-primary transition-colors">
+                <button className="text-xs text-gray-800 hover:text-primary transition-colors">
                   {o}
                 </button>
               </li>
