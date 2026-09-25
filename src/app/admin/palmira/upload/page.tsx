@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { notifyStorageChange } from "@/lib/storageEvents";
 
 export default function PalmiraUploadPage() {
   const [formData, setFormData] = useState({
@@ -113,6 +114,7 @@ export default function PalmiraUploadPage() {
         timestamp: new Date().toISOString(),
       });
       localStorage.setItem("belezanativa_product_uploads", JSON.stringify(uploads));
+      notifyStorageChange("belezanativa_product_uploads", uploads);
 
       setSuccess(`✅ Produto salvo com ${formData.images.length} fotos!`);
       setFormData({

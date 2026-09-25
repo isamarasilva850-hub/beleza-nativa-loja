@@ -16,6 +16,7 @@ const sections = [
     items: [
       { href: "/admin/pedidos", label: "Painel de Pedidos", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" },
       { href: "/admin/vendas", label: "Vendas em Tempo Real", icon: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" },
+      { href: "/admin/montar-pedido", label: "📦 Montar Pedido", icon: "M16 11V7a4 4 0 00-4-4H5a4 4 0 00-4 4v10a4 4 0 004 4h2" },
     ],
   },
   {

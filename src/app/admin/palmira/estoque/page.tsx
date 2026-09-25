@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { notifyStorageChange } from "@/lib/storageEvents";
 
 interface UploadedProduct {
   ref: string;

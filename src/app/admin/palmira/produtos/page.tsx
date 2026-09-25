@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { notifyStorageChange } from "@/lib/storageEvents";
 
 interface UploadedProduct {
   ref: string;
