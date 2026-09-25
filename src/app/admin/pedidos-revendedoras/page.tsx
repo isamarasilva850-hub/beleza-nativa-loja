@@ -115,18 +115,17 @@ export default function PedidosRevendedoras() {
     // Gerar link do catálogo
     const catalogLink = `${typeof window !== "undefined" ? window.location.origin : ""}/catalogo-revendedora/${order.partnerId}`;
 
-    // Criar mensagem com artes E legendas
+    // Criar mensagem com legendas de cada peça
     const artesMsg = refs
       .map((ref) => {
         const arteLegenda = artesLegendasMap[ref];
-        const arteName = ARTE_REFS[ref] || `REF ${ref}`;
-        const legenda = arteLegenda?.legendaCurta || arteLegenda?.legendaCompleta || "";
+        const legenda = arteLegenda?.legendaCurta || arteLegenda?.legendaCompleta || `REF ${ref}`;
 
-        return `📸 ${arteName}\n${legenda}`;
+        return `📸 REF ${ref}\n${legenda}`;
       })
       .join("\n\n");
 
-    const fullMsg = `🎨 ARTES DO SEU PEDIDO\n\n${artesMsg}\n\n---\n\n📱 Seu Catálogo Exclusivo:\n${catalogLink}\n\n🔗 Acesse agora para gerenciar seus produtos e simular novos pedidos!\n\nTodas as artes estão prontas para você usar nas suas redes sociais e WhatsApp! ✨`;
+    const fullMsg = `🎨 PEÇAS DO SEU PEDIDO\n\n${artesMsg}\n\n---\n\n📱 Seu Catálogo Exclusivo:\n${catalogLink}\n\n🔗 Clique para ver FOTOS de cada peça, cores, tamanhos e simular novos pedidos!\n\nTodas as peças estão prontas para você usar nas suas redes sociais e WhatsApp! ✨`;
 
     // Abrir WhatsApp
     window.open(
