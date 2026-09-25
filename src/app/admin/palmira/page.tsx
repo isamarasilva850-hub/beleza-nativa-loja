@@ -25,7 +25,7 @@ export default function PalmiraDashboard() {
           <p className="text-sm text-blue-800 font-medium">💡 Dica: Comece pelo Upload de Produtos para adicionar novas peças com múltiplas fotos!</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Link href="/admin/palmira/upload" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-blue-500 p-6">
             <div className="flex items-start justify-between mb-4">
               <div>
@@ -72,6 +72,22 @@ export default function PalmiraDashboard() {
               <div className="flex items-center gap-2"><span className="text-green-500">✓</span><span>Ordenar por quantidade</span></div>
             </div>
             <div className="pt-4 border-t border-gray-100 text-green-600 font-semibold text-sm">Clique para acompanhar →</div>
+          </Link>
+
+          <Link href="/admin/palmira/adicionar-cor" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-pink-500 p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-xl font-bold text-gray-800">🎨 Adicionar Cor</h3>
+                <p className="text-sm text-gray-600 mt-1">Novas cores aos produtos</p>
+              </div>
+              <div className="text-4xl">✨</div>
+            </div>
+            <div className="space-y-2 text-sm text-gray-600 mb-4">
+              <div className="flex items-center gap-2"><span className="text-pink-500">✓</span><span>Sem reupload de fotos</span></div>
+              <div className="flex items-center gap-2"><span className="text-pink-500">✓</span><span>Seleciona referência existente</span></div>
+              <div className="flex items-center gap-2"><span className="text-pink-500">✓</span><span>Adiciona cor nova rapidinho</span></div>
+            </div>
+            <div className="pt-4 border-t border-gray-100 text-pink-600 font-semibold text-sm">Clique para adicionar →</div>
           </Link>
         </div>
 
