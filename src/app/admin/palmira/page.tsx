@@ -1,122 +1,133 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-export default function PalmiraAdminPage() {
-  const [productsCount, setProductsCount] = useState(0);
+export default function PalmiraDashboard() {
+  const [productCount, setProductCount] = useState(0);
 
   useEffect(() => {
-    try {
-      const products = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
-      setProductsCount(products.length);
-    } catch {}
+    const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
+    setProductCount(uploads.length);
   }, []);
 
-  const menuItems = [
-    {
-      href: "/admin/palmira/upload",
-      icon: "📸",
-      title: "Upload de Produtos",
-      desc: "Adicione fotos e dados dos produtos",
-      color: "from-blue-500 to-blue-600",
-    },
-    {
-      href: "/admin/palmira/produtos",
-      icon: "📦",
-      title: "Produtos",
-      desc: `${productsCount} produtos cadastrados`,
-      color: "from-purple-500 to-purple-600",
-    },
-    {
-      href: "/admin/palmira/estoque",
-      icon: "📊",
-      title: "Controle de Estoque",
-      desc: "Acompanhe o estoque",
-      color: "from-green-500 to-green-600",
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-[#7BC9C2] rounded-xl flex items-center justify-center text-white font-bold text-xl">
-              P
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800">Painel da Palmira</h1>
-              <p className="text-sm text-gray-500">Gerenciar produtos e estoque</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {menuItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <div className="h-full bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow overflow-hidden group cursor-pointer">
-                {/* Gradient Background */}
-                <div className={`h-24 bg-gradient-to-r ${item.color} relative overflow-hidden`}>
-                  <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-2 right-2 text-6xl">{item.icon}</div>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  <div className="text-4xl mb-3">{item.icon}</div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-1">{item.title}</h3>
-                  <p className="text-sm text-gray-500">{item.desc}</p>
-
-                  {/* Arrow */}
-                  <div className="mt-4 inline-block text-[#7BC9C2] font-bold group-hover:translate-x-1 transition-transform">
-                    Acessar →
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
+          <Link href="/admin" className="text-sm text-gray-500 hover:text-gray-700 mb-4 block">
+            ← Voltar
+          </Link>
+          <h1 className="text-4xl font-bold text-gray-800">👩‍💼 Painel da Palmira</h1>
+          <p className="text-gray-600 mt-2">Gerencie produtos e pedidos de forma simples</p>
         </div>
 
         {/* Quick Tips */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">📝 Dicas Rápidas</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <div className="text-3xl">📸</div>
-              <h3 className="font-semibold text-gray-800">Upload</h3>
-              <p className="text-sm text-gray-600">
-                Adicione quantas fotos quiser de cada produto. As fotos são otimizadas automaticamente.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <div className="text-3xl">🖼️</div>
-              <h3 className="font-semibold text-gray-800">Galeria</h3>
-              <p className="text-sm text-gray-600">
-                Os clientes veem um carrossel com todas as fotos do produto na loja.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <div className="text-3xl">📊</div>
-              <h3 className="font-semibold text-gray-800">Estoque</h3>
-              <p className="text-sm text-gray-600">
-                Acompanhe a quantidade de cada produto em tempo real.
-              </p>
-            </div>
-          </div>
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8">
+          <p className="text-sm text-blue-800 font-medium">💡 Dica: Comece pelo Upload de Produtos para adicionar novas peças com múltiplas fotos!</p>
         </div>
 
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <Link href="/admin" className="text-sm text-gray-500 hover:text-gray-700">
-            ← Voltar ao painel completo
+        {/* Main Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Upload Card */}
+          <Link href="/admin/palmira/upload" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-blue-500 p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-xl font-bold text-gray-800">📸 Upload</h3>
+                <p className="text-sm text-gray-600 mt-1">Adicione produtos com fotos</p>
+              </div>
+              <div className="text-4xl">📤</div>
+            </div>
+            <div className="space-y-2 text-sm text-gray-600 mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Múltiplas fotos por produto</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Preço, tamanhos e cores</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-500">✓</span>
+                <span>Sincronização automática</span>
+              </div>
+            </div>
+            <div className="pt-4 border-t border-gray-100 text-blue-600 font-semibold text-sm">
+              Clique para fazer upload →
+            </div>
           </Link>
+
+          {/* Produtos Card */}
+          <Link href="/admin/palmira/produtos" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-purple-500 p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-xl font-bold text-gray-800">📦 Produtos</h3>
+                <p className="text-sm text-gray-600 mt-1">Veja todos os produtos</p>
+              </div>
+              <div className="text-4xl">📋</div>
+            </div>
+            <div className="space-y-2 text-sm text-gray-600 mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-purple-500">✓</span>
+                <span>Galeria com miniaturas</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-purple-500">✓</span>
+                <span>Pesquisa por referência</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-purple-500">✓</span>
+                <span>Total: {productCount} produtos</span>
+              </div>
+            </div>
+            <div className="pt-4 border-t border-gray-100 text-purple-600 font-semibold text-sm">
+              Clique para visualizar →
+            </div>
+          </Link>
+
+          {/* Estoque Card */}
+          <Link href="/admin/palmira/estoque" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-green-500 p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-xl font-bold text-gray-800">📊 Estoque</h3>
+                <p className="text-sm text-gray-600 mt-1">Controle de quantidade</p>
+              </div>
+              <div className="text-4xl">📈</div>
+            </div>
+            <div className="space-y-2 text-sm text-gray-600 mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">✓</span>
+                <span>Total de peças em estoque</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">✓</span>
+                <span>Alerta de baixo estoque</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">✓</span>
+                <span>Ordenar por quantidade</span>
+              </div>
+            </div>
+            <div className="pt-4 border-t border-gray-100 text-green-600 font-semibold text-sm">
+              Clique para acompanhar →
+            </div>
+          </Link>
+        </div>
+
+        {/* Montar Pedido Link */}
+        <div className="mt-8 bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] rounded-xl shadow-lg p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold">📦 Montar Pedido Rápido</h3>
+              <p className="text-sm opacity-90 mt-1">Crie pedidos em segundos e envie pelo WhatsApp</p>
+            </div>
+            <Link href="/admin/montar-pedido" className="bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+              Acessar →
+            </Link>
+          </div>
         </div>
       </div>
     </div>
   );
 }
-// Force rebuild 2026-09-25 08:15:52
