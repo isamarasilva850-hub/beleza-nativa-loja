@@ -20,6 +20,8 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
   const [added, setAdded] = useState(false);
   const [stockMap, setStockMap] = useState<Record<string, number>>({});
   const [showSizeChart, setShowSizeChart] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [allImages, setAllImages] = useState<string[]>([]);
 
   useEffect(() => {
     if (!product) return;
@@ -30,6 +32,17 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
       });
     });
     setStockMap(map);
+
+    // Carregar imagens customizadas do localStorage
+    try {
+      const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
+      const uploadedProduct = uploads.find((p: any) => p.ref === product.ref);
+      const images = uploadedProduct?.images || product.images;
+      setAllImages(images);
+      setCurrentImageIndex(0);
+    } catch {
+      setAllImages(product.images);
+    }
   }, [product]);
 
   if (!product) {
@@ -74,21 +87,74 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
       </nav>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden relative">
-          {product.images.length > 0 ? (
-            <Image
-              src={product.images[0]}
-              alt={`${product.ref} - ${product.name}`}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-              <svg className="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+        {/* Carrossel de Imagens */}
+        <div className="space-y-4">
+          <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden relative group">
+            {allImages.length > 0 ? (
+              <>
+                <Image
+                  src={allImages[currentImageIndex]}
+                  alt={`${product.ref} - ${product.name} - Foto ${currentImageIndex + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority
+                />
+
+                {/* Botões de Navegação */}
+                {allImages.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length)}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      ❮
+                    </button>
+                    <button
+                      onClick={() => setCurrentImageIndex((prev) => (prev + 1) % allImages.length)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      ❯
+                    </button>
+
+                    {/* Indicador */}
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-1 rounded-full">
+                      {currentImageIndex + 1} / {allImages.length}
+                    </div>
+                  </>
+                )}
+              </>
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center text-gray-300">
+                <svg className="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            )}
+          </div>
+
+          {/* Thumbnails */}
+          {allImages.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {allImages.map((img, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentImageIndex(index)}
+                  className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden transition-all ${
+                    currentImageIndex === index
+                      ? "border-primary scale-105"
+                      : "border-gray-200 hover:border-primary"
+                  }`}
+                >
+                  <Image
+                    src={img}
+                    alt={`Thumbnail ${index + 1}`}
+                    width={64}
+                    height={64}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
             </div>
           )}
         </div>

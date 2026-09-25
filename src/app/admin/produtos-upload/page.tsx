@@ -13,10 +13,10 @@ export default function AdminProdutosUpload() {
     colorHex: "#000000",
     sizes: [] as string[],
     quantity: "",
-    image: "",
+    images: [] as string[],
   });
 
-  const [preview, setPreview] = useState<string>("");
+  const [previews, setPreviews] = useState<string[]>([]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
@@ -57,19 +57,38 @@ export default function AdminProdutosUpload() {
   };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const result = e.target?.result as string;
-        const optimized = await optimizeImage(result);
-        setPreview(optimized);
-        setFormData({ ...formData, image: optimized });
-        setSuccess(`📦 Foto otimizada: ${Math.round(optimized.length / 1024)}KB`);
-        setTimeout(() => setSuccess(""), 2000);
-      };
-      reader.readAsDataURL(file);
+    const files = e.target.files;
+    if (files) {
+      const newImages: string[] = [];
+      const newPreviews: string[] = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+
+        reader.onload = async (event) => {
+          const result = event.target?.result as string;
+          const optimized = await optimizeImage(result);
+          newImages.push(optimized);
+          newPreviews.push(optimized);
+
+          if (newImages.length === files.length) {
+            setFormData({ ...formData, images: [...formData.images, ...newImages] });
+            setPreviews([...previews, ...newPreviews]);
+            setSuccess(`📦 ${newImages.length} fotos adicionadas!`);
+            setTimeout(() => setSuccess(""), 2000);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
     }
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = formData.images.filter((_, i) => i !== index);
+    const newPreviews = previews.filter((_, i) => i !== index);
+    setFormData({ ...formData, images: newImages });
+    setPreviews(newPreviews);
   };
 
   const handleSizeChange = (size: string) => {
@@ -93,6 +112,11 @@ export default function AdminProdutosUpload() {
 
     if (formData.sizes.length === 0) {
       setError("Selecione pelo menos um tamanho!");
+      return;
+    }
+
+    if (formData.images.length === 0) {
+      setError("Adicione pelo menos uma foto!");
       return;
     }
 
@@ -149,15 +173,31 @@ export default function AdminProdutosUpload() {
             tipo_movimento: "entrada_inicial",
             entrada_saida: "E",
             quantidade: parseInt(formData.quantity),
-            custo_unitario: parseFloat(formData.price) * 0.5,
-            observacao: `Entrada via Upload - ${formData.color || "Padrão"}`,
+            valor_unitario: parseFloat(formData.price),
           },
         }),
       });
 
       if (!estoque_res.ok) throw new Error("Erro ao registrar estoque");
 
-      setSuccess(`✅ Produto "${formData.name}" criado na ERP com sucesso!`);
+      // Salvar produto com múltiplas imagens em localStorage
+      const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
+      uploads.push({
+        ref: formData.ref,
+        name: formData.name,
+        category: formData.category,
+        gender: formData.gender,
+        price: parseFloat(formData.price),
+        images: formData.images,
+        color: formData.color,
+        colorHex: formData.colorHex,
+        sizes: formData.sizes,
+        quantity: parseInt(formData.quantity),
+        timestamp: new Date().toISOString(),
+      });
+      localStorage.setItem("belezanativa_product_uploads", JSON.stringify(uploads));
+
+      setSuccess(`✅ Produto criado com ${formData.images.length} fotos!`);
       setFormData({
         ref: "",
         name: "",
@@ -168,193 +208,203 @@ export default function AdminProdutosUpload() {
         colorHex: "#000000",
         sizes: [],
         quantity: "",
-        image: "",
+        images: [],
       });
-      setPreview("");
-
-      setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
-      setError(`Erro ao enviar: ${(err as Error).message}`);
+      setPreviews([]);
+    } catch (err: any) {
+      setError(`❌ ${err.message}`);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">📸 Upload de Produtos</h1>
-        <p className="text-gray-500">Adicione novas peças ao catálogo da Beleza Nativa</p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-800">📸 Upload de Produtos</h1>
+        <p className="text-sm text-gray-500">Adicione fotos quantas quiser de cada peça</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Foto */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">📷 Foto do Produto</h2>
-          <div className="flex gap-6 flex-col md:flex-row">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Selecione a foto:</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-sm cursor-pointer hover:border-[#7BC9C2] transition-colors"
-              />
-            </div>
-            {preview && (
-              <div className="w-40 h-40 rounded-lg overflow-hidden border-2 border-gray-200">
-                <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-              </div>
-            )}
+      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-6 space-y-4">
+        {/* Dados do Produto */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Referência *</label>
+            <input
+              type="text"
+              value={formData.ref}
+              onChange={(e) => setFormData({ ...formData, ref: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+              placeholder="Ex: 537"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nome *</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+              placeholder="Ex: Conjunto Sem Bojo"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Preço *</label>
+            <input
+              type="number"
+              step="0.01"
+              value={formData.price}
+              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+              placeholder="Ex: 46.90"
+            />
           </div>
         </div>
 
-        {/* Informações Básicas */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">📝 Informações Básicas</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">REF * (ex: 515)</label>
-              <input
-                type="text"
-                required
-                value={formData.ref}
-                onChange={(e) => setFormData({ ...formData, ref: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
-                placeholder="Referência da peça"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nome * (ex: Conjunto Rendado)</label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
-                placeholder="Nome do produto"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
-              <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2] bg-white"
-              >
-                <option>Lingerie</option>
-                <option>Moda Praia</option>
-                <option>Pijama</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Gênero</label>
-              <select
-                value={formData.gender}
-                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2] bg-white"
-              >
-                <option>Feminino</option>
-                <option>Infantil</option>
-                <option>Masculino</option>
-              </select>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+            <select
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+            >
+              <option>Lingerie</option>
+              <option>Moda Praia</option>
+              <option>Pijama</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Gênero</label>
+            <select
+              value={formData.gender}
+              onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+            >
+              <option>Feminino</option>
+              <option>Masculino</option>
+              <option>Infantil</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Quantidade *</label>
+            <input
+              type="number"
+              value={formData.quantity}
+              onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+              placeholder="Ex: 100"
+            />
           </div>
         </div>
 
-        {/* Preço e Quantidade */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">💰 Preço e Estoque</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Preço de Atacado * (ex: 50.00)</label>
-              <input
-                type="number"
-                required
-                step="0.01"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
-                placeholder="50.00"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Quantidade * (ex: 50)</label>
-              <input
-                type="number"
-                required
-                value={formData.quantity}
-                onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
-                placeholder="50"
-              />
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Cor</label>
+            <input
+              type="text"
+              value={formData.color}
+              onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+              placeholder="Ex: Vinho"
+            />
           </div>
-        </div>
-
-        {/* Cor */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">🎨 Cor</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Cor (ex: Vinho)</label>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Código da Cor</label>
+            <div className="flex gap-2">
+              <input
+                type="color"
+                value={formData.colorHex}
+                onChange={(e) => setFormData({ ...formData, colorHex: e.target.value })}
+                className="w-16 h-10 border border-gray-300 rounded-lg cursor-pointer"
+              />
               <input
                 type="text"
-                value={formData.color}
-                onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
-                placeholder="Vinho, Preto, Rosa..."
+                value={formData.colorHex}
+                onChange={(e) => setFormData({ ...formData, colorHex: e.target.value })}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+                placeholder="#000000"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Cor (Seletor)</label>
-              <div className="flex gap-3">
-                <input
-                  type="color"
-                  value={formData.colorHex}
-                  onChange={(e) => setFormData({ ...formData, colorHex: e.target.value })}
-                  className="w-16 h-11 rounded-lg cursor-pointer border border-gray-200"
-                />
-                <span className="text-sm text-gray-600 font-mono">{formData.colorHex}</span>
-              </div>
             </div>
           </div>
         </div>
 
         {/* Tamanhos */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">📏 Tamanhos Disponíveis *</h2>
-          <div className="flex flex-wrap gap-3">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Tamanhos *</label>
+          <div className="flex gap-2 flex-wrap">
             {["P", "M", "G", "GG"].map((size) => (
-              <label key={size} className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.sizes.includes(size)}
-                  onChange={() => handleSizeChange(size)}
-                  className="w-4 h-4 rounded border-gray-300 text-[#7BC9C2] cursor-pointer"
-                />
-                <span className="text-sm font-medium text-gray-700">{size}</span>
-              </label>
+              <button
+                key={size}
+                type="button"
+                onClick={() => handleSizeChange(size)}
+                className={`px-4 py-2 rounded font-semibold text-sm transition-colors ${
+                  formData.sizes.includes(size)
+                    ? "bg-[#7BC9C2] text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                {size}
+              </button>
             ))}
           </div>
         </div>
 
-        {/* Mensagens */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm font-medium">
-            ❌ {error}
+        {/* Upload de Múltiplas Fotos */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">📸 Fotos do Produto *</label>
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#7BC9C2] transition-colors">
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+              id="imageInput"
+            />
+            <label htmlFor="imageInput" className="cursor-pointer">
+              <div className="text-4xl mb-2">🖼️</div>
+              <p className="text-sm font-medium text-gray-700">Clique ou arraste fotos aqui</p>
+              <p className="text-xs text-gray-500">Suporta múltiplas imagens</p>
+            </label>
           </div>
-        )}
-        {success && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 text-sm font-medium">
-            {success}
+        </div>
+
+        {/* Preview das Imagens */}
+        {previews.length > 0 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Fotos adicionadas: {previews.length}
+            </label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {previews.map((preview, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={preview}
+                    alt={`Preview ${index + 1}`}
+                    className="w-full h-40 object-cover rounded-lg border border-gray-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Botão Submit */}
+        {/* Mensagens */}
+        {success && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
+        {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
+
+        {/* Submit */}
         <button
           type="submit"
-          className="w-full py-4 bg-gradient-to-r from-[#7BC9C2] to-[#6ab8b1] text-white rounded-lg font-bold text-lg hover:shadow-lg transition-shadow"
+          className="w-full bg-[#7BC9C2] hover:bg-[#5fb3ac] text-white font-bold py-3 rounded-lg transition-colors"
         >
-          🚀 ENVIAR PRODUTO
+          ✅ ENVIAR PRODUTO COM {formData.images.length} FOTO{formData.images.length !== 1 ? "S" : ""}
         </button>
       </form>
     </div>
