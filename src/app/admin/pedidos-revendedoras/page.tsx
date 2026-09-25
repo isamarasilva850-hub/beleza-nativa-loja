@@ -111,16 +111,19 @@ export default function PedidosRevendedoras() {
     // Buscar REFs do pedido
     const refs = [...new Set(order.items.map((item) => item.ref))];
 
+    // Gerar link do catálogo
+    const catalogLink = `${typeof window !== "undefined" ? window.location.origin : ""}/catalogo-revendedora/${order.partnerId}`;
+
     // Criar mensagem com artes
     const artesMsg = refs
       .map((ref) => {
         const arteName = ARTE_REFS[ref] || `REF ${ref}`;
         const imagePath = `/artes/${ref}.png`;
-        return `📸 ${arteName}\nArte: ${imagePath}`;
+        return `📸 ${arteName}`;
       })
-      .join("\n\n");
+      .join("\n");
 
-    const fullMsg = `🎨 ARTES DO SEU PEDIDO\n\n${artesMsg}\n\n---\n\nTodas as artes estão prontas para você usar nas suas redes sociais e WhatsApp! 📱`;
+    const fullMsg = `🎨 ARTES DO SEU PEDIDO\n\n${artesMsg}\n\n---\n\n📱 Seu Catálogo Exclusivo:\n${catalogLink}\n\n🔗 Acesse agora para gerenciar seus produtos e simular novos pedidos!\n\nTodas as artes estão prontas para você usar nas suas redes sociais e WhatsApp! ✨`;
 
     // Abrir WhatsApp
     window.open(
