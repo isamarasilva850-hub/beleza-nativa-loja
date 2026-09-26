@@ -3,29 +3,8 @@
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-
-interface Partner {
-  id: string;
-  name: string;
-  company: string;
-  phone: string;
-  city: string;
-  state: string;
-  status: "ativo" | "inativo" | "pendente";
-  logo?: string;
-  markupPercentage?: number;
-}
-
-interface PurchasedProduct {
-  productId: number;
-  ref: string;
-  quantity: number;
-  color: string;
-  size: string;
-  purchaseDate: string;
-  price: number;
-  name: string;
-}
+import { usePartners } from "@/hooks/usePartners";
+import { usePurchases } from "@/hooks/usePurchases";
 
 interface CartItem {
   productId: number;
@@ -50,46 +29,47 @@ export default function CatalogoRevendedora() {
   const params = useParams();
   const id = params?.id as string;
 
-  const [partner, setPartner] = useState<Partner | null>(null);
-  const [purchases, setPurchases] = useState<PurchasedProduct[]>([]);
+  const { partners } = usePartners();
+  const { purchases, loadPurchasesByPartner } = usePurchases();
+
+  const [partner, setPartner] = useState<any>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
 
   useEffect(() => {
-    // Carregar dados do parceiro
-    const saved = localStorage.getItem("belezanativa_partners");
-    if (saved) {
-      const partners = JSON.parse(saved);
-      const foundPartner = partners.find((p: Partner) => p.id === id);
+    if (id && partners.length > 0) {
+      const foundPartner = partners.find((p: any) => p.id === id);
       setPartner(foundPartner || null);
     }
+  }, [id, partners]);
 
-    // Carregar compras do parceiro
-    const savedPurchases = localStorage.getItem(`belezanativa_purchases_${id}`);
-    if (savedPurchases) {
-      setPurchases(JSON.parse(savedPurchases));
+  useEffect(() => {
+    if (id) {
+      loadPurchasesByPartner(id);
+
+      // Carregar carrinho salvo (browser storage apenas)
+      const savedCart = typeof window !== "undefined" ? localStorage.getItem(`catalogo_cart_${id}`) : null;
+      if (savedCart) {
+        setCart(JSON.parse(savedCart));
+      }
+
+      // Carregar produtos
+      fetch("/api/products")
+        .then((res) => res.json())
+        .then((data) => setProducts(data))
+        .catch(() => setProducts([]));
+
+      setLoading(false);
     }
-
-    // Carregar carrinho salvo
-    const savedCart = localStorage.getItem(`catalogo_cart_${id}`);
-    if (savedCart) {
-      setCart(JSON.parse(savedCart));
-    }
-
-    // Carregar produtos (simplificado)
-    fetch("/api/products")
-      .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch(() => setProducts([]));
-
-    setLoading(false);
-  }, [id]);
+  }, [id, loadPurchasesByPartner]);
 
   const saveCart = (newCart: CartItem[]) => {
     setCart(newCart);
-    localStorage.setItem(`catalogo_cart_${id}`, JSON.stringify(newCart));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`catalogo_cart_${id}`, JSON.stringify(newCart));
+    }
   };
 
   const addToCart = (product: PurchasedProduct, productData: Product) => {
