@@ -23,6 +23,17 @@ interface Product {
   price: number;
   images: string[];
   category: string;
+  description?: string;
+  composition?: string;
+  care?: string;
+}
+
+interface PurchasedProduct {
+  productId: number;
+  ref: string;
+  name: string;
+  color: string;
+  size: string;
 }
 
 export default function CatalogoRevendedora() {
@@ -308,6 +319,23 @@ export default function CatalogoRevendedora() {
                     <div className="p-4">
                       <p className="text-xs text-gray-400 font-mono mb-1">REF {product.ref}</p>
                       <h3 className="font-bold text-gray-800 mb-2 line-clamp-2">{product.name}</h3>
+
+                      {/* DESCRIÇÃO */}
+                      {product.description && (
+                        <p className="text-xs text-gray-600 mb-3 line-clamp-2">{product.description}</p>
+                      )}
+
+                      {/* COMPOSIÇÃO + CUIDADOS (resumo) */}
+                      {(product.composition || product.care) && (
+                        <div className="mb-3 text-xs text-gray-500 space-y-1">
+                          {product.composition && (
+                            <p><span className="font-semibold">Composição:</span> {product.composition.substring(0, 40)}...</p>
+                          )}
+                          {product.care && (
+                            <p><span className="font-semibold">Cuidado:</span> {product.care.substring(0, 40)}...</p>
+                          )}
+                        </div>
+                      )}
 
                       {purchaseInfo && (
                         <div className="mb-3">

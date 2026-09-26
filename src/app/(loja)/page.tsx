@@ -14,8 +14,10 @@ interface UploadedProduct {
   category: string;
   gender: string;
   price: number;
-  image: string;
-  variant: { color: string; colorHex: string; sizes: string[] };
+  images: string[];
+  color: string;
+  colorHex: string;
+  sizes: string[];
   quantity: number;
   timestamp: string;
 }
@@ -45,6 +47,19 @@ export default function Home() {
     if (typeof window === "undefined") return;
 
     const loadProductsFromERP = async () => {
+      try {
+        // Tentar carregar do Supabase primeiro
+        const response = await fetch("/api/products-upload");
+        if (response.ok) {
+          const supabaseProducts = await response.json();
+          setUploadedProducts(supabaseProducts);
+          return;
+        }
+      } catch (err) {
+        console.log("Erro ao carregar produtos do Supabase, tentando localStorage");
+      }
+
+      // Fallback para localStorage
       try {
         const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
         setUploadedProducts(uploads);
@@ -323,7 +338,15 @@ export default function Home() {
               {uploadedProducts.map((upload, idx) => (
                 <div key={`upload-${idx}`} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100">
                   <div className="aspect-square bg-gray-200 relative overflow-hidden">
-                    <img src={upload.image} alt={upload.name} className="w-full h-full object-cover" />
+                    {upload.images.length > 0 ? (
+                      <img src={upload.images[0]} alt={upload.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-300">
+                        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                    )}
                     <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
                       NOVO
                     </div>
@@ -333,8 +356,8 @@ export default function Home() {
                     <h3 className="font-semibold text-gray-800 text-sm mb-1 line-clamp-2">{upload.name}</h3>
                     <p className="text-xs text-gray-500 mb-2">{upload.gender}</p>
                     <div className="flex items-center justify-between mb-2">
-                      <div className="w-5 h-5 rounded-full border-2 border-gray-200" style={{ backgroundColor: upload.variant.colorHex }} title={upload.variant.color} />
-                      <span className="text-xs text-gray-500">{upload.variant.sizes.join(", ")}</span>
+                      <div className="w-5 h-5 rounded-full border-2 border-gray-200" style={{ backgroundColor: upload.colorHex }} title={upload.color} />
+                      <span className="text-xs text-gray-500">{upload.sizes.join(", ")}</span>
                     </div>
                     <p className="text-lg font-bold text-primary">R$ {upload.price.toFixed(2).replace(".", ",")}</p>
                     <p className="text-xs text-gray-500 mt-1">Est: {upload.quantity} un.</p>

@@ -93,14 +93,8 @@ export default function PalmiraUploadPage() {
       return;
     }
 
-    if (formData.images.length === 0) {
-      setError("❌ Adicione pelo menos uma foto!");
-      return;
-    }
-
     try {
-      const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
-      uploads.push({
+      const productData = {
         ref: formData.ref,
         name: formData.name,
         category: "Lingerie",
@@ -112,11 +106,27 @@ export default function PalmiraUploadPage() {
         sizes: formData.sizes,
         quantity: parseInt(formData.quantity),
         timestamp: new Date().toISOString(),
-      });
+      };
+
+      // Salvar no localStorage (para backup local)
+      const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
+      uploads.push(productData);
       localStorage.setItem("belezanativa_product_uploads", JSON.stringify(uploads));
       notifyStorageChange("belezanativa_product_uploads", uploads);
 
-      setSuccess(`✅ Produto salvo com ${formData.images.length} fotos!`);
+      // Salvar no Supabase
+      const response = await fetch("/api/products-upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erro ao salvar no servidor");
+      }
+
+      setSuccess(`✅ Produto "${formData.name}" salvo com sucesso! (Local + Servidor)`);
       setFormData({
         ref: "",
         name: "",

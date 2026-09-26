@@ -115,11 +115,6 @@ export default function AdminProdutosUpload() {
       return;
     }
 
-    if (formData.images.length === 0) {
-      setError("Adicione pelo menos uma foto!");
-      return;
-    }
-
     try {
       const mapCategoryToGrupo: Record<string, string> = {
         "Lingerie": "Lingerie",
@@ -180,9 +175,7 @@ export default function AdminProdutosUpload() {
 
       if (!estoque_res.ok) throw new Error("Erro ao registrar estoque");
 
-      // Salvar produto com múltiplas imagens em localStorage
-      const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
-      uploads.push({
+      const productData = {
         ref: formData.ref,
         name: formData.name,
         category: formData.category,
@@ -194,10 +187,26 @@ export default function AdminProdutosUpload() {
         sizes: formData.sizes,
         quantity: parseInt(formData.quantity),
         timestamp: new Date().toISOString(),
-      });
+      };
+
+      // Salvar no localStorage (para backup local)
+      const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
+      uploads.push(productData);
       localStorage.setItem("belezanativa_product_uploads", JSON.stringify(uploads));
 
-      setSuccess(`✅ Produto criado com ${formData.images.length} fotos!`);
+      // Salvar no Supabase
+      const response = await fetch("/api/products-upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erro ao salvar no servidor");
+      }
+
+      setSuccess(`✅ Produto criado com ${formData.images.length} fotos! (Local + Servidor)`);
       setFormData({
         ref: "",
         name: "",

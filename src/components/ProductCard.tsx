@@ -65,13 +65,16 @@ export default function ProductCard({ product }: ProductCardProps) {
             R$ {product.price.toFixed(2).replace(".", ",")} <span className="text-[10px] font-normal">para revenda</span>
           </p>
         ) : (
-          <Link
-            href="/minha-conta"
-            className="text-[10px] text-primary hover:underline -mt-0.5 mb-2 block"
-            onClick={(e) => e.stopPropagation()}
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              window.location.href = "/minha-conta";
+            }}
+            className="text-[10px] text-primary hover:underline -mt-0.5 mb-2 block bg-none border-none p-0 cursor-pointer"
           >
             Logue-se para ver o preço de revenda
-          </Link>
+          </button>
         )}
 
         <div className="flex gap-1 mb-2">
