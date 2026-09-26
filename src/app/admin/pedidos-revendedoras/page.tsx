@@ -1,157 +1,66 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { artesLegendasMap } from "@/data/artes-legendas";
-
-interface Partner {
-  id: string;
-  name: string;
-  company: string;
-  phone: string;
-  city: string;
-  state: string;
-}
-
-interface PurchasedProduct {
-  productId: number;
-  ref: string;
-  quantity: number;
-  color: string;
-  size: string;
-  purchaseDate: string;
-  price: number;
-  name: string;
-}
-
-interface OrderRecord {
-  id: string;
-  partnerId: string;
-  partnerName: string;
-  partnerPhone: string;
-  items: Array<{
-    productId: number;
-    ref: string;
-    name: string;
-    price: number;
-    color: string;
-    size: string;
-    quantity: number;
-  }>;
-  total: number;
-  date: string;
-  status: "pendente" | "pago" | "artes_enviadas";
-}
-
-const ARTE_REFS: Record<string, string> = {
-  "031": "Biquíni 031",
-  "055": "Shortinho 055",
-  "062": "Conjunto 062",
-  "067": "Biquíni 067",
-  "073": "Biquíni 073",
-  "079": "Biquíni 079",
-  "091": "Shortinho 091",
-  "096": "Shortinho 096",
-  "443": "Lingerie 443",
-  "445": "Lingerie 445",
-  "466": "Lingerie 466",
-  "510": "Biquíni 510",
-  "515": "Biquíni 515",
-  "537": "Conjunto 537",
-  "554": "Biquíni 554",
-};
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useOrders } from '@/hooks/useOrders';
+import { artesLegendasMap } from '@/data/artes-legendas';
 
 export default function PedidosRevendedoras() {
-  const [orders, setOrders] = useState<OrderRecord[]>([]);
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [filter, setFilter] = useState<"todos" | "pendente" | "pago" | "artes_enviadas">("todos");
+  const { orders, loading, error, loadOrders, updateOrderStatus } = useOrders();
+  const [filter, setFilter] = useState<'todos' | 'pendente' | 'pago' | 'artes_enviadas'>('todos');
 
   useEffect(() => {
-    // Carregar parceiros
-    const saved = localStorage.getItem("belezanativa_partners");
-    if (saved) {
-      setPartners(JSON.parse(saved));
-    }
+    loadOrders();
+  }, [loadOrders]);
 
-    // Carregar pedidos salvos
-    const savedOrders = localStorage.getItem("belezanativa_orders");
-    if (savedOrders) {
-      setOrders(JSON.parse(savedOrders));
-    }
-  }, []);
-
-  const saveOrders = (newOrders: OrderRecord[]) => {
-    setOrders(newOrders);
-    localStorage.setItem("belezanativa_orders", JSON.stringify(newOrders));
-  };
-
-  const createOrderFromSimulation = (partnerId: string, items: any[], total: number) => {
-    const partner = partners.find((p) => p.id === partnerId);
-    if (!partner) return;
-
-    const newOrder: OrderRecord = {
-      id: Date.now().toString(36),
-      partnerId,
-      partnerName: partner.company || partner.name,
-      partnerPhone: partner.phone,
-      items,
-      total,
-      date: new Date().toLocaleDateString("pt-BR"),
-      status: "pendente",
-    };
-
-    saveOrders([newOrder, ...orders]);
-  };
-
-  const updateStatus = (orderId: string, status: OrderRecord["status"]) => {
-    const updated = orders.map((o) => (o.id === orderId ? { ...o, status } : o));
-    saveOrders(updated);
-  };
-
-  const sendArtes = (order: OrderRecord) => {
+  const sendArtes = async (order: any) => {
     // Buscar REFs do pedido
-    const refs = [...new Set(order.items.map((item) => item.ref))];
+    const refs = [...new Set(order.items.map((item: any) => item.ref))];
 
     // Gerar link do catálogo
-    const catalogLink = `${typeof window !== "undefined" ? window.location.origin : ""}/catalogo-revendedora/${order.partnerId}`;
+    const catalogLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/catalogo-revendedora/${order.partnerId}`;
 
     // Criar mensagem com legendas de cada peça
     const artesMsg = refs
-      .map((ref) => {
+      .map((ref: string) => {
         const arteLegenda = artesLegendasMap[ref];
         const legenda = arteLegenda?.legendaCurta || arteLegenda?.legendaCompleta || `REF ${ref}`;
 
         return `📸 REF ${ref}\n${legenda}`;
       })
-      .join("\n\n");
+      .join('\n\n');
 
     const fullMsg = `🎨 PEÇAS DO SEU PEDIDO\n\n${artesMsg}\n\n---\n\n📱 Seu Catálogo Exclusivo:\n${catalogLink}\n\n🔗 Clique para ver FOTOS de cada peça, cores, tamanhos e simular novos pedidos!\n\nTodas as peças estão prontas para você usar nas suas redes sociais e WhatsApp! ✨`;
 
     // Abrir WhatsApp
     window.open(
       `https://wa.me/${order.partnerPhone}?text=${encodeURIComponent(fullMsg)}`,
-      "_blank"
+      '_blank'
     );
 
-    // Marcar como enviado
-    updateStatus(order.id, "artes_enviadas");
+    // Marcar como enviado no Supabase
+    try {
+      await updateOrderStatus(order.id, 'artes_enviadas');
+    } catch (err) {
+      console.error('Erro ao atualizar status:', err);
+    }
   };
 
   const filteredOrders = orders.filter((order) => {
-    if (filter === "todos") return true;
+    if (filter === 'todos') return true;
     return order.status === filter;
   });
 
-  const statusColor: Record<OrderRecord["status"], string> = {
-    pendente: "bg-yellow-100 text-yellow-700",
-    pago: "bg-blue-100 text-blue-700",
-    artes_enviadas: "bg-green-100 text-green-700",
+  const statusColor: Record<string, string> = {
+    pendente: 'bg-yellow-100 text-yellow-700',
+    pago: 'bg-blue-100 text-blue-700',
+    artes_enviadas: 'bg-green-100 text-green-700',
   };
 
-  const statusLabel: Record<OrderRecord["status"], string> = {
-    pendente: "⏳ Pendente",
-    pago: "✅ Pago",
-    artes_enviadas: "🎨 Artes Enviadas",
+  const statusLabel: Record<string, string> = {
+    pendente: '⏳ Pendente',
+    pago: '✅ Pago',
+    artes_enviadas: '🎨 Artes Enviadas',
   };
 
   return (
@@ -166,31 +75,36 @@ export default function PedidosRevendedoras() {
           <p className="text-gray-600 mt-1">Gerenciar pedidos e enviar artes</p>
         </div>
 
-        {/* Filtros */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex gap-2 flex-wrap">
-          {(["todos", "pendente", "pago", "artes_enviadas"] as const).map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                filter === status
-                  ? "bg-[#7BC9C2] text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              {status === "todos"
-                ? "Todos"
-                : status === "pendente"
-                ? "⏳ Pendente"
-                : status === "pago"
-                ? "✅ Pago"
-                : "🎨 Artes Enviadas"}
-            </button>
-          ))}
-        </div>
+        {loading && <div className="p-8 text-center text-gray-600">⏳ Carregando pedidos...</div>}
+        {error && <div className="p-8 text-center text-red-600">❌ Erro: {error}</div>}
 
-        {/* Pedidos */}
-        {filteredOrders.length > 0 ? (
+        {!loading && !error && (
+          <>
+            {/* Filtros */}
+            <div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex gap-2 flex-wrap">
+              {(['todos', 'pendente', 'pago', 'artes_enviadas'] as const).map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilter(status)}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    filter === status
+                      ? 'bg-[#7BC9C2] text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  {status === 'todos'
+                    ? 'Todos'
+                    : status === 'pendente'
+                    ? '⏳ Pendente'
+                    : status === 'pago'
+                    ? '✅ Pago'
+                    : '🎨 Artes Enviadas'}
+                </button>
+              ))}
+            </div>
+
+            {/* Pedidos */}
+            {filteredOrders.length > 0 ? (
           <div className="space-y-4">
             {filteredOrders.map((order) => (
               <div key={order.id} className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-[#7BC9C2]">
@@ -224,16 +138,16 @@ export default function PedidosRevendedoras() {
 
                 {/* Ações */}
                 <div className="flex gap-2 flex-wrap">
-                  {order.status === "pendente" && (
+                  {order.status === 'pendente' && (
                     <button
-                      onClick={() => updateStatus(order.id, "pago")}
+                      onClick={() => updateOrderStatus(order.id, 'pago')}
                       className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-bold hover:bg-blue-600"
                     >
                       ✅ Marcar como Pago
                     </button>
                   )}
 
-                  {order.status === "pago" && (
+                  {order.status === 'pago' && (
                     <button
                       onClick={() => sendArtes(order)}
                       className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-bold hover:bg-green-600 flex items-center gap-2"
@@ -242,7 +156,7 @@ export default function PedidosRevendedoras() {
                     </button>
                   )}
 
-                  {order.status === "artes_enviadas" && (
+                  {order.status === 'artes_enviadas' && (
                     <button
                       onClick={() => sendArtes(order)}
                       className="px-4 py-2 bg-gray-400 text-white rounded-lg text-sm font-bold hover:bg-gray-500"
@@ -266,26 +180,28 @@ export default function PedidosRevendedoras() {
         ) : (
           <div className="text-center py-16 bg-white rounded-xl">
             <p className="text-gray-500 text-lg">Nenhum pedido encontrado</p>
-            <p className="text-gray-400 text-sm mt-1">
-              Pedidos aparecerão aqui quando você simular no painel de simulador
-            </p>
-          </div>
-        )}
+              <p className="text-gray-400 text-sm mt-1">
+                Pedidos aparecerão aqui quando você simular no painel de simulador
+              </p>
+            </div>
+          )}
 
-        {/* Info */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm text-blue-900">
-            <strong>ℹ️ Como funciona:</strong>
-            <br />
-            1. Você simula um pedido no <strong>/admin/simular-pedido-revendedora</strong>
-            <br />
-            2. O pedido aparece aqui
-            <br />
-            3. Marque como "Pago"
-            <br />
-            4. Clique em "Enviar Artes" - automático envia pro WhatsApp dela! 🎨
-          </p>
-        </div>
+            {/* Info */}
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-sm text-blue-900">
+                <strong>ℹ️ Como funciona:</strong>
+                <br />
+                1. Você simula um pedido no <strong>/admin/simular-pedido-revendedora</strong>
+                <br />
+                2. O pedido aparece aqui
+                <br />
+                3. Marque como "Pago"
+                <br />
+                4. Clique em "Enviar Artes" - automático envia pro WhatsApp dela! 🎨
+              </p>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
