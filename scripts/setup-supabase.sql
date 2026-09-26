@@ -69,6 +69,21 @@ CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_reseller_purchases_partnerId ON reseller_purchases(partnerId);
 CREATE INDEX IF NOT EXISTS idx_shopping_carts_partnerId ON shopping_carts(partnerId);
 
+-- ============ LEADS ============
+CREATE TABLE IF NOT EXISTS leads (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('Lojista', 'Revendedora')),
+  status TEXT NOT NULL CHECK (status IN ('Já revende', 'Quer começar')),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- ============ ÍNDICES ============
+CREATE INDEX IF NOT EXISTS idx_leads_phone ON leads(phone);
+CREATE INDEX IF NOT EXISTS idx_leads_created_at ON leads(created_at);
+
 -- ============ RLS (ROW LEVEL SECURITY) - OPCIONAL ============
 -- Se quiser segurança mais rigorosa, descomente:
 /*
@@ -76,4 +91,5 @@ ALTER TABLE partners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reseller_purchases ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shopping_carts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
 */

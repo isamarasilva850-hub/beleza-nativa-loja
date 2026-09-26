@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Migração Supabase - Beleza Nativa</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #4a9b7f;
+      text-align: center;
+    }
+    .log {
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+      min-height: 200px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .log-entry {
+      margin: 5px 0;
+      padding: 5px;
+    }
+    .success { color: #27ae60; }
+    .error { color: #e74c3c; }
+    .info { color: #3498db; }
+    .warning { color: #f39c12; }
+    .status {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .status.running { color: #f39c12; }
+    .status.success { color: #27ae60; }
+    .status.error { color: #e74c3c; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 Migração para Supabase</h1>
+    <p style="text-align: center; color: #666;">Beleza Nativa - Transferindo dados do localStorage para o Supabase</p>
+
+    <div id="status" class="status running">⏳ Iniciando migração...</div>
+
+    <div id="log" class="log"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://icktrsrkjxjriknfydqr.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_GxT5EwdsNLZADeOPuS4lgg_DG3fZbvg';
+    const logDiv = document.getElementById('log');
+    const statusDiv = document.getElementById('status');
+
+    function addLog(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = message;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+      console.log(message);
+    }
+
+    async function insertData(table, data) {
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'apikey': SUPABASE_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify(data)
+        });
+        return response.ok;
+      } catch (error) {
+        addLog(`❌ Erro ao inserir em ${table}: ${error.message}`, 'error');
+        return false;
+      }
+    }
+
+    async function migrate() {
+      try {
+        addLog('🚀 Iniciando migração para Supabase...\n', 'info');
+
+        // PARTNERS
+        const partners = JSON.parse(localStorage.getItem('partners') || '[]');
+        if (partners.length > 0) {
+          addLog(`📤 PARTNERS: ${partners.length} registros`, 'info');
+          for (const p of partners) {
+            await insertData('partners', p);
+          }
+          addLog('✅ PARTNERS migrado com sucesso!\n', 'success');
+        } else {
+          addLog('⏭️ PARTNERS: nenhum registro (pulando)\n', 'warning');
+        }
+
+        // ORDERS
+        const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        if (orders.length > 0) {
+          addLog(`📤 ORDERS: ${orders.length} registros`, 'info');
+          for (const o of orders) {
+            await insertData('orders', o);
+          }
+          addLog('✅ ORDERS migrado com sucesso!\n', 'success');
+        } else {
+          addLog('⏭️ ORDERS: nenhum registro (pulando)\n', 'warning');
+        }
+
+        // RESELLER PURCHASES
+        const resellerPurchases = JSON.parse(localStorage.getItem('resellerPurchases') || '[]');
+        if (resellerPurchases.length > 0) {
+          addLog(`📤 RESELLER PURCHASES: ${resellerPurchases.length} registros`, 'info');
+          for (const rp of resellerPurchases) {
+            await insertData('reseller_purchases', rp);
+          }
+          addLog('✅ RESELLER PURCHASES migrado com sucesso!\n', 'success');
+        } else {
+          addLog('⏭️ RESELLER PURCHASES: nenhum registro (pulando)\n', 'warning');
+        }
+
+        // SHOPPING CARTS
+        const shoppingCarts = JSON.parse(localStorage.getItem('shoppingCarts') || '[]');
+        if (shoppingCarts.length > 0) {
+          addLog(`📤 SHOPPING CARTS: ${shoppingCarts.length} registros`, 'info');
+          for (const sc of shoppingCarts) {
+            await insertData('shopping_carts', sc);
+          }
+          addLog('✅ SHOPPING CARTS migrado com sucesso!\n', 'success');
+        } else {
+          addLog('⏭️ SHOPPING CARTS: nenhum registro (pulando)\n', 'warning');
+        }
+
+        statusDiv.textContent = '✅ MIGRAÇÃO CONCLUÍDA COM SUCESSO!';
+        statusDiv.className = 'status success';
+        addLog('\n🎉 TODOS OS DADOS FORAM MIGRADOS PARA O SUPABASE!', 'success');
+        addLog('Você pode fechar esta página e voltar ao admin.', 'success');
+
+      } catch (error) {
+        statusDiv.textContent = '❌ ERRO NA MIGRAÇÃO!';
+        statusDiv.className = 'status error';
+        addLog(`\n❌ ERRO CRÍTICO: ${error.message}`, 'error');
+        console.error(error);
+      }
+    }
+
+    // Inicia a migração quando a página carrega
+    migrate();
+  </script>
+</body>
+</html>
