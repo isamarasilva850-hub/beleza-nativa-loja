@@ -15,18 +15,11 @@ export default function ArtesPage() {
   const pendingArtes = orders.filter(order => order.status === 'pago');
 
   const sendArtes = async (order: any) => {
-    const refs = [...new Set(order.items.map((item: any) => item.ref))];
-    const catalogLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/catalogo-revendedora/${order.partnerId}`;
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const artesLink = `${origin}/artes-pedido/${order.id}`;
+    const catalogLink = `${origin}/catalogo-revendedora/${order.partnerId}`;
 
-    const artesMsg = refs
-      .map((ref: string) => {
-        const arteLegenda = artesLegendasMap[ref];
-        const legenda = arteLegenda?.legendaCurta || arteLegenda?.legendaCompleta || `REF ${ref}`;
-        return `📸 REF ${ref}\n${legenda}`;
-      })
-      .join('\n\n');
-
-    const fullMsg = `🎨 PEÇAS DO SEU PEDIDO\n\n${artesMsg}\n\n---\n\n📱 Seu Catálogo Exclusivo:\n${catalogLink}\n\n🔗 Clique para ver FOTOS de cada peça, cores, tamanhos e simular novos pedidos!\n\nTodas as peças estão prontas para você usar nas suas redes sociais e WhatsApp! ✨`;
+    const fullMsg = `🎨 SUAS ARTES ESTÃO PRONTAS!\n\n📸 Clique aqui para ver todas as fotos com as legendas:\n${artesLink}\n\n---\n\n💡 COMO USAR:\n1️⃣ Baixe as imagens\n2️⃣ Poste no Instagram, Facebook, WhatsApp e Stories\n3️⃣ Venda com as fotos prontas!\n\n---\n\n📱 Seu Catálogo Completo:\n${catalogLink}\n\nAqui tem TODAS as cores, tamanhos e você pode simular novos pedidos quando quiser!\n\nTodas as peças estão prontas para você usar e ganhar! 💰✨`;
 
     window.open(
       `https://wa.me/${order.partnerPhone}?text=${encodeURIComponent(fullMsg)}`,
