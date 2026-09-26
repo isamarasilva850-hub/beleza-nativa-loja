@@ -27,7 +27,7 @@ export default function Cadastro() {
   const update = (field: string, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -60,23 +60,26 @@ export default function Cadastro() {
       return;
     }
 
-    // Salvar também no localStorage para aparecer no admin
-    const partners = JSON.parse(localStorage.getItem("belezanativa_partners") || "[]");
-    partners.push({
-      id: Date.now().toString(36),
-      name: form.name,
-      company: form.company || "",
-      cnpj: form.cnpj || "",
-      phone: form.phone,
-      email: form.email,
-      city: form.city || "",
-      state: form.state || "",
-      status: "ativo" as const,
-      createdAt: new Date().toLocaleDateString("pt-BR"),
-      totalOrders: 0,
-      totalSpent: 0,
-    });
-    localStorage.setItem("belezanativa_partners", JSON.stringify(partners));
+    // Salvar no Supabase
+    try {
+      const response = await fetch('/api/partners', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          company: form.company || null,
+          cnpj: form.cnpj || null,
+          email: form.email,
+          city: form.city || null,
+          state: form.state || null,
+        })
+      });
+
+      if (!response.ok) throw new Error('Erro ao salvar cadastro');
+    } catch (err) {
+      console.error('Erro ao salvar no Supabase:', err);
+    }
 
     const msg = [
       "Nova revendedora cadastrada no site!",

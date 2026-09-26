@@ -1,70 +1,49 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-
-interface Partner {
-  id: string;
-  name: string;
-  company: string;
-  cnpj: string;
-  phone: string;
-  email: string;
-  city: string;
-  state: string;
-  status: "ativo" | "inativo" | "pendente";
-  createdAt: string;
-  totalOrders: number;
-  totalSpent: number;
-}
+import { useEffect, useState } from 'react';
+import { usePartners } from '@/hooks/usePartners';
 
 export default function AdminParceiros() {
-  const [partners, setPartners] = useState<Partner[]>(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("belezanativa_partners");
-      if (saved) return JSON.parse(saved);
-    }
-    return [];
-  });
+  const { partners, loading, error, loadPartners, addPartner } = usePartners();
   const [showForm, setShowForm] = useState(false);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [form, setForm] = useState({
-    name: "", company: "", cnpj: "", phone: "", email: "", city: "", state: "",
+    name: '', company: '', cnpj: '', phone: '', email: '', city: '', state: '',
   });
 
-  const savePartners = (data: Partner[]) => {
-    setPartners(data);
-    localStorage.setItem("belezanativa_partners", JSON.stringify(data));
-  };
+  useEffect(() => {
+    loadPartners();
+  }, [loadPartners]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newPartner: Partner = {
-      id: Date.now().toString(36),
-      ...form,
-      status: "ativo",
-      createdAt: new Date().toLocaleDateString("pt-BR"),
-      totalOrders: 0,
-      totalSpent: 0,
-    };
-    savePartners([newPartner, ...partners]);
-    setForm({ name: "", company: "", cnpj: "", phone: "", email: "", city: "", state: "" });
-    setShowForm(false);
-  };
-
-  const toggleStatus = (id: string) => {
-    savePartners(
-      partners.map((p) =>
-        p.id === id ? { ...p, status: p.status === "ativo" ? "inativo" : "ativo" } : p
-      )
-    );
+    try {
+      await addPartner({
+        name: form.name,
+        company: form.company || undefined,
+        cnpj: form.cnpj || undefined,
+        phone: form.phone,
+        email: form.email || undefined,
+        city: form.city || undefined,
+        state: form.state || undefined,
+        status: 'ativo',
+        createdAt: new Date().toISOString(),
+        totalOrders: 0,
+        totalSpent: 0,
+      });
+      setForm({ name: '', company: '', cnpj: '', phone: '', email: '', city: '', state: '' });
+      setShowForm(false);
+    } catch (err) {
+      console.error('Erro ao adicionar parceiro:', err);
+    }
   };
 
   const filtered = partners.filter(
     (p) =>
       !search ||
       p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.company.toLowerCase().includes(search.toLowerCase()) ||
-      p.cnpj.includes(search)
+      (p.company && p.company.toLowerCase().includes(search.toLowerCase())) ||
+      (p.cnpj && p.cnpj.includes(search))
   );
 
   return (
@@ -191,7 +170,11 @@ export default function AdminParceiros() {
 
       {/* Partners List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        {filtered.length > 0 ? (
+        {loading ? (
+          <div className="p-8 text-center text-gray-600">⏳ Carregando parceiros...</div>
+        ) : error ? (
+          <div className="p-8 text-center text-red-600">❌ Erro: {error}</div>
+        ) : filtered.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-100">
@@ -231,27 +214,19 @@ export default function AdminParceiros() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex gap-2">
-                        <a
-                          href={`/admin/parceiros/${p.id}`}
-                          className="text-xs text-blue-500 hover:underline"
-                        >
-                          📦 Catálogo
-                        </a>
-                        <button
-                          onClick={() => toggleStatus(p.id)}
-                          className="text-xs text-[#7BC9C2] hover:underline"
-                        >
-                          {p.status === "ativo" ? "Desativar" : "Ativar"}
-                        </button>
-                      </div>
+                      <a
+                        href={`/admin/parceiros/${p.id}`}
+                        className="text-xs text-blue-500 hover:underline"
+                      >
+                        📦 Catálogo
+                      </a>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        ) : (
+        ) : loading || error ? null : (
           <div className="text-center py-16 text-gray-400">
             <svg className="w-16 h-16 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
