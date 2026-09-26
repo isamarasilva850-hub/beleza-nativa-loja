@@ -1,16 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-
-interface Partner {
-  id: string;
-  name: string;
-  company: string;
-  phone: string;
-  city: string;
-  state: string;
-}
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePartners } from '@/hooks/usePartners';
+import { useOrders } from '@/hooks/useOrders';
 
 interface PurchasedProduct {
   productId: number;
@@ -34,18 +27,17 @@ interface CartItem {
 }
 
 export default function SimularPedidoRevendedora() {
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [selectedPartnerId, setSelectedPartnerId] = useState("");
-  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
+  const { partners, loadPartners } = usePartners();
+  const { createOrder } = useOrders();
+  const [selectedPartnerId, setSelectedPartnerId] = useState('');
+  const [selectedPartner, setSelectedPartner] = useState<any>(null);
   const [purchases, setPurchases] = useState<PurchasedProduct[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [creatingOrder, setCreatingOrder] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("belezanativa_partners");
-    if (saved) {
-      setPartners(JSON.parse(saved));
-    }
-  }, []);
+    loadPartners();
+  }, [loadPartners]);
 
   useEffect(() => {
     if (selectedPartnerId) {
@@ -115,11 +107,40 @@ export default function SimularPedidoRevendedora() {
   const generateResume = () => {
     const resume = cart
       .map((item) => {
-        return `REF ${item.ref} - ${item.name} (${item.color}/${item.size})\nQtd: ${item.quantity} x R$ ${item.price.toFixed(2).replace(".", ",")} = R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}`;
+        return `REF ${item.ref} - ${item.name} (${item.color}/${item.size})\nQtd: ${item.quantity} x R$ ${item.price.toFixed(2).replace('.', ',')} = R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}`;
       })
-      .join("\n\n");
+      .join('\n\n');
 
-    return `📦 PEDIDO DE ${selectedPartner?.company || selectedPartner?.name}\n\n${resume}\n\n${"─".repeat(35)}\nTOTAL: R$ ${totalPrice.toFixed(2).replace(".", ",")}`;
+    return `📦 PEDIDO DE ${selectedPartner?.company || selectedPartner?.name}\n\n${resume}\n\n${'─'.repeat(35)}\nTOTAL: R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+  };
+
+  const createPedido = async () => {
+    if (!selectedPartner || cart.length === 0) {
+      alert('Selecione uma revendedora e adicione produtos');
+      return;
+    }
+
+    setCreatingOrder(true);
+    try {
+      await createOrder({
+        partnerId: selectedPartner.id,
+        partnerName: selectedPartner.company || selectedPartner.name,
+        partnerPhone: selectedPartner.phone,
+        items: cart,
+        total: totalPrice,
+        date: new Date().toISOString().split('T')[0],
+        status: 'pendente',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      alert('✅ Pedido criado com sucesso! Vá para Pedidos das Revendedoras');
+      setCart([]);
+    } catch (error) {
+      alert('❌ Erro ao criar pedido');
+      console.error(error);
+    } finally {
+      setCreatingOrder(false);
+    }
   };
 
   return (
@@ -258,9 +279,17 @@ export default function SimularPedidoRevendedora() {
                     </div>
 
                     <button
+                      onClick={createPedido}
+                      disabled={creatingOrder}
+                      className="w-full py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-50"
+                    >
+                      {creatingOrder ? '⏳ Criando...' : '✅ Finalizar Pedido'}
+                    </button>
+
+                    <button
                       onClick={() => {
                         navigator.clipboard.writeText(generateResume());
-                        alert("✅ Resumo copiado!");
+                        alert('✅ Resumo copiado!');
                       }}
                       className="w-full py-2 bg-blue-500 text-white rounded-lg text-sm font-bold hover:bg-blue-600"
                     >
@@ -269,9 +298,9 @@ export default function SimularPedidoRevendedora() {
 
                     <button
                       onClick={() => {
-                        window.open(`https://wa.me/${selectedPartner?.phone}?text=${encodeURIComponent(generateResume())}`, "_blank");
+                        window.open(`https://wa.me/${selectedPartner?.phone}?text=${encodeURIComponent(generateResume())}`, '_blank');
                       }}
-                      className="w-full py-2 bg-green-500 text-white rounded-lg text-sm font-bold hover:bg-green-600"
+                      className="w-full py-2 bg-teal-500 text-white rounded-lg text-sm font-bold hover:bg-teal-600"
                     >
                       💬 Enviar WhatsApp
                     </button>
