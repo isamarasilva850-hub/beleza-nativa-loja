@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import CRMActions from "@/components/CRMActions";
 
 interface Cliente {
   id: string;
