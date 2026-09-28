@@ -43,6 +43,27 @@ export async function POST() {
       });
     } catch (e) { }
 
+    // Criar tabela products (produtos do catálogo)
+    try {
+      await supabase.rpc('exec_sql', {
+        sql: `CREATE TABLE IF NOT EXISTS products (id TEXT PRIMARY KEY, ref TEXT UNIQUE NOT NULL, name TEXT NOT NULL, price NUMERIC NOT NULL, category TEXT DEFAULT 'Lingerie', gender TEXT DEFAULT 'Feminino', created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW());`
+      });
+    } catch (e) { }
+
+    // Criar tabela product_colors (cores e estoque por tamanho)
+    try {
+      await supabase.rpc('exec_sql', {
+        sql: `CREATE TABLE IF NOT EXISTS product_colors (id TEXT PRIMARY KEY, product_id TEXT NOT NULL, color_name TEXT NOT NULL, color_hex TEXT, qty_p INTEGER DEFAULT 0, qty_m INTEGER DEFAULT 0, qty_g INTEGER DEFAULT 0, qty_gg INTEGER DEFAULT 0, created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW(), FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE);`
+      });
+    } catch (e) { }
+
+    // Criar tabela product_images (fotos dos produtos)
+    try {
+      await supabase.rpc('exec_sql', {
+        sql: `CREATE TABLE IF NOT EXISTS product_images (id TEXT PRIMARY KEY, product_id TEXT NOT NULL, image_url TEXT NOT NULL, image_base64 LONGTEXT, display_order INTEGER DEFAULT 0, created_at TIMESTAMP DEFAULT NOW(), FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE);`
+      });
+    } catch (e) { }
+
     return NextResponse.json({ message: 'Tabelas criadas com sucesso!' });
   } catch (error) {
     console.error('Erro ao criar tabelas:', error);

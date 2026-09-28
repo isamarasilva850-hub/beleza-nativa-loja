@@ -2,22 +2,30 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { notifyStorageChange } from "@/lib/storageEvents";
+
+interface ColorInput {
+  id: string;
+  name: string;
+  hex: string;
+  qty_p: string;
+  qty_m: string;
+  qty_g: string;
+  qty_gg: string;
+}
 
 export default function PalmiraUploadPage() {
   const [formData, setFormData] = useState({
     ref: "",
     name: "",
     price: "",
-    color: "",
-    colorHex: "#000000",
-    sizeQuantities: { P: "", M: "", G: "", GG: "" },
-    images: [] as string[],
   });
 
+  const [colors, setColors] = useState<ColorInput[]>([]);
+  const [images, setImages] = useState<string[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const optimizeImage = (imgBase64: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -50,9 +58,9 @@ export default function PalmiraUploadPage() {
           newPreviews.push(optimized);
 
           if (newImages.length === files.length) {
-            setFormData({ ...formData, images: [...formData.images, ...newImages] });
+            setImages([...images, ...newImages]);
             setPreviews([...previews, ...newPreviews]);
-            setSuccess(`✅ ${newImages.length} fotos adicionadas!`);
+            setSuccess(`✅ ${newImages.length} foto(s) adicionada(s)!`);
             setTimeout(() => setSuccess(""), 2000);
           }
         };
@@ -62,67 +70,82 @@ export default function PalmiraUploadPage() {
   };
 
   const removeImage = (index: number) => {
-    const newImages = formData.images.filter((_, i) => i !== index);
-    const newPreviews = previews.filter((_, i) => i !== index);
-    setFormData({ ...formData, images: newImages });
-    setPreviews(newPreviews);
+    setImages(images.filter((_, i) => i !== index));
+    setPreviews(previews.filter((_, i) => i !== index));
   };
 
-  const handleSizeQuantityChange = (size: string, value: string) => {
-    setFormData({
-      ...formData,
-      sizeQuantities: { ...formData.sizeQuantities, [size]: value },
-    });
+  const addColor = () => {
+    setColors([
+      ...colors,
+      {
+        id: `color_${Date.now()}`,
+        name: "",
+        hex: "#000000",
+        qty_p: "",
+        qty_m: "",
+        qty_g: "",
+        qty_gg: "",
+      },
+    ]);
+  };
+
+  const removeColor = (id: string) => {
+    setColors(colors.filter((c) => c.id !== id));
+  };
+
+  const updateColor = (id: string, field: string, value: string) => {
+    setColors(
+      colors.map((c) => (c.id === id ? { ...c, [field]: value } : c))
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-
-    if (!formData.ref || !formData.name || !formData.price) {
-      setError("❌ Preencha Referência, Nome e Preço!");
-      return;
-    }
-
-    const hasQuantity = Object.values(formData.sizeQuantities).some((q) => q && parseInt(q) > 0);
-    if (!hasQuantity) {
-      setError("❌ Adicione quantidade para pelo menos um tamanho!");
-      return;
-    }
-
-    if (formData.images.length === 0) {
-      setError("❌ Adicione pelo menos uma foto do produto!");
-      return;
-    }
+    setLoading(true);
 
     try {
-      const sizesList = Object.keys(formData.sizeQuantities).filter(
-        (size) => formData.sizeQuantities[size as keyof typeof formData.sizeQuantities] && parseInt(formData.sizeQuantities[size as keyof typeof formData.sizeQuantities]) > 0
+      if (!formData.ref || !formData.name || !formData.price) {
+        throw new Error("❌ Preencha REF, Nome e Preço!");
+      }
+
+      if (colors.length === 0) {
+        throw new Error("❌ Adicione pelo menos uma cor!");
+      }
+
+      if (images.length === 0) {
+        throw new Error("❌ Adicione pelo menos uma foto!");
+      }
+
+      const hasQty = colors.some(
+        (c) =>
+          parseInt(c.qty_p) > 0 ||
+          parseInt(c.qty_m) > 0 ||
+          parseInt(c.qty_g) > 0 ||
+          parseInt(c.qty_gg) > 0
       );
+
+      if (!hasQty) {
+        throw new Error("❌ Adicione quantidade para pelo menos um tamanho!");
+      }
 
       const productData = {
         ref: formData.ref,
         name: formData.name,
-        category: "Lingerie",
-        gender: "Feminino",
-        price: parseFloat(formData.price),
-        images: formData.images,
-        color: formData.color,
-        colorHex: formData.colorHex,
-        sizes: sizesList,
-        sizeQuantities: formData.sizeQuantities,
-        timestamp: new Date().toISOString(),
+        price: formData.price,
+        colors: colors.map((c) => ({
+          name: c.name,
+          hex: c.hex,
+          qty_p: c.qty_p,
+          qty_m: c.qty_m,
+          qty_g: c.qty_g,
+          qty_gg: c.qty_gg,
+        })),
+        images,
       };
 
-      // Salvar no localStorage (para backup local)
-      const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
-      uploads.push(productData);
-      localStorage.setItem("belezanativa_product_uploads", JSON.stringify(uploads));
-      notifyStorageChange("belezanativa_product_uploads", uploads);
-
-      // Salvar no Supabase
-      const response = await fetch("/api/products-upload", {
+      const response = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(productData),
@@ -130,119 +153,133 @@ export default function PalmiraUploadPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Erro ao salvar no servidor");
+        throw new Error(errorData.error || "Erro ao salvar");
       }
 
-      setSuccess(`✅ Produto "${formData.name}" salvo com sucesso! (Local + Servidor)`);
-      setFormData({
-        ref: "",
-        name: "",
-        price: "",
-        color: "",
-        colorHex: "#000000",
-        sizeQuantities: { P: "", M: "", G: "", GG: "" },
-        images: [],
-      });
+      setSuccess(`✅ Produto "${formData.name}" salvo com sucesso! Aparecerá na loja em segundos!`);
+      setFormData({ ref: "", name: "", price: "" });
+      setColors([]);
+      setImages([]);
       setPreviews([]);
+
+      setTimeout(() => setSuccess(""), 4000);
     } catch (err: any) {
-      setError(`❌ ${err.message}`);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <Link href="/admin/palmira" className="text-sm text-gray-500 hover:text-gray-700 mb-4 block">
-            ← Voltar
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-800">📸 Upload de Produtos</h1>
-          <p className="text-gray-600 mt-1">Adicione fotos quantas quiser</p>
-        </div>
+      <div className="max-w-4xl mx-auto">
+        <Link href="/admin/palmira" className="text-sm text-gray-500 hover:text-gray-700 mb-4 block">
+          ← Voltar
+        </Link>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-          {/* Dados Básicos */}
-          <div className="space-y-4">
-            <h3 className="font-bold text-gray-800">📋 Dados do Produto</h3>
-            <div className="grid grid-cols-2 gap-4">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">📦 Upload de Produtos</h1>
+        <p className="text-gray-600 mb-8">Adicione fotos quantas quiser!</p>
+
+        <form onSubmit={handleSubmit} className="space-y-8 bg-white rounded-xl shadow-sm p-8">
+          {/* Dados do Produto */}
+          <div>
+            <h2 className="text-lg font-bold text-gray-800 mb-4">📋 Dados do Produto</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <input
                 type="text"
-                placeholder="Referência"
+                placeholder="Referência (ex: REF001)"
                 value={formData.ref}
                 onChange={(e) => setFormData({ ...formData, ref: e.target.value })}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+                className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
               />
               <input
                 type="text"
-                placeholder="Nome"
+                placeholder="Nome do produto"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+                className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
               />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
               <input
                 type="number"
                 step="0.01"
-                placeholder="Preço"
+                placeholder="Preço (ex: 50.00)"
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
-              />
-              <input
-                type="number"
-                placeholder="Quantidade"
-                value={formData.quantity}
-                onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+                className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
               />
             </div>
           </div>
 
-          {/* Cor */}
-          <div className="space-y-4">
-            <h3 className="font-bold text-gray-800">🎨 Cor</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Nome da cor"
-                value={formData.color}
-                onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
-              />
-              <input
-                type="color"
-                value={formData.colorHex}
-                onChange={(e) => setFormData({ ...formData, colorHex: e.target.value })}
-                className="px-3 py-2 border border-gray-300 rounded-lg cursor-pointer"
-              />
+          {/* Cores e Estoque */}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-gray-800">🎨 Cores e Estoque</h2>
+              <button
+                type="button"
+                onClick={addColor}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition-colors"
+              >
+                + Adicionar Cor
+              </button>
             </div>
+
+            {colors.length === 0 ? (
+              <p className="text-gray-500 text-sm">Clique em "Adicionar Cor" para começar</p>
+            ) : (
+              <div className="space-y-4">
+                {colors.map((color) => (
+                  <div key={color.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex gap-4 flex-1">
+                        <input
+                          type="text"
+                          placeholder="Nome da cor"
+                          value={color.name}
+                          onChange={(e) => updateColor(color.id, "name", e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+                        />
+                        <input
+                          type="color"
+                          value={color.hex}
+                          onChange={(e) => updateColor(color.id, "hex", e.target.value)}
+                          className="w-14 h-10 border border-gray-300 rounded-lg cursor-pointer"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeColor(color.id)}
+                        className="text-red-500 hover:text-red-700 font-bold text-lg ml-2"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-4 gap-2">
+                      {["P", "M", "G", "GG"].map((size) => (
+                        <div key={size} className="flex flex-col">
+                          <label className="text-xs font-bold text-gray-700 mb-1">{size}</label>
+                          <input
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            value={color[`qty_${size.toLowerCase()}` as keyof ColorInput] || ""}
+                            onChange={(e) =>
+                              updateColor(color.id, `qty_${size.toLowerCase()}`, e.target.value)
+                            }
+                            className="px-2 py-2 border border-gray-300 rounded-lg text-sm text-center focus:outline-none focus:border-[#7BC9C2]"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Tamanhos e Quantidade */}
-          <div className="space-y-4">
-            <h3 className="font-bold text-gray-800">📏 Tamanhos e Quantidade</h3>
-            <div className="grid grid-cols-2 gap-4">
-              {["P", "M", "G", "GG"].map((size) => (
-                <div key={size} className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-gray-700">{size}</label>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="Qtd"
-                    value={formData.sizeQuantities[size as keyof typeof formData.sizeQuantities]}
-                    onChange={(e) => handleSizeQuantityChange(size, e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Upload de Fotos */}
-          <div className="space-y-4">
-            <h3 className="font-bold text-gray-800">📷 Fotos</h3>
+          {/* Fotos */}
+          <div>
+            <h2 className="text-lg font-bold text-gray-800 mb-4">📷 Fotos</h2>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#7BC9C2] transition-colors">
               <input
                 type="file"
@@ -258,43 +295,43 @@ export default function PalmiraUploadPage() {
                 <p className="text-xs text-gray-500">Quantas quiser!</p>
               </label>
             </div>
-          </div>
 
-          {/* Preview */}
-          {previews.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-sm font-bold text-gray-700">{previews.length} foto(s)</p>
-              <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                {previews.map((preview, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={preview}
-                      alt={`Preview ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-lg border border-gray-200"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
+            {previews.length > 0 && (
+              <div className="mt-4">
+                <p className="text-sm font-bold text-gray-700 mb-3">{previews.length} foto(s)</p>
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                  {previews.map((preview, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Mensagens */}
           {success && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
           {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
 
-          {/* Submit */}
+          {/* Botão Submit */}
           <button
             type="submit"
-            className="w-full bg-[#7BC9C2] hover:bg-[#5fb3ac] text-white font-bold py-3 rounded-lg transition-colors"
+            disabled={loading}
+            className="w-full bg-[#7BC9C2] hover:bg-[#5fb3ac] disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-colors"
           >
-            ✅ SALVAR PRODUTO
+            {loading ? "⏳ Salvando..." : "✅ SALVAR PRODUTO"}
           </button>
         </form>
       </div>
