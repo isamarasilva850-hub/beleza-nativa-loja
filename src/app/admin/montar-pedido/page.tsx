@@ -102,6 +102,7 @@ export default function MontarPedidoPage() {
                       onClick={() => {
                         setSelectedProduct(product);
                         setSelectedColor("");
+                        setSelectedSize("");
                       }}
                       className={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-blue-50 transition-colors ${
                         selectedProduct?.id === product.id ? "bg-blue-100" : ""
@@ -124,7 +125,10 @@ export default function MontarPedidoPage() {
                     {selectedProduct.variants.map((variant) => (
                       <button
                         key={variant.color}
-                        onClick={() => setSelectedColor(variant.color)}
+                        onClick={() => {
+                          setSelectedColor(variant.color);
+                          setSelectedSize("");
+                        }}
                         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                           selectedColor === variant.color
                             ? "bg-[#7BC9C2] text-white"
