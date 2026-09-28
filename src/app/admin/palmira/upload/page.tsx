@@ -11,8 +11,7 @@ export default function PalmiraUploadPage() {
     price: "",
     color: "",
     colorHex: "#000000",
-    sizes: [] as string[],
-    quantity: "",
+    sizeQuantities: { P: "", M: "", G: "", GG: "" },
     images: [] as string[],
   });
 
@@ -69,12 +68,10 @@ export default function PalmiraUploadPage() {
     setPreviews(newPreviews);
   };
 
-  const handleSizeChange = (size: string) => {
+  const handleSizeQuantityChange = (size: string, value: string) => {
     setFormData({
       ...formData,
-      sizes: formData.sizes.includes(size)
-        ? formData.sizes.filter((s) => s !== size)
-        : [...formData.sizes, size],
+      sizeQuantities: { ...formData.sizeQuantities, [size]: value },
     });
   };
 
@@ -83,13 +80,14 @@ export default function PalmiraUploadPage() {
     setError("");
     setSuccess("");
 
-    if (!formData.ref || !formData.name || !formData.price || !formData.quantity) {
-      setError("❌ Preencha Referência, Nome, Preço e Quantidade!");
+    if (!formData.ref || !formData.name || !formData.price) {
+      setError("❌ Preencha Referência, Nome e Preço!");
       return;
     }
 
-    if (formData.sizes.length === 0) {
-      setError("❌ Selecione pelo menos um tamanho!");
+    const hasQuantity = Object.values(formData.sizeQuantities).some((q) => q && parseInt(q) > 0);
+    if (!hasQuantity) {
+      setError("❌ Adicione quantidade para pelo menos um tamanho!");
       return;
     }
 
@@ -99,6 +97,10 @@ export default function PalmiraUploadPage() {
     }
 
     try {
+      const sizesList = Object.keys(formData.sizeQuantities).filter(
+        (size) => formData.sizeQuantities[size as keyof typeof formData.sizeQuantities] && parseInt(formData.sizeQuantities[size as keyof typeof formData.sizeQuantities]) > 0
+      );
+
       const productData = {
         ref: formData.ref,
         name: formData.name,
@@ -108,8 +110,8 @@ export default function PalmiraUploadPage() {
         images: formData.images,
         color: formData.color,
         colorHex: formData.colorHex,
-        sizes: formData.sizes,
-        quantity: parseInt(formData.quantity),
+        sizes: sizesList,
+        sizeQuantities: formData.sizeQuantities,
         timestamp: new Date().toISOString(),
       };
 
@@ -138,8 +140,7 @@ export default function PalmiraUploadPage() {
         price: "",
         color: "",
         colorHex: "#000000",
-        sizes: [],
-        quantity: "",
+        sizeQuantities: { P: "", M: "", G: "", GG: "" },
         images: [],
       });
       setPreviews([]);
@@ -219,23 +220,22 @@ export default function PalmiraUploadPage() {
             </div>
           </div>
 
-          {/* Tamanhos */}
+          {/* Tamanhos e Quantidade */}
           <div className="space-y-4">
-            <h3 className="font-bold text-gray-800">📏 Tamanhos</h3>
-            <div className="flex gap-2">
+            <h3 className="font-bold text-gray-800">📏 Tamanhos e Quantidade</h3>
+            <div className="grid grid-cols-2 gap-4">
               {["P", "M", "G", "GG"].map((size) => (
-                <button
-                  key={size}
-                  type="button"
-                  onClick={() => handleSizeChange(size)}
-                  className={`px-4 py-2 rounded font-bold transition-colors ${
-                    formData.sizes.includes(size)
-                      ? "bg-[#7BC9C2] text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
-                >
-                  {size}
-                </button>
+                <div key={size} className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-gray-700">{size}</label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="Qtd"
+                    value={formData.sizeQuantities[size as keyof typeof formData.sizeQuantities]}
+                    onChange={(e) => handleSizeQuantityChange(size, e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+                  />
+                </div>
               ))}
             </div>
           </div>
