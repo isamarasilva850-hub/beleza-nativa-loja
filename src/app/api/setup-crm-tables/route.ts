@@ -36,6 +36,13 @@ export async function POST() {
       });
     } catch (e) { }
 
+    // Criar tabela partners (cadastros da loja)
+    try {
+      await supabase.rpc('exec_sql', {
+        sql: `CREATE TABLE IF NOT EXISTS partners (id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT, phone TEXT NOT NULL, company TEXT, cnpj TEXT, city TEXT, state TEXT, status TEXT DEFAULT 'ativo', createdAt TIMESTAMP DEFAULT NOW(), totalOrders INTEGER DEFAULT 0, totalSpent NUMERIC DEFAULT 0);`
+      });
+    } catch (e) { }
+
     return NextResponse.json({ message: 'Tabelas criadas com sucesso!' });
   } catch (error) {
     console.error('Erro ao criar tabelas:', error);
