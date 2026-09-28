@@ -60,9 +60,10 @@ export default function Cadastro() {
       return;
     }
 
-    // Salvar no Supabase
+    // Salvar em 3 lugares: Partners, Lead e Cliente
     try {
-      const response = await fetch('/api/partners', {
+      // 1. Salvar como PARTNER
+      await fetch('/api/partners', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -76,7 +77,32 @@ export default function Cadastro() {
         })
       });
 
-      if (!response.ok) throw new Error('Erro ao salvar cadastro');
+      // 2. Salvar como LEAD
+      await fetch('/api/crm/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: form.name,
+          email: form.email,
+          telefone: form.phone,
+          origem: 'cadastro_loja',
+          status: 'novo',
+          notas: `Empresa: ${form.company || 'N/A'}\nCNPJ/CPF: ${form.cnpj || 'N/A'}\nCidade: ${form.city || 'N/A'}`,
+        })
+      });
+
+      // 3. Salvar como CLIENTE
+      await fetch('/api/crm/clientes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: form.name,
+          email: form.email,
+          telefone: form.phone,
+          tipo: form.company ? 'empresarial' : 'varejo',
+          status: 'ativo',
+        })
+      });
     } catch (err) {
       console.error('Erro ao salvar no Supabase:', err);
     }
