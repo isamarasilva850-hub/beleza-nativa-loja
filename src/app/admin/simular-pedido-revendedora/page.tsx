@@ -130,8 +130,6 @@ export default function SimularPedidoRevendedora() {
         total: totalPrice,
         date: new Date().toISOString().split('T')[0],
         status: 'pendente',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
       });
       alert('✅ Pedido criado com sucesso! Vá para Pedidos das Revendedoras');
       setCart([]);

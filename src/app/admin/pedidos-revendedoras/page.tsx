@@ -15,7 +15,7 @@ export default function PedidosRevendedoras() {
 
   const sendArtes = async (order: any) => {
     // Buscar REFs do pedido
-    const refs = [...new Set(order.items.map((item: any) => item.ref))];
+    const refs = [...new Set((order.items || []).map((item: any): string => item.ref))] as string[];
 
     // Gerar link do catálogo
     const catalogLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/catalogo-revendedora/${order.partnerId}`;
@@ -23,7 +23,7 @@ export default function PedidosRevendedoras() {
     // Criar mensagem com legendas de cada peça
     const artesMsg = refs
       .map((ref: string) => {
-        const arteLegenda = artesLegendasMap[ref];
+        const arteLegenda = artesLegendasMap[ref as keyof typeof artesLegendasMap];
         const legenda = arteLegenda?.legendaCurta || arteLegenda?.legendaCompleta || `REF ${ref}`;
 
         return `📸 REF ${ref}\n${legenda}`;
