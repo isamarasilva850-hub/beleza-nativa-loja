@@ -17,7 +17,10 @@ export async function GET() {
     return NextResponse.json(data || []);
   } catch (error) {
     console.error('Erro ao carregar propostas:', error);
-    return NextResponse.json({ error: 'Erro ao carregar propostas' }, { status: 500 });
+    return NextResponse.json({
+      error: 'Erro ao carregar propostas',
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 });
   }
 }
 

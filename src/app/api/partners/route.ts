@@ -67,7 +67,10 @@ export async function GET() {
   } catch (error) {
     console.error('Erro ao carregar parceiros:', error);
     return NextResponse.json(
-      { error: 'Erro ao carregar parceiros' },
+      {
+        error: 'Erro ao carregar parceiros',
+        details: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }
