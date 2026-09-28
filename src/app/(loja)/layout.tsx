@@ -17,7 +17,7 @@ export default function LojaLayout({
       <CartProvider>
         <Header />
         <main className="flex-1">{children}</main>
-        <Footer />
+        {/* <Footer /> */}
         <WhatsAppButton />
         <CartSidebar />
       </CartProvider>
