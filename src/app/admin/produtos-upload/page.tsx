@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function AdminProdutosUpload() {
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [formData, setFormData] = useState({
     ref: "",
     name: "",
@@ -19,6 +22,41 @@ export default function AdminProdutosUpload() {
   const [previews, setPreviews] = useState<string[]>([]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const loadProducts = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/products-upload");
+      if (res.ok) {
+        const data = await res.json();
+        setProducts(data || []);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar produtos:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteProduct = async (id: string) => {
+    if (!confirm("Deletar este produto?")) return;
+    try {
+      const res = await fetch(`/api/products-upload/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setSuccess("✅ Produto deletado!");
+        loadProducts();
+        setTimeout(() => setSuccess(""), 2000);
+      } else {
+        setError("❌ Erro ao deletar");
+      }
+    } catch (err: any) {
+      setError(`❌ ${err.message}`);
+    }
+  };
 
   const optimizeImage = (imgBase64: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -206,7 +244,7 @@ export default function AdminProdutosUpload() {
         throw new Error(errorData.error || "Erro ao salvar no servidor");
       }
 
-      setSuccess(`✅ Produto criado com ${formData.images.length} fotos! (Local + Servidor)`);
+      setSuccess(`✅ Produto criado com ${formData.images.length} fotos!`);
       setFormData({
         ref: "",
         name: "",
@@ -220,6 +258,7 @@ export default function AdminProdutosUpload() {
         images: [],
       });
       setPreviews([]);
+      loadProducts();
     } catch (err: any) {
       setError(`❌ ${err.message}`);
     }
@@ -416,6 +455,54 @@ export default function AdminProdutosUpload() {
           ✅ ENVIAR PRODUTO COM {formData.images.length} FOTO{formData.images.length !== 1 ? "S" : ""}
         </button>
       </form>
+
+      {/* Lista de Produtos Salvos */}
+      <div>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">📦 Produtos Salvos ({products.length})</h2>
+        {loading ? (
+          <p className="text-gray-500 text-center py-8">Carregando produtos...</p>
+        ) : products.length === 0 ? (
+          <div className="bg-gray-50 rounded-lg p-8 text-center text-gray-500">
+            <p>Nenhum produto salvo ainda</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {products.map((product) => (
+              <div key={product.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                <div className="flex gap-3">
+                  {product.images?.[0] && (
+                    <img
+                      src={product.images[0]}
+                      alt={product.name}
+                      className="w-20 h-20 object-cover rounded border border-gray-200"
+                    />
+                  )}
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-bold text-gray-800 text-sm">{product.name}</p>
+                        <p className="text-xs text-gray-500">Ref: {product.ref}</p>
+                        <p className="text-xs text-gray-600 mt-1">
+                          R$ {product.price?.toFixed(2) || 'N/A'}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => deleteProduct(product.id)}
+                        className="text-red-500 hover:text-red-700 text-sm font-bold"
+                      >
+                        ❌
+                      </button>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-2">
+                      {product.images?.length || 0} foto(s) | {product.quantity} un.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
