@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
-import FloatingButton from "@/components/FloatingButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,7 +21,6 @@ export default function RootLayout({
     <html lang="pt-BR" className={`${geistSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col relative">
         {children}
-        <FloatingButton />
       </body>
     </html>
   );
