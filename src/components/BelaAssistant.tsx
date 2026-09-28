@@ -9,6 +9,30 @@ interface Message {
   type?: "guide" | "message" | "generic";
 }
 
+const BelaAvatar = () => (
+  <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    {/* Background circle */}
+    <circle cx="50" cy="50" r="50" fill="#7BC9C2" />
+
+    {/* Face */}
+    <circle cx="50" cy="45" r="25" fill="#FFE4E1" />
+
+    {/* Hair */}
+    <path d="M 25 45 Q 25 20 50 20 Q 75 20 75 45" fill="#8B4513" />
+
+    {/* Eyes */}
+    <circle cx="40" cy="40" r="3" fill="#333" />
+    <circle cx="60" cy="40" r="3" fill="#333" />
+
+    {/* Smile */}
+    <path d="M 40 50 Q 50 55 60 50" stroke="#333" strokeWidth="2" fill="none" strokeLinecap="round" />
+
+    {/* Sparkle effect */}
+    <circle cx="30" cy="25" r="2" fill="#FFD700" opacity="0.8" />
+    <circle cx="70" cy="30" r="2" fill="#FFD700" opacity="0.8" />
+  </svg>
+);
+
 export default function BelaAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -80,10 +104,12 @@ export default function BelaAssistant() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:shadow-xl transition-all transform hover:scale-110 z-40"
+        className="fixed bottom-6 right-6 bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:shadow-xl transition-all transform hover:scale-110 z-40 border-2 border-white overflow-hidden"
         title="Abrir Bela"
       >
-        <span className="text-2xl">💬</span>
+        <div className="w-full h-full">
+          <BelaAvatar />
+        </div>
       </button>
     );
   }
@@ -92,9 +118,14 @@ export default function BelaAssistant() {
     <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col z-50 border border-gray-200">
       {/* Header */}
       <div className="bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] text-white p-4 rounded-t-2xl flex justify-between items-center">
-        <div>
-          <h3 className="font-bold text-lg">🤖 Bela</h3>
-          <p className="text-xs opacity-90">Sua assistente de IA</p>
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center overflow-hidden">
+            <BelaAvatar />
+          </div>
+          <div>
+            <h3 className="font-bold text-lg">Bela</h3>
+            <p className="text-xs opacity-90">Sua assistente de IA</p>
+          </div>
         </div>
         <button
           onClick={() => setIsOpen(false)}
