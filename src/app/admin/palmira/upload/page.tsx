@@ -93,6 +93,11 @@ export default function PalmiraUploadPage() {
       return;
     }
 
+    if (formData.images.length === 0) {
+      setError("❌ Adicione pelo menos uma foto do produto!");
+      return;
+    }
+
     try {
       const productData = {
         ref: formData.ref,
