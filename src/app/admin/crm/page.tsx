@@ -92,7 +92,8 @@ export default function CRM() {
   const [formCliente, setFormCliente] = useState({ nome: "", email: "", telefone: "", tipo: "varejo", comissao: 0 });
   const [formLead, setFormLead] = useState({ nome: "", email: "", telefone: "", origem: "whatsapp", valor: 0, notas: "", vendedor: "Isamara" });
   const [formAtividade, setFormAtividade] = useState({ tipo: "chamada", clienteId: "", descricao: "", usuario: "Isamara" });
-  const [formProposta, setFormProposta] = useState({ numero: "", clienteId: "", valor: 0, itens: 0 });
+  const [formProposta, setFormProposta] = useState({ clienteId: "", clienteNome: "", valor: 0, dataVencimento: "", descricao: "" });
+  const [editingPropostaId, setEditingPropostaId] = useState<string | null>(null);
 
   const [searchClientes, setSearchClientes] = useState("");
   const [searchLeads, setSearchLeads] = useState("");
@@ -134,6 +135,38 @@ export default function CRM() {
     const storedPropostas = localStorage.getItem("belezanativa_crm_propostas");
     if (storedPropostas) setPropostas(JSON.parse(storedPropostas));
   }, []);
+
+  const savePropostas = (updated: Proposta[]) => {
+    setPropostas(updated);
+    localStorage.setItem("belezanativa_crm_propostas", JSON.stringify(updated));
+  };
+
+  const addProposta = () => {
+    if (!formProposta.clienteId || !formProposta.valor) return;
+    const numero = `PROP-${Date.now().toString(36).toUpperCase()}`;
+    const novo: Proposta = {
+      id: Date.now().toString(),
+      numero,
+      clienteId: formProposta.clienteId,
+      clienteNome: formProposta.clienteNome,
+      valor: formProposta.valor,
+      status: "rascunho",
+      dataEnvio: new Date().toISOString().split("T")[0],
+      dataVencimento: formProposta.dataVencimento || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      itens: 1,
+    };
+    savePropostas([novo, ...propostas]);
+    setFormProposta({ clienteId: "", clienteNome: "", valor: 0, dataVencimento: "", descricao: "" });
+    setShowNovaProposta(false);
+  };
+
+  const updateProposta = (id: string, updates: Partial<Proposta>) => {
+    savePropostas(propostas.map(p => p.id === id ? { ...p, ...updates } : p));
+  };
+
+  const deleteProposta = (id: string) => {
+    savePropostas(propostas.filter(p => p.id !== id));
+  };
 
   const saveClientes = (updated: Cliente[]) => {
     setClientes(updated);
@@ -621,15 +654,114 @@ export default function CRM() {
       {/* PROPOSTAS */}
       {tab === "propostas" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <h2 className="text-xl font-bold text-gray-800">Propostas e Orçamentos</h2>
             <button onClick={() => setShowNovaProposta(!showNovaProposta)} className="px-4 py-2 bg-[#7BC9C2] text-white rounded-lg text-sm font-bold hover:bg-[#6ab8b1]">
               + Nova Proposta
             </button>
           </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400">
-            <p className="font-medium">Módulo de propostas em desenvolvimento</p>
-            <p className="text-xs mt-2">Você será capaz de criar, enviar e rastrear propostas de clientes</p>
+
+          {showNovaProposta && (
+            <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+              <h3 className="font-bold text-gray-700">Criar Proposta</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <select
+                  value={formProposta.clienteId}
+                  onChange={(e) => {
+                    const cliente = clientes.find(c => c.id === e.target.value);
+                    setFormProposta({
+                      ...formProposta,
+                      clienteId: e.target.value,
+                      clienteNome: cliente?.nome || ""
+                    });
+                  }}
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
+                >
+                  <option value="">Selecione o cliente *</option>
+                  {clientes.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+                </select>
+                <input
+                  type="number"
+                  placeholder="Valor (R$) *"
+                  value={formProposta.valor}
+                  onChange={(e) => setFormProposta({ ...formProposta, valor: parseFloat(e.target.value) })}
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
+                />
+                <input
+                  type="date"
+                  placeholder="Data de Vencimento"
+                  value={formProposta.dataVencimento}
+                  onChange={(e) => setFormProposta({ ...formProposta, dataVencimento: e.target.value })}
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
+                />
+                <textarea
+                  placeholder="Descrição (opcional)"
+                  value={formProposta.descricao}
+                  onChange={(e) => setFormProposta({ ...formProposta, descricao: e.target.value })}
+                  className="col-span-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
+                  rows={2}
+                />
+              </div>
+              <div className="flex gap-2">
+                <button onClick={addProposta} className="px-4 py-2 bg-[#7BC9C2] text-white rounded-lg text-sm font-bold hover:bg-[#6ab8b1]">Salvar</button>
+                <button onClick={() => setShowNovaProposta(false)} className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200">Cancelar</button>
+              </div>
+            </div>
+          )}
+
+          <div className="grid gap-3">
+            {propostas.length === 0 ? (
+              <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400">
+                <p className="font-medium">Nenhuma proposta criada</p>
+              </div>
+            ) : (
+              propostas.map(proposta => (
+                <div key={proposta.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-bold text-gray-800">{proposta.clienteNome}</h3>
+                        <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded">{proposta.numero}</span>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                          proposta.status === "rascunho" ? "bg-gray-100 text-gray-700" :
+                          proposta.status === "enviada" ? "bg-blue-100 text-blue-700" :
+                          proposta.status === "visualizada" ? "bg-cyan-100 text-cyan-700" :
+                          proposta.status === "aceita" ? "bg-green-100 text-green-700" :
+                          "bg-red-100 text-red-700"
+                        }`}>
+                          {proposta.status}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2 text-xs text-gray-500">
+                        <span>💰 R$ {proposta.valor.toLocaleString("pt-BR")}</span>
+                        <span>📅 Vence: {proposta.dataVencimento}</span>
+                        <span>📨 Enviada: {proposta.dataEnvio}</span>
+                        <span>📦 {proposta.itens} item(ns)</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <select
+                        value={proposta.status}
+                        onChange={(e) => updateProposta(proposta.id, { status: e.target.value as any })}
+                        className="px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#7BC9C2]"
+                      >
+                        <option value="rascunho">Rascunho</option>
+                        <option value="enviada">Enviada</option>
+                        <option value="visualizada">Visualizada</option>
+                        <option value="aceita">Aceita</option>
+                        <option value="rejeitada">Rejeitada</option>
+                      </select>
+                      <button
+                        onClick={() => deleteProposta(proposta.id)}
+                        className="px-3 py-1.5 bg-red-100 text-red-600 rounded-lg text-xs font-medium hover:bg-red-200 transition-colors"
+                      >
+                        ❌
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}
