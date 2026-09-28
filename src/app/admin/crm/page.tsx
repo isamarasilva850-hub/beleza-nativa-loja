@@ -94,6 +94,7 @@ export default function CRM() {
   const [formAtividade, setFormAtividade] = useState({ tipo: "chamada", clienteId: "", descricao: "", usuario: "Isamara" });
   const [formProposta, setFormProposta] = useState({ clienteId: "", clienteNome: "", valor: 0, dataVencimento: "", descricao: "" });
   const [editingPropostaId, setEditingPropostaId] = useState<string | null>(null);
+  const [editingAtividadeId, setEditingAtividadeId] = useState<string | null>(null);
 
   const [searchClientes, setSearchClientes] = useState("");
   const [searchLeads, setSearchLeads] = useState("");
@@ -216,6 +217,11 @@ export default function CRM() {
     setShowNovoLead(false);
   };
 
+  const saveAtividades = (updated: Atividade[]) => {
+    setAtividades(updated);
+    localStorage.setItem("belezanativa_crm_atividades", JSON.stringify(updated));
+  };
+
   const addAtividade = () => {
     if (!formAtividade.descricao || !formAtividade.clienteId) return;
     const novo: Atividade = {
@@ -227,9 +233,17 @@ export default function CRM() {
       data: new Date().toISOString().split("T")[0],
       usuario: formAtividade.usuario,
     };
-    setAtividades([novo, ...atividades]);
+    saveAtividades([novo, ...atividades]);
     setFormAtividade({ tipo: "chamada", clienteId: "", descricao: "", usuario: "Isamara" });
     setShowNovaAtividade(false);
+  };
+
+  const updateAtividade = (id: string, updates: Partial<Atividade>) => {
+    saveAtividades(atividades.map(a => a.id === id ? { ...a, ...updates } : a));
+  };
+
+  const deleteAtividade = (id: string) => {
+    saveAtividades(atividades.filter(a => a.id !== id));
   };
 
   const updateLeadStatus = (id: string, status: Lead["status"]) => {
@@ -612,8 +626,29 @@ export default function CRM() {
                 <textarea placeholder="Descrição da atividade..." value={formAtividade.descricao} onChange={(e) => setFormAtividade({ ...formAtividade, descricao: e.target.value })} className="col-span-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]" rows={2} />
               </div>
               <div className="flex gap-2">
-                <button onClick={addAtividade} className="px-4 py-2 bg-[#7BC9C2] text-white rounded-lg text-sm font-bold hover:bg-[#6ab8b1]">Salvar</button>
-                <button onClick={() => setShowNovaAtividade(false)} className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200">Cancelar</button>
+                <button
+                  onClick={() => {
+                    if (editingAtividadeId) {
+                      updateAtividade(editingAtividadeId, { tipo: formAtividade.tipo as any, descricao: formAtividade.descricao });
+                      setEditingAtividadeId(null);
+                    } else {
+                      addAtividade();
+                    }
+                  }}
+                  className="px-4 py-2 bg-[#7BC9C2] text-white rounded-lg text-sm font-bold hover:bg-[#6ab8b1]"
+                >
+                  {editingAtividadeId ? "Atualizar" : "Salvar"}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowNovaAtividade(false);
+                    setEditingAtividadeId(null);
+                    setFormAtividade({ tipo: "chamada", clienteId: "", descricao: "", usuario: "Isamara" });
+                  }}
+                  className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200"
+                >
+                  Cancelar
+                </button>
               </div>
             </div>
           )}
@@ -642,6 +677,23 @@ export default function CRM() {
                         <span>👤 {a.usuario}</span>
                         {a.resultado && <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded">✓ {a.resultado}</span>}
                       </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setEditingAtividadeId(a.id);
+                          setFormAtividade({ tipo: a.tipo, clienteId: a.clienteId, descricao: a.descricao, usuario: a.usuario });
+                        }}
+                        className="px-2 py-1.5 bg-blue-100 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-200 transition-colors"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => deleteAtividade(a.id)}
+                        className="px-2 py-1.5 bg-red-100 text-red-600 rounded-lg text-xs font-medium hover:bg-red-200 transition-colors"
+                      >
+                        ❌
+                      </button>
                     </div>
                   </div>
                 </div>
