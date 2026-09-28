@@ -102,71 +102,80 @@ export default function CRM() {
   const [filterTipoCliente, setFilterTipoCliente] = useState("todos");
 
   useEffect(() => {
-    const stored = localStorage.getItem("belezanativa_crm_clientes");
-    if (stored) setClientes(JSON.parse(stored));
-    else {
-      const demo: Cliente[] = [
-        { id: "1", nome: "Rose Shop", email: "rose@shop.com", telefone: "(35) 99999-0001", tipo: "revenda", status: "ativo", dataCadastro: "2024-01-15", ultimaCompra: "2024-09-20", totalGasto: 15000, compras: 28, comissao: 5 },
-        { id: "2", nome: "Dona Bonita", email: "donabonita@email.com", telefone: "(35) 99999-0002", tipo: "revenda", status: "ativo", dataCadastro: "2024-03-10", ultimaCompra: "2024-09-18", totalGasto: 8500, compras: 15, comissao: 5 },
-      ];
-      setClientes(demo);
-      localStorage.setItem("belezanativa_crm_clientes", JSON.stringify(demo));
-    }
-
-    const storedLeads = localStorage.getItem("belezanativa_crm_leads");
-    if (storedLeads) setLeads(JSON.parse(storedLeads));
-    else {
-      const demoLeads: Lead[] = [
-        { id: "1", nome: "The Store", email: "thestore@shop.com", telefone: "(35) 99999-0003", origem: "whatsapp", status: "negociacao", valor: 5000, dataCadastro: "2024-09-16", proximoContato: "2024-09-25", notas: "Interesse em pacote atacado", vendedor: "Isamara" },
-      ];
-      setLeads(demoLeads);
-      localStorage.setItem("belezanativa_crm_leads", JSON.stringify(demoLeads));
-    }
-
-    const storedAtividades = localStorage.getItem("belezanativa_crm_atividades");
-    if (storedAtividades) setAtividades(JSON.parse(storedAtividades));
-    else {
-      const demoAtividades: Atividade[] = [
-        { id: "1", tipo: "chamada", clienteId: "1", clienteNome: "Rose Shop", descricao: "Confirmação de pedido", data: "2024-09-20", usuario: "Isamara", resultado: "Pedido confirmado" },
-      ];
-      setAtividades(demoAtividades);
-      localStorage.setItem("belezanativa_crm_atividades", JSON.stringify(demoAtividades));
-    }
-
-    const storedPropostas = localStorage.getItem("belezanativa_crm_propostas");
-    if (storedPropostas) setPropostas(JSON.parse(storedPropostas));
+    loadAllData();
   }, []);
+
+  const loadAllData = async () => {
+    try {
+      // Carregar do Supabase
+      const [clientesRes, leadsRes, atividadesRes, propostasRes] = await Promise.all([
+        fetch("/api/crm/clientes"),
+        fetch("/api/crm/leads"),
+        fetch("/api/crm/atividades"),
+        fetch("/api/crm/propostas"),
+      ]);
+
+      if (clientesRes.ok) setClientes(await clientesRes.json());
+      if (leadsRes.ok) setLeads(await leadsRes.json());
+      if (atividadesRes.ok) setAtividades(await atividadesRes.json());
+      if (propostasRes.ok) setPropostas(await propostasRes.json());
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+      // Fallback pra localStorage se Supabase falhar
+      const stored = localStorage.getItem("belezanativa_crm_clientes");
+      if (stored) setClientes(JSON.parse(stored));
+    }
+  };
 
   const savePropostas = (updated: Proposta[]) => {
     setPropostas(updated);
     localStorage.setItem("belezanativa_crm_propostas", JSON.stringify(updated));
   };
 
-  const addProposta = () => {
+  const addProposta = async () => {
     if (!formProposta.clienteId || !formProposta.valor) return;
-    const numero = `PROP-${Date.now().toString(36).toUpperCase()}`;
-    const novo: Proposta = {
-      id: Date.now().toString(),
-      numero,
-      clienteId: formProposta.clienteId,
-      clienteNome: formProposta.clienteNome,
-      valor: formProposta.valor,
-      status: "rascunho",
-      dataEnvio: new Date().toISOString().split("T")[0],
-      dataVencimento: formProposta.dataVencimento || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-      itens: 1,
-    };
-    savePropostas([novo, ...propostas]);
-    setFormProposta({ clienteId: "", clienteNome: "", valor: 0, dataVencimento: "", descricao: "" });
-    setShowNovaProposta(false);
+    try {
+      const res = await fetch("/api/crm/propostas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          numero: `PROP-${Date.now().toString(36).toUpperCase()}`,
+          clienteId: formProposta.clienteId,
+          clienteNome: formProposta.clienteNome,
+          valor: formProposta.valor,
+          dataVencimento: formProposta.dataVencimento || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        }),
+      });
+      if (res.ok) {
+        loadAllData();
+        setFormProposta({ clienteId: "", clienteNome: "", valor: 0, dataVencimento: "", descricao: "" });
+        setShowNovaProposta(false);
+      }
+    } catch (err) {
+      console.error("Erro ao criar proposta:", err);
+    }
   };
 
-  const updateProposta = (id: string, updates: Partial<Proposta>) => {
-    savePropostas(propostas.map(p => p.id === id ? { ...p, ...updates } : p));
+  const updateProposta = async (id: string, updates: Partial<Proposta>) => {
+    try {
+      await fetch(`/api/crm/propostas/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      loadAllData();
+    } catch (err) {
+      console.error("Erro ao atualizar proposta:", err);
+    }
   };
 
-  const deleteProposta = (id: string) => {
-    savePropostas(propostas.filter(p => p.id !== id));
+  const deleteProposta = async (id: string) => {
+    try {
+      await fetch(`/api/crm/propostas/${id}`, { method: "DELETE" });
+      loadAllData();
+    } catch (err) {
+      console.error("Erro ao deletar proposta:", err);
+    }
   };
 
   const saveClientes = (updated: Cliente[]) => {
@@ -179,42 +188,44 @@ export default function CRM() {
     localStorage.setItem("belezanativa_crm_leads", JSON.stringify(updated));
   };
 
-  const addCliente = () => {
-    if (!formCliente.nome) return;
-    const novo: Cliente = {
-      id: Date.now().toString(),
-      nome: formCliente.nome,
-      email: formCliente.email,
-      telefone: formCliente.telefone,
-      tipo: formCliente.tipo as "varejo" | "revenda" | "atacado",
-      comissao: formCliente.comissao || 0,
-      status: "ativo",
-      dataCadastro: new Date().toISOString().split("T")[0],
-      totalGasto: 0,
-      compras: 0,
-    };
-    saveClientes([novo, ...clientes]);
-    setFormCliente({ nome: "", email: "", telefone: "", tipo: "varejo", comissao: 0 });
-    setShowNovoCliente(false);
+  const saveAtividadestoSupabase = (atividades: Atividade[]) => {
+    localStorage.setItem("belezanativa_crm_atividades", JSON.stringify(atividades));
   };
 
-  const addLead = () => {
+  const addCliente = async () => {
+    if (!formCliente.nome) return;
+    try {
+      const res = await fetch("/api/crm/clientes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formCliente),
+      });
+      if (res.ok) {
+        loadAllData();
+        setFormCliente({ nome: "", email: "", telefone: "", tipo: "varejo", comissao: 0 });
+        setShowNovoCliente(false);
+      }
+    } catch (err) {
+      console.error("Erro ao criar cliente:", err);
+    }
+  };
+
+  const addLead = async () => {
     if (!formLead.nome) return;
-    const novo: Lead = {
-      id: Date.now().toString(),
-      nome: formLead.nome,
-      email: formLead.email,
-      telefone: formLead.telefone,
-      origem: formLead.origem as "whatsapp" | "instagram" | "indicacao" | "site" | "outro",
-      valor: formLead.valor,
-      notas: formLead.notas,
-      vendedor: formLead.vendedor,
-      status: "novo",
-      dataCadastro: new Date().toISOString().split("T")[0],
-    };
-    saveLeads([novo, ...leads]);
-    setFormLead({ nome: "", email: "", telefone: "", origem: "whatsapp", valor: 0, notas: "", vendedor: "Isamara" });
-    setShowNovoLead(false);
+    try {
+      const res = await fetch("/api/crm/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formLead),
+      });
+      if (res.ok) {
+        loadAllData();
+        setFormLead({ nome: "", email: "", telefone: "", origem: "whatsapp", valor: 0, notas: "", vendedor: "Isamara" });
+        setShowNovoLead(false);
+      }
+    } catch (err) {
+      console.error("Erro ao criar lead:", err);
+    }
   };
 
   const saveAtividades = (updated: Atividade[]) => {
@@ -222,36 +233,76 @@ export default function CRM() {
     localStorage.setItem("belezanativa_crm_atividades", JSON.stringify(updated));
   };
 
-  const addAtividade = () => {
+  const addAtividade = async () => {
     if (!formAtividade.descricao || !formAtividade.clienteId) return;
-    const novo: Atividade = {
-      id: Date.now().toString(),
-      tipo: formAtividade.tipo as "chamada" | "email" | "mensagem" | "reuniao" | "visita",
-      clienteId: formAtividade.clienteId,
-      clienteNome: clientes.find(c => c.id === formAtividade.clienteId)?.nome || "",
-      descricao: formAtividade.descricao,
-      data: new Date().toISOString().split("T")[0],
-      usuario: formAtividade.usuario,
-    };
-    saveAtividades([novo, ...atividades]);
-    setFormAtividade({ tipo: "chamada", clienteId: "", descricao: "", usuario: "Isamara" });
-    setShowNovaAtividade(false);
+    try {
+      const res = await fetch("/api/crm/atividades", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tipo: formAtividade.tipo,
+          clienteId: formAtividade.clienteId,
+          clienteNome: clientes.find(c => c.id === formAtividade.clienteId)?.nome || "",
+          descricao: formAtividade.descricao,
+          usuario: formAtividade.usuario,
+        }),
+      });
+      if (res.ok) {
+        loadAllData();
+        setFormAtividade({ tipo: "chamada", clienteId: "", descricao: "", usuario: "Isamara" });
+        setShowNovaAtividade(false);
+      }
+    } catch (err) {
+      console.error("Erro ao criar atividade:", err);
+    }
   };
 
-  const updateAtividade = (id: string, updates: Partial<Atividade>) => {
-    saveAtividades(atividades.map(a => a.id === id ? { ...a, ...updates } : a));
+  const updateAtividade = async (id: string, updates: Partial<Atividade>) => {
+    try {
+      await fetch(`/api/crm/atividades/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      loadAllData();
+    } catch (err) {
+      console.error("Erro ao atualizar atividade:", err);
+    }
   };
 
-  const deleteAtividade = (id: string) => {
-    saveAtividades(atividades.filter(a => a.id !== id));
+  const deleteAtividade = async (id: string) => {
+    try {
+      await fetch(`/api/crm/atividades/${id}`, { method: "DELETE" });
+      loadAllData();
+    } catch (err) {
+      console.error("Erro ao deletar atividade:", err);
+    }
   };
 
-  const updateLeadStatus = (id: string, status: Lead["status"]) => {
-    saveLeads(leads.map(l => l.id === id ? { ...l, status } : l));
+  const updateLeadStatus = async (id: string, status: Lead["status"]) => {
+    try {
+      await fetch(`/api/crm/leads/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      loadAllData();
+    } catch (err) {
+      console.error("Erro ao atualizar lead:", err);
+    }
   };
 
-  const updateClienteStatus = (id: string, status: Cliente["status"]) => {
-    saveClientes(clientes.map(c => c.id === id ? { ...c, status } : c));
+  const updateClienteStatus = async (id: string, status: Cliente["status"]) => {
+    try {
+      await fetch(`/api/crm/clientes/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      loadAllData();
+    } catch (err) {
+      console.error("Erro ao atualizar cliente:", err);
+    }
   };
 
   // KPIs
