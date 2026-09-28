@@ -64,6 +64,13 @@ export async function POST() {
       });
     } catch (e) { }
 
+    // Criar tabela crm_actions (ações/lembretes/tarefas)
+    try {
+      await supabase.rpc('exec_sql', {
+        sql: `CREATE TABLE IF NOT EXISTS crm_actions (id TEXT PRIMARY KEY, cliente_id TEXT NOT NULL, tipo TEXT NOT NULL, descricao TEXT, data_agendada TEXT NOT NULL, status TEXT DEFAULT 'pendente', mensagem_sugerida LONGTEXT, usuario TEXT DEFAULT 'Isamara', created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW(), FOREIGN KEY(cliente_id) REFERENCES crm_clientes(id) ON DELETE CASCADE);`
+      });
+    } catch (e) { }
+
     return NextResponse.json({ message: 'Tabelas criadas com sucesso!' });
   } catch (error) {
     console.error('Erro ao criar tabelas:', error);
