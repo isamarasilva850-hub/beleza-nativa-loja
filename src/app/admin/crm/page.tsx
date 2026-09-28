@@ -115,10 +115,67 @@ export default function CRM() {
         fetch("/api/crm/propostas"),
       ]);
 
-      if (clientesRes.ok) setClientes(await clientesRes.json());
-      if (leadsRes.ok) setLeads(await leadsRes.json());
-      if (atividadesRes.ok) setAtividades(await atividadesRes.json());
-      if (propostasRes.ok) setPropostas(await propostasRes.json());
+      if (clientesRes.ok) {
+        const data = await clientesRes.json();
+        // Mapear campos do Supabase para interface
+        const mapped = data.map((c: any) => ({
+          id: c.id,
+          nome: c.nome,
+          email: c.email,
+          telefone: c.telefone,
+          tipo: c.tipo,
+          status: c.status,
+          dataCadastro: c.created_at,
+          totalGasto: c.total_gasto || 0,
+          compras: c.compras || 0,
+          comissao: c.comissao || 0,
+        }));
+        setClientes(mapped);
+      }
+      if (leadsRes.ok) {
+        const data = await leadsRes.json();
+        const mapped = data.map((l: any) => ({
+          id: l.id,
+          nome: l.nome,
+          email: l.email,
+          telefone: l.telefone,
+          origem: l.origem,
+          status: l.status,
+          valor: l.valor,
+          dataCadastro: l.created_at,
+          notas: l.notas,
+          vendedor: l.vendedor,
+        }));
+        setLeads(mapped);
+      }
+      if (atividadesRes.ok) {
+        const data = await atividadesRes.json();
+        const mapped = data.map((a: any) => ({
+          id: a.id,
+          tipo: a.tipo,
+          clienteId: a.cliente_id,
+          clienteNome: a.cliente_nome,
+          descricao: a.descricao,
+          data: a.data,
+          usuario: a.usuario,
+          resultado: a.resultado,
+        }));
+        setAtividades(mapped);
+      }
+      if (propostasRes.ok) {
+        const data = await propostasRes.json();
+        const mapped = data.map((p: any) => ({
+          id: p.id,
+          numero: p.numero,
+          clienteId: p.cliente_id,
+          clienteNome: p.cliente_nome,
+          valor: p.valor,
+          status: p.status,
+          dataCadastro: p.created_at,
+          itens: p.itens,
+        }));
+        setPropostas(mapped);
+      }
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
       // Fallback pra localStorage se Supabase falhar
