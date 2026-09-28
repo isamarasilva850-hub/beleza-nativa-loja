@@ -2,25 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { products } from "@/data/products";
+import { products as staticProducts } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import Sidebar from "@/components/Sidebar";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-
-interface UploadedProduct {
-  ref: string;
-  name: string;
-  category: string;
-  gender: string;
-  price: number;
-  images: string[];
-  color: string;
-  colorHex: string;
-  sizes: string[];
-  quantity: number;
-  timestamp: string;
-}
+import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
 
 const banners = [
   { src: "/banners/banner-desktop-1.jpg", mobileSrc: "/banners/banner-principal-1.jpg", alt: "Sua beleza começa por dentro" },
@@ -30,6 +17,7 @@ const banners = [
 
 export default function Home() {
   const searchParams = useSearchParams();
+  const { products: supabaseProducts, loading: loadingSupabase } = useSupabaseProducts();
   const [currentBanner, setCurrentBanner] = useState(0);
   const hoveringRef = useRef(false);
   const [filters, setFilters] = useState({
@@ -41,35 +29,8 @@ export default function Home() {
     sortBy: null as string | null,
   });
   const [showFilters, setShowFilters] = useState(false);
-  const [uploadedProducts, setUploadedProducts] = useState<UploadedProduct[]>([]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const loadProductsFromERP = async () => {
-      try {
-        // Tentar carregar do Supabase primeiro
-        const response = await fetch("/api/products-upload");
-        if (response.ok) {
-          const supabaseProducts = await response.json();
-          setUploadedProducts(supabaseProducts);
-          return;
-        }
-      } catch (err) {
-        console.log("Erro ao carregar produtos do Supabase, tentando localStorage");
-      }
-
-      // Fallback para localStorage
-      try {
-        const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
-        setUploadedProducts(uploads);
-      } catch (err) {
-        console.log("Erro ao carregar produtos do localStorage");
-      }
-    };
-
-    loadProductsFromERP();
-  }, []);
+  const allProducts = [...supabaseProducts, ...staticProducts.filter(sp => !supabaseProducts.find(sup => sup.ref === sp.ref))];
 
   const nextBanner = useCallback(() => {
     setCurrentBanner((prev) => (prev + 1) % banners.length);
@@ -100,7 +61,7 @@ export default function Home() {
     return () => clearTimeout(timerId);
   }, [nextBanner]);
 
-  const filteredProducts = products.filter((p) => {
+  const filteredProducts = allProducts.filter((p) => {
     if (filters.collection && p.collection !== filters.collection) return false;
     if (filters.gender && p.gender !== filters.gender) return false;
     if (filters.category && p.category !== filters.category) return false;
