@@ -29,6 +29,7 @@ export default function Home() {
     sortBy: null as string | null,
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [uploadedProducts] = useState<any[]>([]);
 
   const allProducts = [...supabaseProducts, ...staticProducts.filter(sp => !supabaseProducts.find(sup => sup.ref === sp.ref))];
 
