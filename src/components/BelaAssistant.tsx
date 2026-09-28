@@ -104,7 +104,7 @@ export default function BelaAssistant() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:shadow-xl transition-all transform hover:scale-110 z-40 border-2 border-white overflow-hidden"
+        className="fixed bottom-6 left-6 bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:shadow-xl transition-all transform hover:scale-110 z-40 border-2 border-white overflow-hidden"
         title="Abrir Bela"
       >
         <div className="w-full h-full">
