@@ -8,10 +8,10 @@ export async function GET() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // Teste: SELECT simples
+    // Teste: SELECT * puro
     const { data: products, error: productsError } = await supabase
       .from('products')
-      .select('id, ref, name, price, category, gender');
+      .select('*');
 
     if (productsError) {
       console.error('Erro na tabela products:', productsError);
