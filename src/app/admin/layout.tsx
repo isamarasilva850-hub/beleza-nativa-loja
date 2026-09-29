@@ -194,8 +194,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
         <div className="flex-1 overflow-auto p-4 md:p-6">{children}</div>
       </div>
-      {/* Temporário: Bela desativada pra debug */}
-      {/* <BelaAssistant /> */}
+      <BelaAssistant />
     </div>
   );
 }
