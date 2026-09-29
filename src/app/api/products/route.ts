@@ -8,25 +8,35 @@ export async function GET() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
+    // Teste: SELECT simples
     const { data: products, error: productsError } = await supabase
       .from('products')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select('id, ref, name, price, category, gender');
 
-    if (productsError) throw productsError;
+    if (productsError) {
+      console.error('Erro na tabela products:', productsError);
+      throw new Error(`Erro ao carregar products: ${productsError.message}`);
+    }
+
+    console.log('📦 Produtos carregados:', products?.length || 0);
 
     const { data: colors, error: colorsError } = await supabase
       .from('product_colors')
-      .select('*');
+      .select('id, product_id, color_name, color_hex, qty_p, qty_m, qty_g, qty_gg');
 
-    if (colorsError) throw colorsError;
+    if (colorsError) {
+      console.error('Erro na tabela product_colors:', colorsError);
+      throw new Error(`Erro ao carregar product_colors: ${colorsError.message}`);
+    }
 
     const { data: images, error: imagesError } = await supabase
       .from('product_images')
-      .select('*')
-      .order('display_order', { ascending: true });
+      .select('id, product_id, image_base64, display_order');
 
-    if (imagesError) throw imagesError;
+    if (imagesError) {
+      console.error('Erro na tabela product_images:', imagesError);
+      throw new Error(`Erro ao carregar product_images: ${imagesError.message}`);
+    }
 
     const enrichedProducts = products?.map((product) => ({
       ...product,
