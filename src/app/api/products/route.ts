@@ -36,9 +36,15 @@ export async function GET() {
 
     return NextResponse.json(enrichedProducts);
   } catch (error) {
-    console.error('Erro ao carregar produtos:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('❌ Erro ao carregar produtos:', errorMessage);
+    console.error('Stack:', error instanceof Error ? error.stack : 'N/A');
     return NextResponse.json(
-      { error: 'Erro ao carregar produtos', details: error instanceof Error ? error.message : String(error) },
+      {
+        error: 'Erro ao carregar produtos',
+        message: errorMessage,
+        supabaseConfigured: !!process.env.NEXT_PUBLIC_SUPABASE_URL
+      },
       { status: 500 }
     );
   }
