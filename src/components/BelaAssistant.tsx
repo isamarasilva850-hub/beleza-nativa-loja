@@ -106,8 +106,9 @@ export default function BelaAssistant() {
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 left-6 bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:shadow-xl transition-all transform hover:scale-110 z-40 border-2 border-white overflow-hidden"
         title="Abrir Bela"
+        style={{position: 'fixed', bottom: '24px', left: '24px', width: '64px', height: '64px', zIndex: 40}}
       >
-        <div className="w-full h-full">
+        <div className="w-full h-full" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
           <BelaAvatar />
         </div>
       </button>
