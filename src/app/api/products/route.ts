@@ -46,13 +46,23 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      console.error('❌ Credenciais Supabase faltando!');
+      return NextResponse.json(
+        { error: 'Erro de configuração: Credenciais Supabase não encontradas' },
+        { status: 500 }
+      );
+    }
+
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     );
 
     const body = await request.json();
     const { ref, name, price, colors, images } = body;
+
+    console.log('📦 Recebido:', { ref, name, price, colorsCount: colors?.length, imagesCount: images?.length });
 
     if (!ref || !name || !price) {
       return NextResponse.json(
