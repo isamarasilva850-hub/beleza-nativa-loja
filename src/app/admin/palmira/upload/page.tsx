@@ -26,6 +26,8 @@ export default function PalmiraUploadPage() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [deleteRef, setDeleteRef] = useState("");
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
   const optimizeImage = (imgBase64: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -97,6 +99,38 @@ export default function PalmiraUploadPage() {
     setColors(
       colors.map((c) => (c.id === id ? { ...c, [field]: value } : c))
     );
+  };
+
+  const handleDelete = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoadingDelete(true);
+
+    try {
+      if (!deleteRef.trim()) {
+        throw new Error("❌ Digite a REF do produto para deletar!");
+      }
+
+      const response = await fetch("/api/admin/delete-product", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ref: deleteRef }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erro ao deletar");
+      }
+
+      setSuccess(`🗑️ Produto "${deleteRef}" deletado com sucesso!`);
+      setDeleteRef("");
+      setTimeout(() => setSuccess(""), 4000);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoadingDelete(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -324,6 +358,27 @@ export default function PalmiraUploadPage() {
           {/* Mensagens */}
           {success && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
           {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
+
+          {/* Seção de Deletar Produto */}
+          <div className="border-t pt-8">
+            <h3 className="text-lg font-bold text-red-600 mb-4">🗑️ Deletar Produto</h3>
+            <form onSubmit={handleDelete} className="flex gap-4 mb-6">
+              <input
+                type="text"
+                placeholder="Digite a REF do produto para deletar"
+                value={deleteRef}
+                onChange={(e) => setDeleteRef(e.target.value)}
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+              />
+              <button
+                type="submit"
+                disabled={loadingDelete}
+                className="bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-lg transition-colors"
+              >
+                {loadingDelete ? "⏳ Deletando..." : "🗑️ DELETAR"}
+              </button>
+            </form>
+          </div>
 
           {/* Botão Submit */}
           <button
