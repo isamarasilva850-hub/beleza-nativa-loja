@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 interface Message {
   id: string;
@@ -35,6 +36,7 @@ const BelaAvatar = () => (
 
 export default function BelaAssistant() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -46,6 +48,10 @@ export default function BelaAssistant() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -100,23 +106,21 @@ export default function BelaAssistant() {
     }
   };
 
-  if (!isOpen) {
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:shadow-xl transition-all transform hover:scale-110 z-40 border-2 border-white overflow-hidden"
-        title="Abrir Bela"
-        style={{position: 'fixed', bottom: '24px', left: '24px', width: '64px', height: '64px', zIndex: 40}}
-      >
-        <div className="w-full h-full" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-          <BelaAvatar />
-        </div>
-      </button>
-    );
-  }
+  if (!mounted) return null;
 
-  return (
-    <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col z-50 border border-gray-200">
+  const belaContent = !isOpen ? (
+    <button
+      onClick={() => setIsOpen(true)}
+      className="fixed bottom-6 left-6 bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:shadow-xl transition-all transform hover:scale-110 z-50 border-2 border-white overflow-hidden"
+      title="Abrir Bela"
+      style={{position: 'fixed', bottom: '24px', left: '24px', width: '64px', height: '64px', zIndex: 9999}}
+    >
+      <div className="w-full h-full" style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+        <BelaAvatar />
+      </div>
+    </button>
+  ) : (
+    <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col z-50 border border-gray-200" style={{zIndex: 9999}}>
       {/* Header */}
       <div className="bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] text-white p-4 rounded-t-2xl flex justify-between items-center">
         <div className="flex items-center gap-3">
@@ -225,4 +229,6 @@ export default function BelaAssistant() {
       </div>
     </div>
   );
+
+  return createPortal(belaContent, document.body);
 }
