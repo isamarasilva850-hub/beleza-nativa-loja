@@ -13,6 +13,14 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    const url = query.trim()
+      ? `/?busca=${encodeURIComponent(query)}`
+      : "/";
+    window.location.href = url;
+  };
+
   return (
     <header className="sticky top-0 z-40 bg-white shadow-sm">
       <div className="bg-white border-b border-gray-100">
@@ -35,6 +43,7 @@ export default function Header() {
                 placeholder="O que você procura?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch(searchQuery)}
                 className="w-full pl-10 pr-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 border border-gray-200"
               />
               <svg
@@ -189,6 +198,7 @@ export default function Header() {
             placeholder="O que você procura?"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch(searchQuery)}
             className="w-full pl-10 pr-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
           <svg

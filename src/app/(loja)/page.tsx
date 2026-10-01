@@ -27,6 +27,7 @@ export default function Home() {
     size: null as string | null,
     priceRange: null as [number, number] | null,
     sortBy: null as string | null,
+    searchQuery: null as string | null,
   });
   const [showFilters, setShowFilters] = useState(false);
   const [uploadedProducts] = useState<any[]>([]);
@@ -44,10 +45,12 @@ export default function Home() {
   useEffect(() => {
     const genero = searchParams.get("genero");
     const categoria = searchParams.get("categoria");
+    const busca = searchParams.get("busca");
     setFilters((prev) => ({
       ...prev,
       gender: genero || null,
       category: categoria || null,
+      searchQuery: busca || null,
     }));
   }, [searchParams]);
 
@@ -69,6 +72,12 @@ export default function Home() {
     if (filters.size) {
       const hasSize = p.variants.some((v) => v.sizes.includes(filters.size!));
       if (!hasSize) return false;
+    }
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase();
+      const matchesName = p.name?.toLowerCase().includes(query);
+      const matchesRef = p.ref?.toLowerCase().includes(query);
+      if (!matchesName && !matchesRef) return false;
     }
     return true;
   });
