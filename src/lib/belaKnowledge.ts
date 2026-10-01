@@ -207,6 +207,7 @@ export const belaKnowledge = {
 
   quickAnswers: {
     "como subir produto": "uploadProdutos",
+    "como subo um produto": "uploadProdutos",
     "upload de produto": "uploadProdutos",
     "montar pedido": "montarPedido",
     "criar pedido": "montarPedido",
