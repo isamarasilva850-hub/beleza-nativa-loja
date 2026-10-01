@@ -292,7 +292,7 @@ export default function Home() {
 
         <div className="flex gap-8">
           <div className={`${showFilters ? "block" : "hidden"} md:block w-full md:w-56 flex-shrink-0`}>
-            <Sidebar onFilterChange={(f) => setFilters(f)} />
+            <Sidebar onFilterChange={(f) => setFilters({ ...f, searchQuery: filters.searchQuery })} />
           </div>
           <div className="flex-1">
             {uploadedProducts.length > 0 && (

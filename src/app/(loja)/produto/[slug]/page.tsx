@@ -71,8 +71,8 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
   useEffect(() => {
     if (!product) return;
     const map: Record<string, number> = {};
-    product.variants.forEach((v) => {
-      v.sizes.forEach((s) => {
+    product.variants.forEach((v: any) => {
+      v.sizes.forEach((s: any) => {
         map[`${v.color}-${s}`] = getStockQuantity(product.ref, v.color, s);
       });
     });
@@ -259,7 +259,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
               Cor: <span className="font-normal text-gray-500">{variant.color}</span>
             </p>
             <div className="flex gap-2">
-              {product.variants.map((v, i) => (
+              {product.variants.map((v: any, i: number) => (
                 <button
                   key={i}
                   onClick={() => { setSelectedVariant(i); setSelectedSize(""); }}
@@ -288,7 +288,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
           <div className="mb-6">
             <p className="text-sm font-semibold text-gray-700 mb-2">Tamanho:</p>
             <div className="flex flex-wrap gap-2">
-              {variant.sizes.map((size) => {
+              {variant.sizes.map((size: any) => {
                 const stock = getStock(variant.color, size);
                 const notConfigured = stock === -1;
                 const outOfStock = !notConfigured && stock <= 0;
