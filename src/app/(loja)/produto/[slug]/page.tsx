@@ -2,7 +2,6 @@
 
 import { useState, useEffect, use } from "react";
 import { products } from "@/data/products";
-import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { getStockQuantity } from "@/lib/stock";
@@ -11,9 +10,8 @@ import Image from "next/image";
 
 export default function ProdutoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-  const { products: supabaseProducts } = useSupabaseProducts();
-  const allProducts = [...supabaseProducts, ...products];
-  const product = allProducts.find((p) => p.slug === slug);
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const { addItem } = useCart();
   const { isLoggedIn } = useAuth();
 
@@ -25,6 +23,50 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
   const [showSizeChart, setShowSizeChart] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [allImages, setAllImages] = useState<string[]>([]);
+
+  useEffect(() => {
+    const loadProduct = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch('/api/products');
+        const supabaseProducts = await response.json();
+        const formatted = supabaseProducts.map((item: any, index: number) => ({
+          id: index + 1,
+          ref: item.ref,
+          slug: item.ref.toLowerCase().replace(/\s+/g, '-'),
+          name: item.name,
+          price: parseFloat(item.price),
+          description: `Produto ${item.name}`,
+          composition: "Veja a descrição completa na loja",
+          care: "Lavar com sabão neutro",
+          collection: "Lingerie",
+          category: item.category || "Lingerie",
+          gender: item.gender || "Feminino",
+          variants: item.colors?.map((color: any) => ({
+            color: color.color_name,
+            colorHex: color.color_hex || "#000000",
+            sizes: [
+              ...(parseInt(color.qty_p) > 0 ? ['P'] : []),
+              ...(parseInt(color.qty_m) > 0 ? ['M'] : []),
+              ...(parseInt(color.qty_g) > 0 ? ['G'] : []),
+              ...(parseInt(color.qty_gg) > 0 ? ['GG'] : []),
+            ],
+          })) || [],
+          images: item.images?.map((img: any) => img.image_base64 || img.image_url) || [],
+        }));
+        const allProducts = [...formatted, ...products];
+        const found = allProducts.find((p) => p.slug === slug);
+        setProduct(found || null);
+      } catch (error) {
+        console.error('Erro ao carregar produto:', error);
+        const staticProduct = products.find((p) => p.slug === slug);
+        setProduct(staticProduct || null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProduct();
+  }, [slug]);
 
   useEffect(() => {
     if (!product) return;
