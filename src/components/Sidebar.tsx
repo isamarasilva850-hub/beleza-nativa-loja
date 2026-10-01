@@ -16,13 +16,13 @@ interface SidebarProps {
 
 export default function Sidebar({ onFilterChange }: SidebarProps) {
   const [openSections, setOpenSections] = useState({
-    collections: true,
+    collections: false,
     genders: true,
-    categories: true,
-    sizes: true,
-    colors: true,
-    prices: true,
-    sort: true,
+    categories: false,
+    sizes: false,
+    colors: false,
+    prices: false,
+    sort: false,
   });
 
   const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
