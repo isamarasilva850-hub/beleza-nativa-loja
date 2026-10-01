@@ -89,6 +89,22 @@ export default function PalmiraDashboard() {
             </div>
             <div className="pt-4 border-t border-gray-100 text-pink-600 font-semibold text-sm">Clique para adicionar →</div>
           </Link>
+
+          <Link href="/admin/palmira/reordenar-produtos" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-orange-500 p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-xl font-bold text-gray-800">🔄 Reordenar</h3>
+                <p className="text-sm text-gray-600 mt-1">Ordem na loja</p>
+              </div>
+              <div className="text-4xl">📍</div>
+            </div>
+            <div className="space-y-2 text-sm text-gray-600 mb-4">
+              <div className="flex items-center gap-2"><span className="text-orange-500">✓</span><span>Arraste os produtos</span></div>
+              <div className="flex items-center gap-2"><span className="text-orange-500">✓</span><span>Define ordem na loja</span></div>
+              <div className="flex items-center gap-2"><span className="text-orange-500">✓</span><span>Salva automaticamente</span></div>
+            </div>
+            <div className="pt-4 border-t border-gray-100 text-orange-600 font-semibold text-sm">Clique para reordenar →</div>
+          </Link>
         </div>
 
         <div className="mt-8 bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] rounded-xl shadow-lg p-6 text-white">

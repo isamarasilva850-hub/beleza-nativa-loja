@@ -8,10 +8,11 @@ export async function GET() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // Teste: SELECT * puro
+    // Busca produtos ordenados por display_order
     const { data: products, error: productsError } = await supabase
       .from('products')
-      .select('*');
+      .select('*')
+      .order('display_order', { ascending: true, nullsFirst: false });
 
     if (productsError) {
       console.error('Erro na tabela products:', productsError);
