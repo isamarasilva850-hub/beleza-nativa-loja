@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import { products } from "@/data/products";
+import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { getStockQuantity } from "@/lib/stock";
@@ -10,7 +11,9 @@ import Image from "next/image";
 
 export default function ProdutoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-  const product = products.find((p) => p.slug === slug);
+  const { products: supabaseProducts } = useSupabaseProducts();
+  const allProducts = [...supabaseProducts, ...products];
+  const product = allProducts.find((p) => p.slug === slug);
   const { addItem } = useCart();
   const { isLoggedIn } = useAuth();
 
