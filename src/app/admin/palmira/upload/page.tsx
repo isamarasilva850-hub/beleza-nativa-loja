@@ -325,6 +325,9 @@ export default function PalmiraUploadPage() {
           {/* Fotos */}
           <div>
             <h2 className="text-lg font-bold text-gray-800 mb-4">📷 Fotos</h2>
+            <p className="text-sm text-gray-600 mb-3 bg-blue-50 p-3 rounded-lg">
+              💡 <strong>Dica:</strong> Você pode selecionar VÁRIAS fotos de uma vez! Clique uma vez e selecione todas!
+            </p>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#7BC9C2] transition-colors">
               <input
                 type="file"
