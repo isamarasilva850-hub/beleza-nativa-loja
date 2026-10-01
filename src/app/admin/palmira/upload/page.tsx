@@ -81,7 +81,7 @@ export default function PalmiraUploadPage() {
     setColors([
       ...colors,
       {
-        id: `color_${Date.now()}`,
+        id: `color_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         name: "",
         hex: "#000000",
         qty_p: "",
