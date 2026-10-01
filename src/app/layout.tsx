@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import RegisterServiceWorker from "@/components/RegisterServiceWorker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
             <div style={{fontSize: '12px', opacity: 0.9}}>Calcule seu lucro</div>
           </div>
         </a>
+        <RegisterServiceWorker />
         <style>{`@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }`}</style>
       </body>
     </html>
