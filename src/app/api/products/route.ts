@@ -76,9 +76,9 @@ export async function POST(request: NextRequest) {
     );
 
     const body = await request.json();
-    const { ref, name, price, colors, images } = body;
+    const { ref, name, price, gender, colors, images } = body;
 
-    console.log('📦 Recebido:', { ref, name, price, colorsCount: colors?.length, imagesCount: images?.length });
+    console.log('📦 Recebido:', { ref, name, price, gender, colorsCount: colors?.length, imagesCount: images?.length });
 
     if (!ref || !name || !price) {
       return NextResponse.json(
@@ -87,20 +87,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const productId = `prod_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 9)}`;
-
-    const { error: productError } = await supabase
+    // Verifica se produto com essa REF já existe
+    const { data: existingProducts, error: checkError } = await supabase
       .from('products')
-      .insert({
-        id: productId,
-        ref,
-        name,
-        price: parseFloat(price as string),
-        category: 'Lingerie',
-        gender: 'Feminino',
-      });
+      .select('id')
+      .eq('ref', ref)
+      .limit(1);
 
-    if (productError) throw productError;
+    if (checkError) throw checkError;
+
+    let productId: string;
+
+    if (existingProducts && existingProducts.length > 0) {
+      // Produto já existe - usa o ID existente
+      productId = existingProducts[0].id;
+      console.log(`✅ Produto REF '${ref}' já existe (ID: ${productId}) - adicionando cores`);
+    } else {
+      // Produto novo - cria
+      productId = `prod_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 9)}`;
+      const { error: productError } = await supabase
+        .from('products')
+        .insert({
+          id: productId,
+          ref,
+          name,
+          price: parseFloat(price as string),
+          category: 'Lingerie',
+          gender: gender || 'Feminino',
+        });
+
+      if (productError) throw productError;
+      console.log(`✨ Novo produto criado (REF: ${ref}, ID: ${productId})`);
+    }
 
     if (colors && Array.isArray(colors)) {
       for (const color of colors) {

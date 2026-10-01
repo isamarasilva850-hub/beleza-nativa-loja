@@ -18,6 +18,7 @@ export default function PalmiraUploadPage() {
     ref: "",
     name: "",
     price: "",
+    gender: "Feminino",
   });
 
   const [colors, setColors] = useState<ColorInput[]>([]);
@@ -168,6 +169,7 @@ export default function PalmiraUploadPage() {
         ref: formData.ref,
         name: formData.name,
         price: formData.price,
+        gender: formData.gender,
         colors: colors.map((c) => ({
           name: c.name,
           hex: c.hex,
@@ -191,7 +193,7 @@ export default function PalmiraUploadPage() {
       }
 
       setSuccess(`✅ Produto "${formData.name}" salvo com sucesso! Aparecerá na loja em segundos!`);
-      setFormData({ ref: "", name: "", price: "" });
+      setFormData({ ref: "", name: "", price: "", gender: "Feminino" });
       setColors([]);
       setImages([]);
       setPreviews([]);
@@ -218,7 +220,7 @@ export default function PalmiraUploadPage() {
           {/* Dados do Produto */}
           <div>
             <h2 className="text-lg font-bold text-gray-800 mb-4">📋 Dados do Produto</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <input
                 type="text"
                 placeholder="Referência (ex: REF001)"
@@ -241,6 +243,15 @@ export default function PalmiraUploadPage() {
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                 className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
               />
+              <select
+                value={formData.gender}
+                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+              >
+                <option value="Feminino">👧 Feminino</option>
+                <option value="Masculino">👨 Masculino</option>
+                <option value="Infantil">👶 Infantil</option>
+              </select>
             </div>
           </div>
 
