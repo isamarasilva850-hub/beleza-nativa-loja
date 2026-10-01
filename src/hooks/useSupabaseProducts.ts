@@ -25,7 +25,7 @@ export function useSupabaseProducts() {
           composition: "Veja a descrição completa na loja",
           care: "Lavar com sabão neutro",
           collection: "Lingerie",
-          gender: "Feminino",
+          gender: item.gender || "Feminino",
           category: item.category || "Lingerie",
           variants: item.colors?.map((color: any) => ({
             color: color.color_name,
