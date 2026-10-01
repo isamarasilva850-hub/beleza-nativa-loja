@@ -4,11 +4,38 @@ import { useEffect, useState } from "react";
 
 export default function PalmiraDashboard() {
   const [productCount, setProductCount] = useState(0);
+  const [updatingGenders, setUpdatingGenders] = useState(false);
+  const [genderUpdateMessage, setGenderUpdateMessage] = useState("");
 
   useEffect(() => {
     const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
     setProductCount(uploads.length);
   }, []);
+
+  const handleUpdateGenders = async () => {
+    try {
+      setUpdatingGenders(true);
+      setGenderUpdateMessage("");
+
+      const response = await fetch("/api/admin/atualizar-generos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({})
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setGenderUpdateMessage(`✅ Atualizado! ${data.updated.infantil} Infantil, ${data.updated.masculino} Masculino, ${data.updated.feminino} Feminino`);
+      } else {
+        setGenderUpdateMessage("❌ Erro ao atualizar gêneros");
+      }
+    } catch (err) {
+      setGenderUpdateMessage("❌ Erro na atualização");
+      console.error(err);
+    } finally {
+      setUpdatingGenders(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8">
@@ -23,6 +50,25 @@ export default function PalmiraDashboard() {
 
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8">
           <p className="text-sm text-blue-800 font-medium">💡 Dica: Comece pelo Upload de Produtos para adicionar novas peças com múltiplas fotos!</p>
+        </div>
+
+        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-purple-900 font-medium mb-2">🏷️ Atualizar Classificação de Produtos</p>
+              <p className="text-xs text-purple-800">Clique para categorizar os produtos como Infantil, Masculino ou Feminino</p>
+              {genderUpdateMessage && (
+                <p className="text-sm mt-2 font-semibold">{genderUpdateMessage}</p>
+              )}
+            </div>
+            <button
+              onClick={handleUpdateGenders}
+              disabled={updatingGenders}
+              className="ml-4 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-bold px-6 py-2 rounded-lg transition-colors whitespace-nowrap"
+            >
+              {updatingGenders ? "⏳ Atualizando..." : "✨ Atualizar"}
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
