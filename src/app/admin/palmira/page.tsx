@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function PalmiraDashboard() {
+  // Dashboard principal da Palmira com ferramentas de gestão
   const [productCount, setProductCount] = useState(0);
   const [updatingGenders, setUpdatingGenders] = useState(false);
   const [genderUpdateMessage, setGenderUpdateMessage] = useState("");
