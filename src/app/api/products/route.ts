@@ -38,11 +38,11 @@ export async function GET() {
       throw new Error(`Erro ao carregar product_images: ${imagesError.message}`);
     }
 
-    const enrichedProducts = (products?.map((product) => ({
+    const enrichedProducts = products?.map((product) => ({
       ...product,
       colors: colors?.filter((c) => c.product_id === product.id) || [],
       images: images?.filter((i) => i.product_id === product.id) || [],
-    })) || []).sort((a, b) => (a.display_order || 999) - (b.display_order || 999));
+    })) || [];
 
     return NextResponse.json(enrichedProducts);
   } catch (error) {
