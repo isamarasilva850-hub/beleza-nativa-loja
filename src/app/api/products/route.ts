@@ -8,11 +8,10 @@ export async function GET() {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Busca produtos ordenados por display_order
+    // Busca produtos
     const { data: products, error: productsError } = await supabase
       .from('products')
-      .select('*')
-      .order('display_order', { ascending: true, nullsFirst: false });
+      .select('*');
 
     if (productsError) {
       console.error('Erro na tabela products:', productsError);
