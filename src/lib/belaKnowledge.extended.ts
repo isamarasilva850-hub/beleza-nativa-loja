@@ -1093,20 +1093,20 @@ export function findRelevantMethodModule(query: string): string {
 
   // Palavras-chave para CADA PASSO do método
   const stepKeywords: Record<string, string[]> = {
-    "1-abrir": ["abrir", "abertura", "primeira", "iniciar", "começar", "contato", "oi", "ola", "olá", "como começo"],
-    "2-conectar": ["conectar", "conhecer", "negócio", "canais", "como vende", "como trabalha", "entender negócio"],
-    "3-diagnosticar": ["diagnosticar", "problema", "dificuldade", "desafio", "necessidade", "o que ela precisa", "qual dificuldade"],
-    "4-divulgacao": ["divulgação", "postar", "conteúdo", "arte", "legenda", "instagram", "facebook", "social", "como posta"],
-    "5-personalizar": ["personalizar", "solução", "adequado", "certo para", "pensei", "separei"],
-    "6-apresentar": ["apresentar", "mostrar", "peças", "modelos", "qual gosto", "que acha"],
-    "7-fidelizar": ["fidelizar", "pós-venda", "recompra", "indicação", "depois da venda", "cliente voltou"],
+    "1-abrir": ["abrir", "abordo", "abordar", "abordagem", "abertura", "primeira", "iniciar", "começar", "contato", "oi", "ola", "olá", "como começo", "primeira mensagem"],
+    "2-conectar": ["conectar", "conhecer", "negócio", "canais", "como vende", "como trabalha", "entender negócio", "qual é seu negócio"],
+    "3-diagnosticar": ["diagnosticar", "problema", "dificuldade", "desafio", "necessidade", "o que ela precisa", "qual dificuldade", "qual é a dificuldade"],
+    "4-divulgacao": ["divulgação", "postar", "conteúdo", "arte", "legenda", "instagram", "facebook", "social", "como posta", "como divulga"],
+    "5-personalizar": ["personalizar", "solução", "adequado", "certo para", "pensei", "separei", "qual modelo", "que produto"],
+    "6-apresentar": ["apresentar", "mostrar", "peças", "modelos", "qual gosto", "que acha", "qual modelo", "que tipo"],
+    "7-fidelizar": ["fidelizar", "pós-venda", "recompra", "indicação", "depois da venda", "cliente voltou", "manter cliente"],
   };
 
   // Palavras-chave para MÓDULOS específicos
   const moduleKeywords: Record<string, string[]> = {
-    "objecoesHandling": ["objeção", "mas é caro", "está caro", "não tenho", "já tenho fornecedor", "vou pensar", "como respondo", "alguém diz", "dúvida", "resisti"],
-    "conducaoClientes": ["condução", "follow-up", "próximo contato", "nutrição", "cliente sumiu", "reativar", "reconquistar", "como manter"],
-    "mensagensEstagios": ["mensagem", "escrever", "o que falo", "como falo", "qual texto", "redação", "como mando"],
+    "objecoesHandling": ["objeção", "mas é caro", "está caro", "não tenho", "já tenho fornecedor", "vou pensar", "como respondo", "alguém diz", "dúvida", "resisti", "contornar", "contorno", "derrubando objeção", "lidar com objeção", "responder objeção", "dificuldade", "barreira"],
+    "conducaoClientes": ["condução", "follow-up", "próximo contato", "nutrição", "cliente sumiu", "reativar", "reconquistar", "como manter", "manter cliente", "reter cliente"],
+    "mensagensEstagios": ["mensagem", "escrever", "o que falo", "como falo", "qual texto", "redação", "como mando", "qual mensagem", "que digo", "como digo"],
   };
 
   // Score do módulo mais relevante
