@@ -114,14 +114,15 @@ export default function Home() {
   }, [filteredProducts]);
 
   const activeBanners = getActiveBanners();
+  const bannersLength = activeBanners.length || 1;
 
   const nextBanner = useCallback(() => {
-    setCurrentBanner((prev) => (prev + 1) % activeBanners.length);
-  }, [activeBanners.length]);
+    setCurrentBanner((prev) => (prev + 1) % bannersLength);
+  }, [bannersLength]);
 
   const prevBanner = useCallback(() => {
-    setCurrentBanner((prev) => (prev - 1 + activeBanners.length) % activeBanners.length);
-  }, [activeBanners.length]);
+    setCurrentBanner((prev) => (prev - 1 + bannersLength) % bannersLength);
+  }, [bannersLength]);
 
   // Reset banner when gender filter changes
   useEffect(() => {
