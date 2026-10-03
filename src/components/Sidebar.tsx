@@ -10,7 +10,7 @@ interface SidebarProps {
     category: string | null;
     size: string | null;
     priceRange: [number, number] | null;
-    sortBy: string | null;
+    sortBy?: string | null;
   }) => void;
 }
 

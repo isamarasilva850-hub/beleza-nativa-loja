@@ -26,11 +26,12 @@ export default function Home() {
     category: null as string | null,
     size: null as string | null,
     priceRange: null as [number, number] | null,
-    sortBy: null as string | null,
+    sortBy: "newest" as string,
     searchQuery: null as string | null,
   });
   const [showFilters, setShowFilters] = useState(false);
   const [uploadedProducts] = useState<any[]>([]);
+  const [searchInput, setSearchInput] = useState("");
 
   const allProducts = [...supabaseProducts, ...staticProducts.filter(sp => !supabaseProducts.find(sup => sup.ref === sp.ref))];
 
@@ -65,22 +66,36 @@ export default function Home() {
     return () => clearTimeout(timerId);
   }, [nextBanner]);
 
-  const filteredProducts = allProducts.filter((p) => {
-    if (filters.collection && p.collection !== filters.collection) return false;
-    if (filters.gender && p.gender !== filters.gender) return false;
-    if (filters.category && p.category !== filters.category) return false;
-    if (filters.size) {
-      const hasSize = p.variants.some((v) => v.sizes.includes(filters.size!));
-      if (!hasSize) return false;
-    }
-    if (filters.searchQuery) {
-      const query = filters.searchQuery.toLowerCase();
-      const matchesName = p.name?.toLowerCase().includes(query);
-      const matchesRef = p.ref?.toLowerCase().includes(query);
-      if (!matchesName && !matchesRef) return false;
-    }
-    return true;
-  });
+  const filteredProducts = allProducts
+    .filter((p) => {
+      if (filters.collection && p.collection !== filters.collection) return false;
+      if (filters.gender && p.gender !== filters.gender) return false;
+      if (filters.category && p.category !== filters.category) return false;
+      if (filters.size) {
+        const hasSize = p.variants.some((v) => v.sizes.includes(filters.size!));
+        if (!hasSize) return false;
+      }
+      if (filters.searchQuery) {
+        const query = filters.searchQuery.toLowerCase();
+        const matchesName = p.name?.toLowerCase().includes(query);
+        const matchesRef = p.ref?.toLowerCase().includes(query);
+        if (!matchesName && !matchesRef) return false;
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      switch (filters.sortBy) {
+        case "price-asc":
+          return (a.price || 0) - (b.price || 0);
+        case "price-desc":
+          return (b.price || 0) - (a.price || 0);
+        case "name":
+          return String(a.name || "").localeCompare(String(b.name || ""));
+        case "newest":
+        default:
+          return String(b.id || "").localeCompare(String(a.id || ""));
+      }
+    });
 
   return (
     <div>
@@ -280,29 +295,67 @@ export default function Home() {
 
       {/* 5. Products */}
       <section className="max-w-7xl mx-auto px-4 py-8 pb-12">
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="md:hidden w-full mb-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-          </svg>
-          {showFilters ? "OCULTAR FILTROS" : "FILTRAR PRODUTOS"}
-        </button>
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="🔍 Buscar por nome, referência..."
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+                setFilters({ ...filters, searchQuery: e.target.value || null });
+              }}
+              className="w-full px-4 py-3 rounded-lg bg-gray-100 border-2 border-gray-200 focus:border-primary focus:bg-white outline-none transition-colors"
+            />
+          </div>
+        </div>
+
+        {/* Controls Bar */}
+        <div className="flex flex-col md:flex-row gap-3 mb-6 items-start md:items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-gray-600">
+              {filteredProducts.length} {filteredProducts.length === 1 ? "produto" : "produtos"} encontrado{filteredProducts.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+
+          <div className="flex gap-2 w-full md:w-auto">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex-1 md:flex-none px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary-dark transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              {showFilters ? "Ocultar" : "Filtros"}
+            </button>
+
+            <select
+              value={filters.sortBy || "newest"}
+              onChange={(e) => setFilters({ ...filters, sortBy: e.target.value } as any)}
+              className="flex-1 md:flex-none px-3 py-2 bg-white border-2 border-gray-200 rounded-lg text-sm font-semibold focus:border-primary outline-none transition-colors"
+            >
+              <option value="newest">✨ Mais novos</option>
+              <option value="price-asc">💰 Menor preço</option>
+              <option value="price-desc">💎 Maior preço</option>
+              <option value="name">A-Z Nome</option>
+            </select>
+          </div>
+        </div>
 
         <div className="flex gap-8">
           <div className={`${showFilters ? "block" : "hidden"} md:block w-full md:w-56 flex-shrink-0`}>
-            <Sidebar onFilterChange={(f) => setFilters({ ...f, searchQuery: filters.searchQuery })} />
+            <Sidebar onFilterChange={(f) => setFilters({ ...f, searchQuery: filters.searchQuery, sortBy: filters.sortBy })} />
           </div>
           <div className="flex-1">
             {uploadedProducts.length > 0 && (
-              <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded">
                 <p className="text-sm font-semibold text-green-700">
-                  ✨ {uploadedProducts.length} produto(s) novo(s) adicionado(s) por Palmira!
+                  ✨ {uploadedProducts.length} produto(s) novo(s) adicionado(s)!
                 </p>
               </div>
             )}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
