@@ -33,7 +33,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
       href={`/produto/${product.slug}`}
-      className="group block bg-white rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-primary/20"
+      className="group block bg-white rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 border-2 border-gray-200 hover:border-primary"
     >
       <div className="aspect-[3/4] bg-gray-100 relative overflow-hidden">
         {hasImage ? (
@@ -57,31 +57,31 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="p-3">
         {/* Category Badge */}
         <div className="mb-2">
-          <span className="inline-block bg-primary/10 text-primary text-[10px] font-semibold px-2 py-1 rounded">
+          <span className="inline-block bg-primary text-white text-[10px] font-bold px-2 py-1 rounded-full">
             {product.category}
           </span>
         </div>
 
         {/* Product Name */}
-        <p className="text-xs font-bold text-gray-800 mb-1 line-clamp-2">
+        <p className="text-sm font-bold text-gray-900 mb-1 line-clamp-2">
           {product.name}
         </p>
 
         {/* Description */}
-        <p className="text-[10px] text-gray-600 mb-2 line-clamp-2">
+        <p className="text-xs text-gray-700 mb-2 line-clamp-2 font-medium">
           {product.description}
         </p>
 
         {/* Prices */}
-        <div className="mb-2">
+        <div className="mb-2 bg-gray-50 p-2 rounded-lg border border-gray-200">
           <p className="text-primary-dark font-bold text-lg">
             R$ {retailPrice.toFixed(2).replace(".", ",")}
           </p>
-          <p className="text-[10px] text-gray-400 -mt-0.5">para uso próprio</p>
+          <p className="text-xs text-gray-600 font-semibold -mt-0.5">para uso próprio</p>
 
           {isLoggedIn ? (
             <p className="text-sm font-bold text-primary mt-1">
-              R$ {product.price.toFixed(2).replace(".", ",")} <span className="text-[10px] font-normal">revenda</span>
+              R$ {product.price.toFixed(2).replace(".", ",")} <span className="text-xs font-semibold text-gray-700">revenda</span>
             </p>
           ) : (
             <button
@@ -90,7 +90,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 e.stopPropagation();
                 window.location.href = "/minha-conta";
               }}
-              className="text-[10px] text-primary hover:underline mt-1 block bg-none border-none p-0 cursor-pointer"
+              className="text-xs text-primary font-semibold hover:text-primary-dark mt-1 block bg-none border-none p-0 cursor-pointer underline"
             >
               Logue-se para preço de revenda
             </button>

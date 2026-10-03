@@ -21,7 +21,7 @@ export default function GanheButton({ size = "md", position = "relative", classN
     <Link href="/cadastro">
       <div className={`${positionClasses} ${className}`}>
         <button
-          className={`${sizeClasses[size]} bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-full flex items-center justify-center gap-2 shadow-lg hover:shadow-2xl hover:scale-110 transition-all duration-300 animate-pulse hover:animate-none border-2 border-white/20 backdrop-blur-sm`}
+          className={`${sizeClasses[size]} bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-full flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-300 animate-pulse hover:animate-none border-3 border-white backdrop-blur-sm`}
         >
           <span className="text-lg md:text-2xl">💰</span>
           <div className="flex flex-col items-start gap-0">

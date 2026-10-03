@@ -75,7 +75,7 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
   const sortOptions = ["MAIS VENDIDOS", "OFERTAS", "MENOR PREÇO", "MAIOR PREÇO"];
 
   return (
-    <aside className="w-full bg-gradient-to-b from-gray-50 to-white rounded-lg p-4 border border-gray-100 shadow-sm">
+    <aside className="w-full bg-white rounded-lg p-4 border-2 border-gray-300 shadow-md">
       {/* Header */}
       <div className="mb-6 pb-4 border-b border-gray-100">
         <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
