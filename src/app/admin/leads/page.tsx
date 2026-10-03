@@ -3,13 +3,26 @@
 import { useEffect, useState } from 'react';
 import { useLeads } from '@/hooks/useLeads';
 
+interface CapturedLead {
+  id: string;
+  name: string;
+  phone: string;
+  createdAt: string;
+}
+
 export default function LeadsPage() {
   const { leads, loading, error, loadLeads, getStats } = useLeads();
   const [filter, setFilter] = useState<'todos' | 'Lojista' | 'Revendedora'>('todos');
   const [statusFilter, setStatusFilter] = useState<'todos' | 'Já revende' | 'Quer começar'>('todos');
+  const [capturedLeads, setCapturedLeads] = useState<CapturedLead[]>([]);
 
   useEffect(() => {
     loadLeads();
+    // Load captured leads from localStorage
+    const saved = localStorage.getItem("belezanativa_leads");
+    if (saved) {
+      setCapturedLeads(JSON.parse(saved));
+    }
   }, [loadLeads]);
 
   const stats = getStats();
@@ -159,6 +172,57 @@ export default function LeadsPage() {
         <p className="text-sm text-teal-900">
           💡 <strong>Dica:</strong> Clique em "WhatsApp" para entrar em contato com o lead e oferecer mais detalhes sobre como revender conosco!
         </p>
+      </div>
+
+      {/* VISITANTES CAPTURADOS */}
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">👥 Visitantes Capturados</h2>
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          {capturedLeads.length === 0 ? (
+            <div className="p-8 text-center text-gray-600">
+              <p className="text-lg mb-2">📭 Nenhum visitante capturado ainda</p>
+              <p className="text-sm">Quando visitantes preencherem o formulário na loja, aparecerão aqui</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">Nome</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">Telefone</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">Data de Captura</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700">Ação</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {capturedLeads.map((lead) => (
+                    <tr key={lead.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 font-semibold text-gray-900">{lead.name}</td>
+                      <td className="px-6 py-4 text-gray-600">{lead.phone}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {new Date(lead.createdAt).toLocaleDateString('pt-BR', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </td>
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => openWhatsApp(lead.phone, lead.name)}
+                          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition"
+                        >
+                          💬 WhatsApp
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
