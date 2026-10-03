@@ -12,7 +12,6 @@ const vendedores = [
 ];
 
 export default function AdminDashboard() {
-  const [selectedVendedor, setSelectedVendedor] = useState(0);
   const [stockTotal, setStockTotal] = useState(0);
   const [partnersCount, setPartnersCount] = useState(0);
   const [ordersCount, setOrdersCount] = useState(0);
@@ -37,8 +36,6 @@ export default function AdminDashboard() {
     if (crmLeads) setCrmLeads(JSON.parse(crmLeads).length);
   }, []);
 
-  const today = new Date();
-  const monthName = today.toLocaleDateString("pt-BR", { month: "long" }).toUpperCase();
 
   return (
     <div className="space-y-6">
@@ -109,104 +106,6 @@ export default function AdminDashboard() {
         </Link>
       </div>
 
-      {/* Funil de Vendas */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-800 uppercase tracking-wider">Resumo do Funil de Vendas</h2>
-          <select
-            value={selectedVendedor}
-            onChange={(e) => setSelectedVendedor(Number(e.target.value))}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2] bg-white"
-          >
-            {vendedores.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.name} - {v.clients} clientes ativos
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Vendas do período */}
-          <div className="bg-gradient-to-br from-[#7BC9C2]/10 to-[#7BC9C2]/5 rounded-xl p-4 border border-[#7BC9C2]/20">
-            <p className="text-xs font-semibold text-[#7BC9C2] uppercase mb-2">Valor de Vendas</p>
-            <p className="text-2xl font-bold text-gray-800">R$ 0,00</p>
-            <p className="text-xs text-gray-500 mt-1">mês atual</p>
-            <div className="mt-3 space-y-1 text-xs">
-              <div className="flex justify-between">
-                <span className="text-gray-500">Novos</span>
-                <span className="font-medium text-gray-700">R$ 0,00</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Recompras</span>
-                <span className="font-medium text-gray-700">R$ 0,00</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Resgatados</span>
-                <span className="font-medium text-gray-700">R$ 0,00</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Metas */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-50/50 rounded-xl p-4 border border-blue-100">
-            <p className="text-xs font-semibold text-blue-600 uppercase mb-2">Metas</p>
-            <div className="space-y-3">
-              <div>
-                <p className="text-xs text-gray-500">Meta do Mês - {monthName}</p>
-                <div className="flex justify-between mt-1">
-                  <span className="text-xs text-gray-500">Vendido</span>
-                  <span className="text-xs font-bold text-gray-700">R$ 0,00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-xs text-gray-500">Alvo</span>
-                  <span className="text-xs font-bold text-gray-700">R$ 0,00</span>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500">Meta do Dia - {today.toLocaleDateString("pt-BR")}</p>
-                <div className="flex justify-between mt-1">
-                  <span className="text-xs text-gray-500">Vendido</span>
-                  <span className="text-xs font-bold text-gray-700">R$ 0,00</span>
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 pt-1 border-t border-blue-100">Ticket médio: R$ 0,00</p>
-            </div>
-          </div>
-
-          {/* Atendimentos */}
-          <div className="bg-gradient-to-br from-green-50 to-green-50/50 rounded-xl p-4 border border-green-100">
-            <p className="text-xs font-semibold text-green-600 uppercase mb-2">Atendimentos Hoje</p>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-600">Clientes Atendidos</span>
-                <span className="text-xl font-bold text-gray-800">0</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-600">Clientes Agendados</span>
-                <span className="text-xl font-bold text-gray-800">0</span>
-              </div>
-              <div className="pt-2 border-t border-green-100">
-                <p className="text-xs text-gray-500">Agenda de Hoje</p>
-                <p className="text-xs text-gray-400 mt-1">Nenhuma ocorrência</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Em negociação */}
-          <div className="bg-gradient-to-br from-yellow-50 to-yellow-50/50 rounded-xl p-4 border border-yellow-100">
-            <p className="text-xs font-semibold text-yellow-600 uppercase mb-2">Em Negociação</p>
-            <p className="text-2xl font-bold text-gray-800">R$ 0,00</p>
-            <p className="text-xs text-gray-500 mt-1">Valor potencial (não fechado)</p>
-            <div className="mt-3 pt-3 border-t border-yellow-100">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-500">Itens em negociação</span>
-                <span className="text-xs font-bold text-gray-700">0 itens</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Menu de Gestão - replica Via Shop sections */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
