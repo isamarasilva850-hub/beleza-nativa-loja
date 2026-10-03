@@ -14,6 +14,8 @@ export async function POST(request: NextRequest) {
 
     // Primeiro, tenta encontrar uma resposta na base de conhecimento expandida (Palmira)
     const moduleGuideExtended = getModuleGuideExtended(message);
+    console.log('🔍 Extended search for:', message);
+    console.log('📊 Extended result:', moduleGuideExtended ? '✅ FOUND' : '❌ NOT FOUND');
     if (moduleGuideExtended) {
       return NextResponse.json({
         response: moduleGuideExtended,
