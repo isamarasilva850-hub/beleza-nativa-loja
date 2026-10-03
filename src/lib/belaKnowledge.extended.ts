@@ -1104,9 +1104,9 @@ export function findRelevantMethodModule(query: string): string {
 
   // Palavras-chave para MÓDULOS específicos
   const moduleKeywords: Record<string, string[]> = {
-    "objecoesHandling": ["objeção", "mas é caro", "está caro", "não tenho", "já tenho fornecedor", "vou pensar", "como respondo", "alguém diz", "dúvida", "resisti", "contornar", "contorno", "derrubando objeção", "lidar com objeção", "responder objeção", "dificuldade", "barreira"],
-    "conducaoClientes": ["condução", "follow-up", "próximo contato", "nutrição", "cliente sumiu", "reativar", "reconquistar", "como manter", "manter cliente", "reter cliente"],
-    "mensagensEstagios": ["mensagem", "escrever", "o que falo", "como falo", "qual texto", "redação", "como mando", "qual mensagem", "que digo", "como digo"],
+    "objecoesHandling": ["objeção", "caro", "ta caro", "está caro", "não tenho", "já tenho", "fornecedor", "vou pensar", "como respondo", "alguém diz", "dúvida", "resisti", "contornar", "contorno", "derrubando", "lidar com", "responder", "cliente disse", "disse que", "respondeu", "barreira"],
+    "conducaoClientes": ["condução", "follow-up", "próximo", "nutrição", "cliente sumiu", "reativar", "reconquistar", "manter", "reter", "voltar"],
+    "mensagensEstagios": ["mensagem", "escrever", "falo", "texto", "redação", "mando", "mandar", "envio", "que digo", "digo", "respondo"],
   };
 
   // Score do módulo mais relevante
