@@ -27,7 +27,7 @@ export default function Cadastro() {
   const update = (field: string, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -58,6 +58,53 @@ export default function Cadastro() {
     if (!ok) {
       setError("Este e-mail já está cadastrado. Faça login.");
       return;
+    }
+
+    // Salvar em 3 lugares: Partners, Lead e Cliente
+    try {
+      // 1. Salvar como PARTNER
+      await fetch('/api/partners', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          company: form.company || null,
+          cnpj: form.cnpj || null,
+          email: form.email,
+          city: form.city || null,
+          state: form.state || null,
+        })
+      });
+
+      // 2. Salvar como LEAD
+      await fetch('/api/crm/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: form.name,
+          email: form.email,
+          telefone: form.phone,
+          origem: 'cadastro_loja',
+          status: 'novo',
+          notas: `Empresa: ${form.company || 'N/A'}\nCNPJ/CPF: ${form.cnpj || 'N/A'}\nCidade: ${form.city || 'N/A'}`,
+        })
+      });
+
+      // 3. Salvar como CLIENTE
+      await fetch('/api/crm/clientes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: form.name,
+          email: form.email,
+          telefone: form.phone,
+          tipo: form.company ? 'empresarial' : 'varejo',
+          status: 'ativo',
+        })
+      });
+    } catch (err) {
+      console.error('Erro ao salvar no Supabase:', err);
     }
 
     const msg = [

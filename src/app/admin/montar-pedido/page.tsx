@@ -9,6 +9,7 @@ interface ItemPedido {
   ref: string;
   name: string;
   color: string;
+  size: string;
   price: number;
   quantity: number;
 }
@@ -18,6 +19,7 @@ export default function MontarPedidoPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<typeof products[0] | null>(null);
   const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
 
   // Observa mudanças nos produtos da Palmira em tempo real
@@ -30,12 +32,13 @@ export default function MontarPedidoPage() {
   );
 
   const handleAddItem = () => {
-    if (!selectedProduct || !selectedColor || quantity < 1) return;
+    if (!selectedProduct || !selectedColor || !selectedSize || quantity < 1) return;
 
     const newItem: ItemPedido = {
       ref: selectedProduct.ref,
       name: selectedProduct.name,
       color: selectedColor,
+      size: selectedSize,
       price: selectedProduct.price,
       quantity,
     };
@@ -43,6 +46,7 @@ export default function MontarPedidoPage() {
     setItems([...items, newItem]);
     setSelectedProduct(null);
     setSelectedColor("");
+    setSelectedSize("");
     setQuantity(1);
     setSearchTerm("");
   };
@@ -54,7 +58,7 @@ export default function MontarPedidoPage() {
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const resumoTexto = `📦 PEDIDO\n\n${items
-    .map((item) => `REF ${item.ref} - ${item.name} (${item.color})\nQtd: ${item.quantity} x R$ ${item.price.toFixed(2).replace(".", ",")} = R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}`)
+    .map((item) => `REF ${item.ref} - ${item.name} (${item.color} - ${item.size})\nQtd: ${item.quantity} x R$ ${item.price.toFixed(2).replace(".", ",")} = R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}`)
     .join("\n\n")}\n\n${"─".repeat(25)}\nTOTAL: R$ ${total.toFixed(2).replace(".", ",")}`;
 
   return (
@@ -98,6 +102,7 @@ export default function MontarPedidoPage() {
                       onClick={() => {
                         setSelectedProduct(product);
                         setSelectedColor("");
+                        setSelectedSize("");
                       }}
                       className={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-blue-50 transition-colors ${
                         selectedProduct?.id === product.id ? "bg-blue-100" : ""
@@ -120,7 +125,10 @@ export default function MontarPedidoPage() {
                     {selectedProduct.variants.map((variant) => (
                       <button
                         key={variant.color}
-                        onClick={() => setSelectedColor(variant.color)}
+                        onClick={() => {
+                          setSelectedColor(variant.color);
+                          setSelectedSize("");
+                        }}
                         className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                           selectedColor === variant.color
                             ? "bg-[#7BC9C2] text-white"
@@ -135,8 +143,32 @@ export default function MontarPedidoPage() {
                 </div>
               )}
 
-              {/* Quantidade */}
+              {/* Seleção de Tamanho */}
               {selectedProduct && selectedColor && (
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">📐 Tamanho</label>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedProduct.variants
+                      .find((v) => v.color === selectedColor)
+                      ?.sizes.map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => setSelectedSize(size)}
+                          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                            selectedSize === size
+                              ? "bg-[#7BC9C2] text-white"
+                              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Quantidade */}
+              {selectedProduct && selectedColor && selectedSize && (
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">📏 Quantidade</label>
                   <div className="flex items-center gap-4">
@@ -164,7 +196,7 @@ export default function MontarPedidoPage() {
               )}
 
               {/* Botão Adicionar */}
-              {selectedProduct && selectedColor && (
+              {selectedProduct && selectedColor && selectedSize && (
                 <button
                   onClick={handleAddItem}
                   className="w-full bg-[#7BC9C2] hover:bg-[#5fb3ac] text-white font-bold py-3 rounded-lg transition-colors"
@@ -187,7 +219,7 @@ export default function MontarPedidoPage() {
                       <div className="flex-1">
                         <p className="text-xs text-gray-500 font-mono">REF {item.ref}</p>
                         <p className="text-sm font-semibold text-gray-800 line-clamp-2">{item.name}</p>
-                        <p className="text-xs text-gray-600">{item.color}</p>
+                        <p className="text-xs text-gray-600">{item.color} - {item.size}</p>
                         <p className="text-sm text-[#7BC9C2] font-bold">
                           {item.quantity} x R$ {item.price.toFixed(2).replace(".", ",")}
                         </p>

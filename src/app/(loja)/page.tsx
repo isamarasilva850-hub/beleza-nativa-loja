@@ -2,23 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { products } from "@/data/products";
+import { products as staticProducts } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import Sidebar from "@/components/Sidebar";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-
-interface UploadedProduct {
-  ref: string;
-  name: string;
-  category: string;
-  gender: string;
-  price: number;
-  image: string;
-  variant: { color: string; colorHex: string; sizes: string[] };
-  quantity: number;
-  timestamp: string;
-}
+import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
 
 const banners = [
   { src: "/banners/banner-desktop-1.jpg", mobileSrc: "/banners/banner-principal-1.jpg", alt: "Sua beleza começa por dentro" },
@@ -28,6 +17,7 @@ const banners = [
 
 export default function Home() {
   const searchParams = useSearchParams();
+  const { products: supabaseProducts, loading: loadingSupabase } = useSupabaseProducts();
   const [currentBanner, setCurrentBanner] = useState(0);
   const hoveringRef = useRef(false);
   const [filters, setFilters] = useState({
@@ -37,24 +27,12 @@ export default function Home() {
     size: null as string | null,
     priceRange: null as [number, number] | null,
     sortBy: null as string | null,
+    searchQuery: null as string | null,
   });
   const [showFilters, setShowFilters] = useState(false);
-  const [uploadedProducts, setUploadedProducts] = useState<UploadedProduct[]>([]);
+  const [uploadedProducts] = useState<any[]>([]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const loadProductsFromERP = async () => {
-      try {
-        const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
-        setUploadedProducts(uploads);
-      } catch (err) {
-        console.log("Erro ao carregar produtos do localStorage");
-      }
-    };
-
-    loadProductsFromERP();
-  }, []);
+  const allProducts = [...supabaseProducts, ...staticProducts.filter(sp => !supabaseProducts.find(sup => sup.ref === sp.ref))];
 
   const nextBanner = useCallback(() => {
     setCurrentBanner((prev) => (prev + 1) % banners.length);
@@ -67,10 +45,12 @@ export default function Home() {
   useEffect(() => {
     const genero = searchParams.get("genero");
     const categoria = searchParams.get("categoria");
+    const busca = searchParams.get("busca");
     setFilters((prev) => ({
       ...prev,
       gender: genero || null,
       category: categoria || null,
+      searchQuery: busca || null,
     }));
   }, [searchParams]);
 
@@ -85,13 +65,19 @@ export default function Home() {
     return () => clearTimeout(timerId);
   }, [nextBanner]);
 
-  const filteredProducts = products.filter((p) => {
+  const filteredProducts = allProducts.filter((p) => {
     if (filters.collection && p.collection !== filters.collection) return false;
     if (filters.gender && p.gender !== filters.gender) return false;
     if (filters.category && p.category !== filters.category) return false;
     if (filters.size) {
       const hasSize = p.variants.some((v) => v.sizes.includes(filters.size!));
       if (!hasSize) return false;
+    }
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase();
+      const matchesName = p.name?.toLowerCase().includes(query);
+      const matchesRef = p.ref?.toLowerCase().includes(query);
+      if (!matchesName && !matchesRef) return false;
     }
     return true;
   });
@@ -306,7 +292,7 @@ export default function Home() {
 
         <div className="flex gap-8">
           <div className={`${showFilters ? "block" : "hidden"} md:block w-full md:w-56 flex-shrink-0`}>
-            <Sidebar onFilterChange={(f) => setFilters(f)} />
+            <Sidebar onFilterChange={(f) => setFilters({ ...f, searchQuery: filters.searchQuery })} />
           </div>
           <div className="flex-1">
             {uploadedProducts.length > 0 && (
@@ -323,7 +309,15 @@ export default function Home() {
               {uploadedProducts.map((upload, idx) => (
                 <div key={`upload-${idx}`} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100">
                   <div className="aspect-square bg-gray-200 relative overflow-hidden">
-                    <img src={upload.image} alt={upload.name} className="w-full h-full object-cover" />
+                    {upload.images.length > 0 ? (
+                      <img src={upload.images[0]} alt={upload.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-300">
+                        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                    )}
                     <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
                       NOVO
                     </div>
@@ -333,8 +327,8 @@ export default function Home() {
                     <h3 className="font-semibold text-gray-800 text-sm mb-1 line-clamp-2">{upload.name}</h3>
                     <p className="text-xs text-gray-500 mb-2">{upload.gender}</p>
                     <div className="flex items-center justify-between mb-2">
-                      <div className="w-5 h-5 rounded-full border-2 border-gray-200" style={{ backgroundColor: upload.variant.colorHex }} title={upload.variant.color} />
-                      <span className="text-xs text-gray-500">{upload.variant.sizes.join(", ")}</span>
+                      <div className="w-5 h-5 rounded-full border-2 border-gray-200" style={{ backgroundColor: upload.colorHex }} title={upload.color} />
+                      <span className="text-xs text-gray-500">{upload.sizes.join(", ")}</span>
                     </div>
                     <p className="text-lg font-bold text-primary">R$ {upload.price.toFixed(2).replace(".", ",")}</p>
                     <p className="text-xs text-gray-500 mt-1">Est: {upload.quantity} un.</p>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import CRMActions from "@/components/CRMActions";
 
 interface Cliente {
   id: string;
@@ -92,7 +93,9 @@ export default function CRM() {
   const [formCliente, setFormCliente] = useState({ nome: "", email: "", telefone: "", tipo: "varejo", comissao: 0 });
   const [formLead, setFormLead] = useState({ nome: "", email: "", telefone: "", origem: "whatsapp", valor: 0, notas: "", vendedor: "Isamara" });
   const [formAtividade, setFormAtividade] = useState({ tipo: "chamada", clienteId: "", descricao: "", usuario: "Isamara" });
-  const [formProposta, setFormProposta] = useState({ numero: "", clienteId: "", valor: 0, itens: 0 });
+  const [formProposta, setFormProposta] = useState({ clienteId: "", clienteNome: "", valor: 0, dataVencimento: "", descricao: "" });
+  const [editingPropostaId, setEditingPropostaId] = useState<string | null>(null);
+  const [editingAtividadeId, setEditingAtividadeId] = useState<string | null>(null);
 
   const [searchClientes, setSearchClientes] = useState("");
   const [searchLeads, setSearchLeads] = useState("");
@@ -100,40 +103,138 @@ export default function CRM() {
   const [filterTipoCliente, setFilterTipoCliente] = useState("todos");
 
   useEffect(() => {
-    const stored = localStorage.getItem("belezanativa_crm_clientes");
-    if (stored) setClientes(JSON.parse(stored));
-    else {
-      const demo: Cliente[] = [
-        { id: "1", nome: "Rose Shop", email: "rose@shop.com", telefone: "(35) 99999-0001", tipo: "revenda", status: "ativo", dataCadastro: "2024-01-15", ultimaCompra: "2024-09-20", totalGasto: 15000, compras: 28, comissao: 5 },
-        { id: "2", nome: "Dona Bonita", email: "donabonita@email.com", telefone: "(35) 99999-0002", tipo: "revenda", status: "ativo", dataCadastro: "2024-03-10", ultimaCompra: "2024-09-18", totalGasto: 8500, compras: 15, comissao: 5 },
-      ];
-      setClientes(demo);
-      localStorage.setItem("belezanativa_crm_clientes", JSON.stringify(demo));
-    }
-
-    const storedLeads = localStorage.getItem("belezanativa_crm_leads");
-    if (storedLeads) setLeads(JSON.parse(storedLeads));
-    else {
-      const demoLeads: Lead[] = [
-        { id: "1", nome: "The Store", email: "thestore@shop.com", telefone: "(35) 99999-0003", origem: "whatsapp", status: "negociacao", valor: 5000, dataCadastro: "2024-09-16", proximoContato: "2024-09-25", notas: "Interesse em pacote atacado", vendedor: "Isamara" },
-      ];
-      setLeads(demoLeads);
-      localStorage.setItem("belezanativa_crm_leads", JSON.stringify(demoLeads));
-    }
-
-    const storedAtividades = localStorage.getItem("belezanativa_crm_atividades");
-    if (storedAtividades) setAtividades(JSON.parse(storedAtividades));
-    else {
-      const demoAtividades: Atividade[] = [
-        { id: "1", tipo: "chamada", clienteId: "1", clienteNome: "Rose Shop", descricao: "Confirmação de pedido", data: "2024-09-20", usuario: "Isamara", resultado: "Pedido confirmado" },
-      ];
-      setAtividades(demoAtividades);
-      localStorage.setItem("belezanativa_crm_atividades", JSON.stringify(demoAtividades));
-    }
-
-    const storedPropostas = localStorage.getItem("belezanativa_crm_propostas");
-    if (storedPropostas) setPropostas(JSON.parse(storedPropostas));
+    loadAllData();
   }, []);
+
+  const loadAllData = async () => {
+    try {
+      // Carregar do Supabase
+      const [clientesRes, leadsRes, atividadesRes, propostasRes] = await Promise.all([
+        fetch("/api/crm/clientes"),
+        fetch("/api/crm/leads"),
+        fetch("/api/crm/atividades"),
+        fetch("/api/crm/propostas"),
+      ]);
+
+      if (clientesRes.ok) {
+        const data = await clientesRes.json();
+        // Mapear campos do Supabase para interface
+        const mapped = data.map((c: any) => ({
+          id: c.id,
+          nome: c.nome,
+          email: c.email,
+          telefone: c.telefone,
+          tipo: c.tipo,
+          status: c.status,
+          dataCadastro: c.created_at,
+          totalGasto: c.total_gasto || 0,
+          compras: c.compras || 0,
+          comissao: c.comissao || 0,
+        }));
+        setClientes(mapped);
+      }
+      if (leadsRes.ok) {
+        const data = await leadsRes.json();
+        const mapped = data.map((l: any) => ({
+          id: l.id,
+          nome: l.nome,
+          email: l.email,
+          telefone: l.telefone,
+          origem: l.origem,
+          status: l.status,
+          valor: l.valor,
+          dataCadastro: l.created_at,
+          notas: l.notas,
+          vendedor: l.vendedor,
+        }));
+        setLeads(mapped);
+      }
+      if (atividadesRes.ok) {
+        const data = await atividadesRes.json();
+        const mapped = data.map((a: any) => ({
+          id: a.id,
+          tipo: a.tipo,
+          clienteId: a.cliente_id,
+          clienteNome: a.cliente_nome,
+          descricao: a.descricao,
+          data: a.data,
+          usuario: a.usuario,
+          resultado: a.resultado,
+        }));
+        setAtividades(mapped);
+      }
+      if (propostasRes.ok) {
+        const data = await propostasRes.json();
+        const mapped = data.map((p: any) => ({
+          id: p.id,
+          numero: p.numero,
+          clienteId: p.cliente_id,
+          clienteNome: p.cliente_nome,
+          valor: p.valor,
+          status: p.status,
+          dataCadastro: p.created_at,
+          itens: p.itens,
+        }));
+        setPropostas(mapped);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+      // Fallback pra localStorage se Supabase falhar
+      const stored = localStorage.getItem("belezanativa_crm_clientes");
+      if (stored) setClientes(JSON.parse(stored));
+    }
+  };
+
+  const savePropostas = (updated: Proposta[]) => {
+    setPropostas(updated);
+    localStorage.setItem("belezanativa_crm_propostas", JSON.stringify(updated));
+  };
+
+  const addProposta = async () => {
+    if (!formProposta.clienteId || !formProposta.valor) return;
+    try {
+      const res = await fetch("/api/crm/propostas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          numero: `PROP-${Date.now().toString(36).toUpperCase()}`,
+          clienteId: formProposta.clienteId,
+          clienteNome: formProposta.clienteNome,
+          valor: formProposta.valor,
+          dataVencimento: formProposta.dataVencimento || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        }),
+      });
+      if (res.ok) {
+        loadAllData();
+        setFormProposta({ clienteId: "", clienteNome: "", valor: 0, dataVencimento: "", descricao: "" });
+        setShowNovaProposta(false);
+      }
+    } catch (err) {
+      console.error("Erro ao criar proposta:", err);
+    }
+  };
+
+  const updateProposta = async (id: string, updates: Partial<Proposta>) => {
+    try {
+      await fetch(`/api/crm/propostas/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      loadAllData();
+    } catch (err) {
+      console.error("Erro ao atualizar proposta:", err);
+    }
+  };
+
+  const deleteProposta = async (id: string) => {
+    try {
+      await fetch(`/api/crm/propostas/${id}`, { method: "DELETE" });
+      loadAllData();
+    } catch (err) {
+      console.error("Erro ao deletar proposta:", err);
+    }
+  };
 
   const saveClientes = (updated: Cliente[]) => {
     setClientes(updated);
@@ -145,66 +246,121 @@ export default function CRM() {
     localStorage.setItem("belezanativa_crm_leads", JSON.stringify(updated));
   };
 
-  const addCliente = () => {
+  const saveAtividadestoSupabase = (atividades: Atividade[]) => {
+    localStorage.setItem("belezanativa_crm_atividades", JSON.stringify(atividades));
+  };
+
+  const addCliente = async () => {
     if (!formCliente.nome) return;
-    const novo: Cliente = {
-      id: Date.now().toString(),
-      nome: formCliente.nome,
-      email: formCliente.email,
-      telefone: formCliente.telefone,
-      tipo: formCliente.tipo as "varejo" | "revenda" | "atacado",
-      comissao: formCliente.comissao || 0,
-      status: "ativo",
-      dataCadastro: new Date().toISOString().split("T")[0],
-      totalGasto: 0,
-      compras: 0,
-    };
-    saveClientes([novo, ...clientes]);
-    setFormCliente({ nome: "", email: "", telefone: "", tipo: "varejo", comissao: 0 });
-    setShowNovoCliente(false);
+    try {
+      const res = await fetch("/api/crm/clientes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formCliente),
+      });
+      if (res.ok) {
+        loadAllData();
+        setFormCliente({ nome: "", email: "", telefone: "", tipo: "varejo", comissao: 0 });
+        setShowNovoCliente(false);
+      }
+    } catch (err) {
+      console.error("Erro ao criar cliente:", err);
+    }
   };
 
-  const addLead = () => {
+  const addLead = async () => {
     if (!formLead.nome) return;
-    const novo: Lead = {
-      id: Date.now().toString(),
-      nome: formLead.nome,
-      email: formLead.email,
-      telefone: formLead.telefone,
-      origem: formLead.origem as "whatsapp" | "instagram" | "indicacao" | "site" | "outro",
-      valor: formLead.valor,
-      notas: formLead.notas,
-      vendedor: formLead.vendedor,
-      status: "novo",
-      dataCadastro: new Date().toISOString().split("T")[0],
-    };
-    saveLeads([novo, ...leads]);
-    setFormLead({ nome: "", email: "", telefone: "", origem: "whatsapp", valor: 0, notas: "", vendedor: "Isamara" });
-    setShowNovoLead(false);
+    try {
+      const res = await fetch("/api/crm/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formLead),
+      });
+      if (res.ok) {
+        loadAllData();
+        setFormLead({ nome: "", email: "", telefone: "", origem: "whatsapp", valor: 0, notas: "", vendedor: "Isamara" });
+        setShowNovoLead(false);
+      }
+    } catch (err) {
+      console.error("Erro ao criar lead:", err);
+    }
   };
 
-  const addAtividade = () => {
+  const saveAtividades = (updated: Atividade[]) => {
+    setAtividades(updated);
+    localStorage.setItem("belezanativa_crm_atividades", JSON.stringify(updated));
+  };
+
+  const addAtividade = async () => {
     if (!formAtividade.descricao || !formAtividade.clienteId) return;
-    const novo: Atividade = {
-      id: Date.now().toString(),
-      tipo: formAtividade.tipo as "chamada" | "email" | "mensagem" | "reuniao" | "visita",
-      clienteId: formAtividade.clienteId,
-      clienteNome: clientes.find(c => c.id === formAtividade.clienteId)?.nome || "",
-      descricao: formAtividade.descricao,
-      data: new Date().toISOString().split("T")[0],
-      usuario: formAtividade.usuario,
-    };
-    setAtividades([novo, ...atividades]);
-    setFormAtividade({ tipo: "chamada", clienteId: "", descricao: "", usuario: "Isamara" });
-    setShowNovaAtividade(false);
+    try {
+      const res = await fetch("/api/crm/atividades", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tipo: formAtividade.tipo,
+          clienteId: formAtividade.clienteId,
+          clienteNome: clientes.find(c => c.id === formAtividade.clienteId)?.nome || "",
+          descricao: formAtividade.descricao,
+          usuario: formAtividade.usuario,
+        }),
+      });
+      if (res.ok) {
+        loadAllData();
+        setFormAtividade({ tipo: "chamada", clienteId: "", descricao: "", usuario: "Isamara" });
+        setShowNovaAtividade(false);
+      }
+    } catch (err) {
+      console.error("Erro ao criar atividade:", err);
+    }
   };
 
-  const updateLeadStatus = (id: string, status: Lead["status"]) => {
-    saveLeads(leads.map(l => l.id === id ? { ...l, status } : l));
+  const updateAtividade = async (id: string, updates: Partial<Atividade>) => {
+    try {
+      await fetch(`/api/crm/atividades/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+      loadAllData();
+    } catch (err) {
+      console.error("Erro ao atualizar atividade:", err);
+    }
   };
 
-  const updateClienteStatus = (id: string, status: Cliente["status"]) => {
-    saveClientes(clientes.map(c => c.id === id ? { ...c, status } : c));
+  const deleteAtividade = async (id: string) => {
+    try {
+      await fetch(`/api/crm/atividades/${id}`, { method: "DELETE" });
+      loadAllData();
+    } catch (err) {
+      console.error("Erro ao deletar atividade:", err);
+    }
+  };
+
+  const updateLeadStatus = async (id: string, status: Lead["status"]) => {
+    try {
+      await fetch(`/api/crm/leads/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      loadAllData();
+    } catch (err) {
+      console.error("Erro ao atualizar lead:", err);
+    }
+  };
+
+  const updateClienteStatus = async (id: string, status: Cliente["status"]) => {
+    try {
+      await fetch(`/api/crm/clientes/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      loadAllData();
+    } catch (err) {
+      console.error("Erro ao atualizar cliente:", err);
+    }
   };
 
   // KPIs
@@ -579,8 +735,29 @@ export default function CRM() {
                 <textarea placeholder="Descrição da atividade..." value={formAtividade.descricao} onChange={(e) => setFormAtividade({ ...formAtividade, descricao: e.target.value })} className="col-span-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]" rows={2} />
               </div>
               <div className="flex gap-2">
-                <button onClick={addAtividade} className="px-4 py-2 bg-[#7BC9C2] text-white rounded-lg text-sm font-bold hover:bg-[#6ab8b1]">Salvar</button>
-                <button onClick={() => setShowNovaAtividade(false)} className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200">Cancelar</button>
+                <button
+                  onClick={() => {
+                    if (editingAtividadeId) {
+                      updateAtividade(editingAtividadeId, { tipo: formAtividade.tipo as any, descricao: formAtividade.descricao });
+                      setEditingAtividadeId(null);
+                    } else {
+                      addAtividade();
+                    }
+                  }}
+                  className="px-4 py-2 bg-[#7BC9C2] text-white rounded-lg text-sm font-bold hover:bg-[#6ab8b1]"
+                >
+                  {editingAtividadeId ? "Atualizar" : "Salvar"}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowNovaAtividade(false);
+                    setEditingAtividadeId(null);
+                    setFormAtividade({ tipo: "chamada", clienteId: "", descricao: "", usuario: "Isamara" });
+                  }}
+                  className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200"
+                >
+                  Cancelar
+                </button>
               </div>
             </div>
           )}
@@ -610,6 +787,23 @@ export default function CRM() {
                         {a.resultado && <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded">✓ {a.resultado}</span>}
                       </div>
                     </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setEditingAtividadeId(a.id);
+                          setFormAtividade({ tipo: a.tipo, clienteId: a.clienteId, descricao: a.descricao, usuario: a.usuario });
+                        }}
+                        className="px-2 py-1.5 bg-blue-100 text-blue-600 rounded-lg text-xs font-medium hover:bg-blue-200 transition-colors"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => deleteAtividade(a.id)}
+                        className="px-2 py-1.5 bg-red-100 text-red-600 rounded-lg text-xs font-medium hover:bg-red-200 transition-colors"
+                      >
+                        ❌
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))
@@ -621,15 +815,114 @@ export default function CRM() {
       {/* PROPOSTAS */}
       {tab === "propostas" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <h2 className="text-xl font-bold text-gray-800">Propostas e Orçamentos</h2>
             <button onClick={() => setShowNovaProposta(!showNovaProposta)} className="px-4 py-2 bg-[#7BC9C2] text-white rounded-lg text-sm font-bold hover:bg-[#6ab8b1]">
               + Nova Proposta
             </button>
           </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400">
-            <p className="font-medium">Módulo de propostas em desenvolvimento</p>
-            <p className="text-xs mt-2">Você será capaz de criar, enviar e rastrear propostas de clientes</p>
+
+          {showNovaProposta && (
+            <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
+              <h3 className="font-bold text-gray-700">Criar Proposta</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <select
+                  value={formProposta.clienteId}
+                  onChange={(e) => {
+                    const cliente = clientes.find(c => c.id === e.target.value);
+                    setFormProposta({
+                      ...formProposta,
+                      clienteId: e.target.value,
+                      clienteNome: cliente?.nome || ""
+                    });
+                  }}
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
+                >
+                  <option value="">Selecione o cliente *</option>
+                  {clientes.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+                </select>
+                <input
+                  type="number"
+                  placeholder="Valor (R$) *"
+                  value={formProposta.valor}
+                  onChange={(e) => setFormProposta({ ...formProposta, valor: parseFloat(e.target.value) })}
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
+                />
+                <input
+                  type="date"
+                  placeholder="Data de Vencimento"
+                  value={formProposta.dataVencimento}
+                  onChange={(e) => setFormProposta({ ...formProposta, dataVencimento: e.target.value })}
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
+                />
+                <textarea
+                  placeholder="Descrição (opcional)"
+                  value={formProposta.descricao}
+                  onChange={(e) => setFormProposta({ ...formProposta, descricao: e.target.value })}
+                  className="col-span-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
+                  rows={2}
+                />
+              </div>
+              <div className="flex gap-2">
+                <button onClick={addProposta} className="px-4 py-2 bg-[#7BC9C2] text-white rounded-lg text-sm font-bold hover:bg-[#6ab8b1]">Salvar</button>
+                <button onClick={() => setShowNovaProposta(false)} className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200">Cancelar</button>
+              </div>
+            </div>
+          )}
+
+          <div className="grid gap-3">
+            {propostas.length === 0 ? (
+              <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400">
+                <p className="font-medium">Nenhuma proposta criada</p>
+              </div>
+            ) : (
+              propostas.map(proposta => (
+                <div key={proposta.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-bold text-gray-800">{proposta.clienteNome}</h3>
+                        <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded">{proposta.numero}</span>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                          proposta.status === "rascunho" ? "bg-gray-100 text-gray-700" :
+                          proposta.status === "enviada" ? "bg-blue-100 text-blue-700" :
+                          proposta.status === "visualizada" ? "bg-cyan-100 text-cyan-700" :
+                          proposta.status === "aceita" ? "bg-green-100 text-green-700" :
+                          "bg-red-100 text-red-700"
+                        }`}>
+                          {proposta.status}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2 text-xs text-gray-500">
+                        <span>💰 R$ {proposta.valor.toLocaleString("pt-BR")}</span>
+                        <span>📅 Vence: {proposta.dataVencimento}</span>
+                        <span>📨 Enviada: {proposta.dataEnvio}</span>
+                        <span>📦 {proposta.itens} item(ns)</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <select
+                        value={proposta.status}
+                        onChange={(e) => updateProposta(proposta.id, { status: e.target.value as any })}
+                        className="px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#7BC9C2]"
+                      >
+                        <option value="rascunho">Rascunho</option>
+                        <option value="enviada">Enviada</option>
+                        <option value="visualizada">Visualizada</option>
+                        <option value="aceita">Aceita</option>
+                        <option value="rejeitada">Rejeitada</option>
+                      </select>
+                      <button
+                        onClick={() => deleteProposta(proposta.id)}
+                        className="px-3 py-1.5 bg-red-100 text-red-600 rounded-lg text-xs font-medium hover:bg-red-200 transition-colors"
+                      >
+                        ❌
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}

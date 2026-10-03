@@ -1,140 +1,176 @@
-"use client";
+﻿'use client';
 
-import { useState, useEffect } from "react";
-import { products } from "@/data/products";
+import { useEffect } from 'react';
+import { useReports } from '@/hooks/useReports';
 
-export default function Relatorios() {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [partners, setPartners] = useState<any[]>([]);
-  const [leads, setLeads] = useState<any[]>([]);
-  const [period, setPeriod] = useState("mes");
+export default function RelatoriosPage() {
+  const { data, loading, error, loadReports } = useReports();
 
   useEffect(() => {
-    const o = localStorage.getItem("belezanativa_orders");
-    const p = localStorage.getItem("belezanativa_partners");
-    const l = localStorage.getItem("belezanativa_leads");
-    if (o) setOrders(JSON.parse(o));
-    if (p) setPartners(JSON.parse(p));
-    if (l) setLeads(JSON.parse(l));
-  }, []);
+    loadReports();
+  }, [loadReports]);
 
-  const totalRevenue = orders.reduce((s: number, o: any) => s + (o.total || 0), 0);
-  const totalOrders = orders.length;
-  const ticketMedio = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-  const activePartners = partners.filter((p: any) => p.status === "ativo").length;
-  const convertedLeads = leads.filter((l: any) => l.status === "convertido").length;
-  const conversionRate = leads.length > 0 ? ((convertedLeads / leads.length) * 100).toFixed(1) : "0";
+  if (loading) {
+    return <div className="p-6 text-center text-gray-600">⏳ Carregando relatórios...</div>;
+  }
 
-  const categorySales: Record<string, number> = {};
-  products.forEach((p) => {
-    if (!categorySales[p.category]) categorySales[p.category] = 0;
-  });
+  if (error) {
+    return <div className="p-6 text-center text-red-600">❌ Erro: {error}</div>;
+  }
 
-  const kpis = [
-    { label: "Receita Total", value: `R$ ${totalRevenue.toFixed(2).replace(".", ",")}`, color: "text-green-600", bg: "bg-green-50" },
-    { label: "Total de Pedidos", value: totalOrders.toString(), color: "text-blue-600", bg: "bg-blue-50" },
-    { label: "Ticket Médio", value: `R$ ${ticketMedio.toFixed(2).replace(".", ",")}`, color: "text-purple-600", bg: "bg-purple-50" },
-    { label: "Clientes Ativos", value: activePartners.toString(), color: "text-[#7BC9C2]", bg: "bg-[#7BC9C2]/10" },
-    { label: "Leads Gerados", value: leads.length.toString(), color: "text-orange-600", bg: "bg-orange-50" },
-    { label: "Taxa Conversão", value: `${conversionRate}%`, color: "text-indigo-600", bg: "bg-indigo-50" },
-    { label: "Produtos Ativos", value: products.length.toString(), color: "text-pink-600", bg: "bg-pink-50" },
-    { label: "Leads Convertidos", value: convertedLeads.toString(), color: "text-emerald-600", bg: "bg-emerald-50" },
-  ];
+  if (!data) {
+    return <div className="p-6 text-center text-gray-600">Sem dados disponíveis</div>;
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold text-gray-800">KPIs de Vendas 360°</h1>
-        <div className="flex gap-2">
-          {[
-            { key: "semana", label: "7 dias" },
-            { key: "mes", label: "30 dias" },
-            { key: "trimestre", label: "90 dias" },
-            { key: "todos", label: "Todos" },
-          ].map((p) => (
-            <button key={p.key} onClick={() => setPeriod(p.key)} className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${period === p.key ? "bg-[#7BC9C2] text-white" : "bg-white text-gray-600 border border-gray-200"}`}>
-              {p.label}
-            </button>
-          ))}
+    <div className="p-6 space-y-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">📊 Relatórios & Análise</h1>
+        <p className="text-gray-600">Acompanhe as vendas, revendedoras top e produtos mais vendidos</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-200">
+          <p className="text-sm text-blue-600 font-semibold mb-2">TOTAL DE VENDAS</p>
+          <p className="text-3xl font-bold text-blue-900">
+            R$ {data.totalSales.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+        <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-lg border border-green-200">
+          <p className="text-sm text-green-600 font-semibold mb-2">TOTAL DE PEDIDOS</p>
+          <p className="text-3xl font-bold text-green-900">{data.totalOrders}</p>
+        </div>
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-lg border border-purple-200">
+          <p className="text-sm text-purple-600 font-semibold mb-2">TICKET MÉDIO</p>
+          <p className="text-3xl font-bold text-purple-900">
+            R$ {data.averageTicket.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+        <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-lg border border-orange-200">
+          <p className="text-sm text-orange-600 font-semibold mb-2">REVENDEDORAS</p>
+          <p className="text-3xl font-bold text-orange-900">{data.topPartners.length}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {kpis.map((kpi) => (
-          <div key={kpi.label} className={`${kpi.bg} rounded-xl p-4`}>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{kpi.label}</p>
-            <p className={`text-xl font-bold mt-1 ${kpi.color}`}>{kpi.value}</p>
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">📦 Status dos Pedidos</h2>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+            <p className="text-sm text-yellow-600 font-semibold">Pendente</p>
+            <p className="text-2xl font-bold text-yellow-900">{data.orderStatus.pendente}</p>
           </div>
-        ))}
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <p className="text-sm text-blue-600 font-semibold">Pago</p>
+            <p className="text-2xl font-bold text-blue-900">{data.orderStatus.pago}</p>
+          </div>
+          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+            <p className="text-sm text-green-600 font-semibold">Entregue</p>
+            <p className="text-2xl font-bold text-green-900">{data.orderStatus.entregue}</p>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <h2 className="font-bold text-gray-700 mb-4">Funil de Vendas</h2>
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">👑 Top 5 Revendedoras por Faturamento</h2>
+        {data.topPartners.length > 0 ? (
           <div className="space-y-3">
-            {[
-              { label: "Leads Gerados", value: leads.length, color: "bg-blue-500", width: "100%" },
-              { label: "Em Contato", value: leads.filter((l: any) => l.status === "contato").length, color: "bg-yellow-500", width: leads.length > 0 ? `${(leads.filter((l: any) => l.status === "contato").length / leads.length) * 100}%` : "0%" },
-              { label: "Em Negociação", value: leads.filter((l: any) => l.status === "negociacao").length, color: "bg-orange-500", width: leads.length > 0 ? `${(leads.filter((l: any) => l.status === "negociacao").length / leads.length) * 100}%` : "0%" },
-              { label: "Convertidos", value: convertedLeads, color: "bg-green-500", width: leads.length > 0 ? `${(convertedLeads / leads.length) * 100}%` : "0%" },
-            ].map((stage) => (
-              <div key={stage.label}>
-                <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-gray-600">{stage.label}</span>
-                  <span className="font-bold text-gray-800">{stage.value}</span>
+            {data.topPartners.map((partner, idx) => (
+              <div key={partner.id} className="flex items-center gap-4 pb-3 border-b last:border-b-0">
+                <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  {idx + 1}
                 </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                  <div className={`h-full ${stage.color} rounded-full transition-all`} style={{ width: stage.width || "0%" }} />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-900">{partner.name}</p>
+                  <p className="text-xs text-gray-500">{partner.orderCount} pedidos</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-teal-600">R$ {partner.totalSales.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  <p className="text-xs text-gray-500">{((partner.totalSales / data.totalSales) * 100).toFixed(1)}% do total</p>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        ) : (
+          <p className="text-gray-500 text-sm">Nenhum pedido registrado</p>
+        )}
+      </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <h2 className="font-bold text-gray-700 mb-4">Produtos por Categoria</h2>
-          <div className="space-y-2">
-            {Object.entries(
-              products.reduce<Record<string, number>>((acc, p) => {
-                acc[p.category] = (acc[p.category] || 0) + 1;
-                return acc;
-              }, {})
-            )
-              .sort((a, b) => b[1] - a[1])
-              .map(([cat, count]) => (
-                <div key={cat} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                  <span className="text-sm text-gray-600">{cat}</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#7BC9C2] rounded-full" style={{ width: `${(count / products.length) * 100}%` }} />
-                    </div>
-                    <span className="text-sm font-bold text-gray-700 w-8 text-right">{count}</span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">🏆 Top 10 Produtos Mais Vendidos</h2>
+          {data.topProducts.length > 0 ? (
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {data.topProducts.map((product, idx) => (
+                <div key={idx} className="flex items-center justify-between pb-2 border-b last:border-b-0">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">{product.name}</p>
+                    <p className="text-xs text-gray-500">{product.quantity} unidades</p>
                   </div>
+                  <p className="text-sm font-semibold text-teal-600">
+                    R$ {product.sales.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
                 </div>
               ))}
-          </div>
+            </div>
+          ) : (
+            <p className="text-gray-500 text-sm">Nenhum produto vendido</p>
+          )}
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">🎨 Cores Mais Vendidas</h2>
+          {data.topColors.length > 0 ? (
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {data.topColors.map((color, idx) => {
+                const percentage = (color.quantity / (data.topColors.reduce((sum, c) => sum + c.quantity, 0))) * 100;
+                return (
+                  <div key={idx} className="pb-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-medium text-gray-900">{color.color}</p>
+                      <p className="text-xs font-semibold text-gray-600">{color.quantity}</p>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-gradient-to-r from-teal-400 to-teal-600 h-2 rounded-full transition-all"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-sm">Nenhuma cor vendida</p>
+          )}
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <h2 className="font-bold text-gray-700 mb-4">Resumo de Performance</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 bg-gray-50 rounded-lg text-center">
-            <p className="text-3xl font-bold text-[#7BC9C2]">{products.length}</p>
-            <p className="text-xs text-gray-500 mt-1">Produtos no Catálogo</p>
-          </div>
-          <div className="p-4 bg-gray-50 rounded-lg text-center">
-            <p className="text-3xl font-bold text-[#7BC9C2]">{products.reduce((s, p) => s + p.variants.length, 0)}</p>
-            <p className="text-xs text-gray-500 mt-1">Variações de Cor</p>
-          </div>
-          <div className="p-4 bg-gray-50 rounded-lg text-center">
-            <p className="text-3xl font-bold text-[#7BC9C2]">
-              {products.reduce((s, p) => s + p.variants.reduce((vs, v) => vs + v.sizes.length, 0), 0)}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">SKUs Totais</p>
+      {data.monthlySales.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">📈 Vendas por Mês</h2>
+          <div className="space-y-3 max-h-64 overflow-y-auto">
+            {data.monthlySales.map((item, idx) => {
+              const percentage = (item.total / Math.max(...data.monthlySales.map(m => m.total))) * 100;
+              return (
+                <div key={idx} className="pb-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-medium text-gray-700">{item.month}</p>
+                    <p className="text-sm font-bold text-teal-600">
+                      R$ {item.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div
+                      className="bg-gradient-to-r from-teal-400 to-teal-600 h-3 rounded-full transition-all"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,167 @@
+import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET() {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    // Busca produtos
+    const { data: products, error: productsError } = await supabase
+      .from('products')
+      .select('*');
+
+    if (productsError) {
+      console.error('Erro na tabela products:', productsError);
+      throw new Error(`Erro ao carregar products: ${productsError.message}`);
+    }
+
+    console.log('📦 Produtos carregados:', products?.length || 0);
+
+    const { data: colors, error: colorsError } = await supabase
+      .from('product_colors')
+      .select('id, product_id, color_name, color_hex, qty_p, qty_m, qty_g, qty_gg');
+
+    if (colorsError) {
+      console.error('Erro na tabela product_colors:', colorsError);
+      throw new Error(`Erro ao carregar product_colors: ${colorsError.message}`);
+    }
+
+    const { data: images, error: imagesError } = await supabase
+      .from('product_images')
+      .select('id, product_id, image_base64, display_order');
+
+    if (imagesError) {
+      console.error('Erro na tabela product_images:', imagesError);
+      throw new Error(`Erro ao carregar product_images: ${imagesError.message}`);
+    }
+
+    const enrichedProducts = products?.map((product) => ({
+      ...product,
+      colors: colors?.filter((c) => c.product_id === product.id) || [],
+      images: images?.filter((i) => i.product_id === product.id) || [],
+    })) || [];
+
+    return NextResponse.json(enrichedProducts);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('❌ Erro ao carregar produtos:', errorMessage);
+    console.error('Stack:', error instanceof Error ? error.stack : 'N/A');
+    return NextResponse.json(
+      {
+        error: 'Erro ao carregar produtos',
+        message: errorMessage,
+        supabaseConfigured: !!process.env.NEXT_PUBLIC_SUPABASE_URL
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      console.error('❌ Credenciais Supabase faltando!');
+      return NextResponse.json(
+        { error: 'Erro de configuração: Credenciais Supabase não encontradas' },
+        { status: 500 }
+      );
+    }
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    );
+
+    const body = await request.json();
+    const { ref, name, price, gender, colors, images } = body;
+
+    console.log('📦 Recebido:', { ref, name, price, gender, colorsCount: colors?.length, imagesCount: images?.length });
+
+    if (!ref || !name || !price) {
+      return NextResponse.json(
+        { error: 'REF, Nome e Preço são obrigatórios' },
+        { status: 400 }
+      );
+    }
+
+    // Verifica se produto com essa REF já existe
+    const { data: existingProducts, error: checkError } = await supabase
+      .from('products')
+      .select('id')
+      .eq('ref', ref)
+      .limit(1);
+
+    if (checkError) throw checkError;
+
+    let productId: string;
+
+    if (existingProducts && existingProducts.length > 0) {
+      // Produto já existe - usa o ID existente
+      productId = existingProducts[0].id;
+      console.log(`✅ Produto REF '${ref}' já existe (ID: ${productId}) - adicionando cores`);
+    } else {
+      // Produto novo - cria
+      productId = `prod_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 9)}`;
+      const { error: productError } = await supabase
+        .from('products')
+        .insert({
+          id: productId,
+          ref,
+          name,
+          price: parseFloat(price as string),
+          category: 'Lingerie',
+          gender: gender || 'Feminino',
+        });
+
+      if (productError) throw productError;
+      console.log(`✨ Novo produto criado (REF: ${ref}, ID: ${productId})`);
+    }
+
+    if (colors && Array.isArray(colors)) {
+      for (const color of colors) {
+        const colorId = `color_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 9)}`;
+        const { error: colorError } = await supabase
+          .from('product_colors')
+          .insert({
+            id: colorId,
+            product_id: productId,
+            color_name: color.name,
+            color_hex: color.hex || '#000000',
+            qty_p: parseInt(color.qty_p) || 0,
+            qty_m: parseInt(color.qty_m) || 0,
+            qty_g: parseInt(color.qty_g) || 0,
+            qty_gg: parseInt(color.qty_gg) || 0,
+          });
+
+        if (colorError) throw colorError;
+      }
+    }
+
+    if (images && Array.isArray(images)) {
+      for (let i = 0; i < images.length; i++) {
+        const imageId = `img_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 9)}`;
+        const { error: imageError } = await supabase
+          .from('product_images')
+          .insert({
+            id: imageId,
+            product_id: productId,
+            image_base64: images[i],
+            display_order: i,
+          });
+
+        if (imageError) throw imageError;
+      }
+    }
+
+    return NextResponse.json({ id: productId, ref, name, price }, { status: 201 });
+  } catch (error) {
+    console.error('Erro ao criar produto:', error);
+    return NextResponse.json(
+      { error: 'Erro ao criar produto', details: error instanceof Error ? error.message : String(error) },
+      { status: 500 }
+    );
+  }
+}
