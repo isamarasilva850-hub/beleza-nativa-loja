@@ -70,48 +70,49 @@ export async function POST(req: Request) {
               .eq("product_id", prod.id)
               .order("position", { ascending: true });
 
-          const existingCount = existingImages?.length || 0;
+            const existingCount = existingImages?.length || 0;
 
-          // Insert only NEW images (those not already in database)
-          for (let i = 0; i < product.images.length; i++) {
-            const imgBase64 = product.images[i];
+            // Insert only NEW images (those not already in database)
+            for (let i = 0; i < product.images.length; i++) {
+              const imgBase64 = product.images[i];
 
-            // Check if this image already exists at this position
-            if (i < existingCount && existingImages?.[i]?.image_url === imgBase64) {
-              // Image already exists, skip
-              continue;
-            } else if (i < existingCount) {
-              // Update existing image at this position
-              await supabase
-                .from("product_images")
-                .update({
-                  image_url: imgBase64,
-                  position: i,
-                })
-                .eq("id", existingImages![i].id);
-            } else {
-              // Insert new image
-              await supabase.from("product_images").insert([
-                {
-                  product_id: prod.id,
-                  image_url: imgBase64,
-                  position: i,
-                },
-              ]);
+              // Check if this image already exists at this position
+              if (i < existingCount && existingImages?.[i]?.image_url === imgBase64) {
+                // Image already exists, skip
+                continue;
+              } else if (i < existingCount) {
+                // Update existing image at this position
+                await supabase
+                  .from("product_images")
+                  .update({
+                    image_url: imgBase64,
+                    position: i,
+                  })
+                  .eq("id", existingImages![i].id);
+              } else {
+                // Insert new image
+                await supabase.from("product_images").insert([
+                  {
+                    product_id: prod.id,
+                    image_url: imgBase64,
+                    position: i,
+                  },
+                ]);
+              }
             }
-          }
 
-          // If images were removed, delete extras
-          if (product.images.length < existingCount) {
-            const idsToDelete = existingImages
-              ?.slice(product.images.length)
-              .map((img) => img.id) || [];
+            // If images were removed, delete extras
+            if (product.images.length < existingCount) {
+              const idsToDelete = existingImages
+                ?.slice(product.images.length)
+                .map((img) => img.id) || [];
 
-            if (idsToDelete.length > 0) {
-              await supabase
-                .from("product_images")
-                .delete()
-                .in("id", idsToDelete);
+              if (idsToDelete.length > 0) {
+                await supabase
+                  .from("product_images")
+                  .delete()
+                  .in("id", idsToDelete);
+              }
             }
           }
         }

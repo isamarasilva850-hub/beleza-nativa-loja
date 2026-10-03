@@ -5,9 +5,6 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { notifyStorageChange } from "@/lib/storageEvents";
 
-// Alias para o construtor Image do DOM (não confundir com Image do Next.js)
-const DOMImage = typeof window !== 'undefined' ? window.Image : Image;
-
 interface UploadedProduct {
   ref: string;
   name: string;
@@ -63,7 +60,7 @@ export default function PalmiraProdutosPage() {
 
       reader.onload = async (event) => {
         const result = event.target?.result as string;
-        const imgElement = new DOMImage();
+        const imgElement = document.createElement('img') as HTMLImageElement;
         imgElement.onload = () => {
           const canvas = document.createElement("canvas");
           canvas.width = 800;
