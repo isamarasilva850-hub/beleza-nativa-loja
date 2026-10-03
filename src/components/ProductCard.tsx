@@ -33,7 +33,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
       href={`/produto/${product.slug}`}
-      className="group block bg-white rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 border-2 border-gray-200 hover:border-primary"
+      className="group block bg-white rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 border-2 border-gray-200 hover:border-primary"
     >
       <div className="aspect-[3/4] bg-gray-100 relative overflow-hidden">
         {hasImage ? (
@@ -51,7 +51,6 @@ export default function ProductCard({ product }: ProductCardProps) {
             </svg>
           </div>
         )}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
       </div>
 
       <div className="p-3">
