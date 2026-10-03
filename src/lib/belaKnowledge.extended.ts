@@ -725,6 +725,100 @@ export const belaKnowledgeExtended = {
         "🎯 Segmente: mãe compra por conforto, adolescente por estilo",
         "💝 Ofereça valor: desconto progressivo, frete grátis, presente surpresa"
       ]
+    },
+
+    conducaoClientes: {
+      title: "🎯 Condução de Clientes (Follow-up)",
+      description: "Estratégia para manter cliente quente e converter em venda",
+      steps: [
+        {
+          number: 1,
+          title: "Cliente viu mas não comprou?",
+          description: "Aguarde 2-3 horas. Se silêncio: mande 'Ficou com dúvida?' ou 'Quer tentar?'"
+        },
+        {
+          number: 2,
+          title: "Ofereça alternativa",
+          description: "Se disse que tá caro: 'Temos em rosa também, é 10% mais barato' ou parcelado"
+        },
+        {
+          number: 3,
+          title: "Crie urgência",
+          description: "Use FATOS: 'Só 2 peças em P dessa cor' ou 'Vai viajar e quer novo?'"
+        },
+        {
+          number: 4,
+          title: "Se sumiu por dias",
+          description: "Mande algo útil (não venda!): dica de moda, cuida roupa, história do produto"
+        },
+        {
+          number: 5,
+          title: "Reative com desconto",
+          description: "Se foi cliente 1x: 'Voltou novidade! Só pra você que já confia: 15% OFF'"
+        },
+        {
+          number: 6,
+          title: "Invista em relacionamento",
+          description: "Parabéns data dela, pergunte se a peça chegou bem, compartilhe unboxing"
+        }
+      ],
+      tips: [
+        "🔥 1ª mensagem = aquecimento (sem vender), 2ª = oferta, 3ª = urgência",
+        "💰 Ciclo de vendas é 3-7 mensagens, nunca é só 1",
+        "👥 Cliente que nunca respondeu ≠ cliente que respondeu e sumiu",
+        "📊 Clientes que respondem pedindo referência = ouro puro (3-5x mais valiosos)",
+        "⏰ Melhor momento pra reconquistar: 3 dias após compra (enquanto está feliz)",
+        "🎁 Ofereça referência: 'Traga amiga, vcs ganham 20% cada'",
+        "❌ Não spam: máximo 2-3 mensagens se não responde, depois dá espaço",
+        "✨ Estrela = cliente que virou revendedora (ela faz follow-up COM VOCÊ!)"
+      ]
+    },
+
+    mensagensEstagios: {
+      title: "📱 Mensagens por Estágio de Cliente",
+      description: "Mensagem certa no momento certo do customer journey",
+      steps: [
+        {
+          number: 1,
+          title: "🔍 AWARENESS (Primeira vez que descobre)",
+          description: "Não venda, seja ÚTIL: dica de moda, educação. Ex: 'Sabe qual cor combina com sua pele? Azul traz transparência, rosa aquece. Qual combina mais com você?'"
+        },
+        {
+          number: 2,
+          title: "💭 INTERESSE (Viu, curtiu, quer saber mais)",
+          description: "Mostre VALOR + PROVA. Ex: 'Viu que elas se encaixam em 3 tipos de corpo? Quer saber qual é o seu?' ou tag com foto de cliente igual no seu tipo"
+        },
+        {
+          number: 3,
+          title: "⚖️ CONSIDERAÇÃO (Tá na dúvida entre 2-3 peças)",
+          description: "COMPARAÇÃO + BENEFÍCIO. Ex: 'Essa cor dura mais (tingimento importado) e aquela é confortável. Qual você usa mais: na praia ou trabalho?'"
+        },
+        {
+          number: 4,
+          title: "✅ DECISÃO (Quer mas tá com medo)",
+          description: "REMOVA OBJEÇÃO: preço, tamanho, entrega. Ex: 'Primeira compra? Entra no nosso grupo de amigas da Beleza - ganha 20% OFF + chat de dúvidas sempre aberto'"
+        },
+        {
+          number: 5,
+          title: "🎁 COMPRA (Pedido confirmado)",
+          description: "CELEBRE + EXPECTATIVA. Ex: 'Compra confirmada! 🎉 Sua cor chegará em 3-5 dias. Quer dica de como cuidar pra durar 10x mais?'"
+        },
+        {
+          number: 6,
+          title: "🌟 RETENÇÃO (Já recebeu)",
+          description: "PEÇA FEEDBACK + CRIE HÁBITO. Ex: 'Chegou bem? Envia foto com ela! Que cor combina com você? Aquelas outras cores que curtiu?' + ativação newsletter"
+        }
+      ],
+      tips: [
+        "📊 A MAIORIA abandona na fase 3-4. Use objeção reversa: 'Não quer?', 'Ficou com medo?', 'Tá diferente do que imaginava?'",
+        "🎯 AWARENESS = 70% educação + 30% branding. DECISÃO = 70% venda + 30% garantia",
+        "💬 NUNCA venda direto no 1º contato. Antes precisa: saber o tipo dela, qual sua dúvida, se combina",
+        "⏰ Timing por estágio: Awareness (dias), Interesse (horas), Consideração (minutos!), Decisão (imediato), Compra (segundos), Retenção (2 min após recebido)",
+        "🔄 Se pulou estágio (ex: awareness → compra = raro), retorne: educação. Se travou num estágio, respeite mas não abandone",
+        "👥 Clientes que passam por TODOS os 6 estágios virão sua marca pra amigas = OURO",
+        "🎁 Estágio mais importante pra retenção = COMPRA (expectativa) + RETENÇÃO (feedback). 70% volta se recebeu BEM e você perguntou como foi",
+        "💡 Se cliente pula de INTERESSE direto pra COMPRA = impulso. Se sai de RETENÇÃO = marca ruim (não foi celebrado bem)"
+      ]
     }
   },
 
@@ -794,6 +888,26 @@ export const belaKnowledgeExtended = {
     "texto para whatsapp": "mensagensClientes",
     "mensagem vendedora": "mensagensClientes",
     "como vendo no whatsapp": "mensagensClientes",
+
+    // Condução
+    "condução": "conducaoClientes",
+    "follow-up": "conducaoClientes",
+    "cliente sumiu": "conducaoClientes",
+    "cliente não respondeu": "conducaoClientes",
+    "como reativar cliente": "conducaoClientes",
+    "cliente voltou": "conducaoClientes",
+    "reconquistar cliente": "conducaoClientes",
+
+    // Estágios de Cliente
+    "mensagens estágio": "mensagensEstagios",
+    "estágio cliente": "mensagensEstagios",
+    "todos os momentos": "mensagensEstagios",
+    "awareness": "mensagensEstagios",
+    "interesse": "mensagensEstagios",
+    "consideração": "mensagensEstagios",
+    "decisão": "mensagensEstagios",
+    "retenção": "mensagensEstagios",
+    "customer journey": "mensagensEstagios",
 
     // Outros
     "pedidos": "pedidos",
