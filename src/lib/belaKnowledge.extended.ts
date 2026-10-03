@@ -1043,18 +1043,22 @@ export const belaKnowledgeExtended = {
 
 // Função para buscar guia na base expandida
 export function getModuleGuideExtended(query: string): string {
-  const lowerQuery = query.toLowerCase();
+  const lowerQuery = query.toLowerCase().trim();
 
   // Busca nos quick answers da Palmira
   for (const [keyword, moduleKey] of Object.entries(belaKnowledgeExtended.palmiraQuickAnswers)) {
-    if (lowerQuery.includes(keyword)) {
+    // Tenta includes PRIMEIRO (mais flexível)
+    if (lowerQuery.includes(keyword.trim())) {
       const module = belaKnowledgeExtended.modules[moduleKey as keyof typeof belaKnowledgeExtended.modules];
       if (module && 'steps' in module) {
+        console.log('✅ Found module:', moduleKey);
         return formatModuleGuide(module as any);
       }
     }
   }
 
+  // Se não encontrou, retorna string vazia
+  console.log('❌ No module found for:', lowerQuery);
   return "";
 }
 
