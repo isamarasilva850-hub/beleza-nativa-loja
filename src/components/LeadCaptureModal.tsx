@@ -133,7 +133,7 @@ export default function LeadCaptureModal() {
           </h2>
 
           <p className="text-gray-600 text-sm mt-3 font-medium">
-            🎁 Desconto só pra você + Frete GRÁTIS
+            🎁 Cupom surpresa + Consulte opções de frete
           </p>
 
           <div className="flex justify-center gap-2 mt-3 text-xs text-gray-700">
@@ -151,7 +151,7 @@ export default function LeadCaptureModal() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xl">🚚</span>
-              <span className="text-gray-800"><strong>Frete grátis</strong> p/ todo Brasil</span>
+              <span className="text-gray-800"><strong>Confira frete</strong> para seu estado</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xl">⏰</span>
