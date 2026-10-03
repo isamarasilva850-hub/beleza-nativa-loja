@@ -9,6 +9,7 @@ import GanheButton from "@/components/GanheButton";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
+import { useQueryParams } from "@/hooks/useQueryParams";
 
 const banners = [
   { src: "/banners/banner-desktop-1.jpg", mobileSrc: "/banners/banner-principal-1.jpg", alt: "Sua beleza começa por dentro" },
@@ -18,6 +19,7 @@ const banners = [
 
 export default function Home() {
   const searchParams = useSearchParams();
+  const queryParams = useQueryParams();
   const { products: supabaseProducts, loading: loadingSupabase } = useSupabaseProducts();
   const [currentBanner, setCurrentBanner] = useState(0);
   const hoveringRef = useRef(false);
@@ -60,18 +62,14 @@ export default function Home() {
     return () => clearTimeout(timerId);
   }, [nextBanner]);
 
-  // Read from URL searchParams - using both useSearchParams and window.location as fallback
-  let urlGender = searchParams.get("genero");
-  let urlCategory = searchParams.get("categoria");
-  let urlSearch = searchParams.get("busca");
+  // Read from custom hook that reliably reads URL query params
+  const urlGender = queryParams.genero || null;
+  const urlCategory = queryParams.categoria || null;
+  const urlSearch = queryParams.busca || null;
 
-  // Fallback to window.location if useSearchParams doesn't work
-  if (typeof window !== 'undefined' && !urlGender) {
-    const params = new URLSearchParams(window.location.search);
-    urlGender = params.get("genero");
-    urlCategory = params.get("categoria");
-    urlSearch = params.get("busca");
-  }
+  // Debug: log query params
+  console.log("Query params:", queryParams);
+  console.log("URL gender:", urlGender);
 
   // Merge with local state
   const effectiveFilters = {
@@ -87,6 +85,10 @@ export default function Home() {
       if (effectiveFilters.gender) {
         const productGenderLower = p.gender?.toLowerCase() || "";
         const filterGenderLower = effectiveFilters.gender?.toLowerCase() || "";
+        // Log to console for debugging
+        if (allProducts.indexOf(p) < 3) {
+          console.log(`Product: ${p.name}, gender: '${p.gender}' vs filter: '${effectiveFilters.gender}'`);
+        }
         if (productGenderLower !== filterGenderLower) {
           return false;
         }
