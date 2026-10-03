@@ -42,14 +42,34 @@ export default function Home() {
 
   const allProducts = [...supabaseProducts, ...staticProducts.filter(sp => !supabaseProducts.find(sup => sup.ref === sp.ref))];
 
+  // Get banners from filtered products or use static banners
+  const getActiveBanners = useCallback(() => {
+    let productsToUse = filteredProducts.slice(0, 3);
+    if (productsToUse.length > 0) {
+      return productsToUse.map(p => ({
+        src: p.images?.[0] || banners[0].src,
+        mobileSrc: p.images?.[0] || banners[0].mobileSrc,
+        alt: p.name || "Produto"
+      }));
+    }
+    return banners;
+  }, [filteredProducts]);
+
+  const activeBanners = getActiveBanners();
+
   const nextBanner = useCallback(() => {
-    setCurrentBanner((prev) => (prev + 1) % banners.length);
-  }, []);
+    setCurrentBanner((prev) => (prev + 1) % activeBanners.length);
+  }, [activeBanners.length]);
 
   const prevBanner = useCallback(() => {
-    setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
-  }, []);
+    setCurrentBanner((prev) => (prev - 1 + activeBanners.length) % activeBanners.length);
+  }, [activeBanners.length]);
 
+
+  // Reset banner when gender filter changes
+  useEffect(() => {
+    setCurrentBanner(0);
+  }, [urlGender]);
 
   useEffect(() => {
     let timerId: NodeJS.Timeout;
@@ -129,7 +149,7 @@ export default function Home() {
         onMouseLeave={() => (hoveringRef.current = false)}
       >
         <div className="hidden md:block relative w-full" style={{ aspectRatio: "19/7" }}>
-          {banners.map((banner, i) => (
+          {activeBanners.map((banner, i) => (
             <div
               key={i}
               className="absolute inset-0 transition-opacity duration-700"
@@ -147,7 +167,7 @@ export default function Home() {
           ))}
         </div>
         <div className="md:hidden relative w-full" style={{ paddingBottom: "100%" }}>
-          {banners.map((banner, i) => (
+          {activeBanners.map((banner, i) => (
             <div
               key={i}
               className="absolute inset-0 transition-opacity duration-700"
@@ -186,7 +206,7 @@ export default function Home() {
         </button>
 
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-          {banners.map((_, i) => (
+          {activeBanners.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrentBanner(i)}
