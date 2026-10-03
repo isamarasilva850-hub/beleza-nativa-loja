@@ -25,52 +25,50 @@ export async function POST(req: Request) {
     let synced = 0;
 
     for (const product of products) {
-      // Check if product with same ref already exists
-      const { data: existing } = await supabase
-        .from("products")
-        .select("id")
-        .eq("reference", product.ref)
-        .single()
-        .catch(() => ({ data: null }));
-
-      const productData = {
-        reference: product.ref,
-        name: product.name,
-        description: `Cor: ${product.color || "Sem cor"}`,
-        price: product.price,
-        category: product.category || "Lingerie",
-        gender: product.gender || "Feminino",
-        created_at: new Date(product.timestamp || Date.now()).toISOString(),
-      };
-
-      if (existing?.id) {
-        // Update existing
-        await supabase
-          .from("products")
-          .update(productData)
-          .eq("id", existing.id);
-      } else {
-        // Insert new
-        await supabase.from("products").insert([productData]);
-      }
-
-      // Handle images if provided - MERGE strategy
-      if (product.images && product.images.length > 0) {
-        const { data: prod } = await supabase
+      try {
+        // Check if product with same ref already exists
+        const { data: existing } = await supabase
           .from("products")
           .select("id")
           .eq("reference", product.ref)
-          .single()
-          .catch(() => ({ data: null }));
+          .single();
 
-        if (prod?.id) {
-          // Get existing images for this product
-          const { data: existingImages } = await supabase
-            .from("product_images")
-            .select("id, image_url, position")
-            .eq("product_id", prod.id)
-            .order("position", { ascending: true })
-            .catch(() => ({ data: [] }));
+        const productData = {
+          reference: product.ref,
+          name: product.name,
+          description: `Cor: ${product.color || "Sem cor"}`,
+          price: product.price,
+          category: product.category || "Lingerie",
+          gender: product.gender || "Feminino",
+          created_at: new Date(product.timestamp || Date.now()).toISOString(),
+        };
+
+        if (existing?.id) {
+          // Update existing
+          await supabase
+            .from("products")
+            .update(productData)
+            .eq("id", existing.id);
+        } else {
+          // Insert new
+          await supabase.from("products").insert([productData]);
+        }
+
+        // Handle images if provided - MERGE strategy
+        if (product.images && product.images.length > 0) {
+          const { data: prod } = await supabase
+            .from("products")
+            .select("id")
+            .eq("reference", product.ref)
+            .single();
+
+          if (prod?.id) {
+            // Get existing images for this product
+            const { data: existingImages } = await supabase
+              .from("product_images")
+              .select("id, image_url, position")
+              .eq("product_id", prod.id)
+              .order("position", { ascending: true });
 
           const existingCount = existingImages?.length || 0;
 
@@ -117,6 +115,8 @@ export async function POST(req: Request) {
             }
           }
         }
+      } catch (e) {
+        console.error("Error syncing product:", e);
       }
 
       synced++;
