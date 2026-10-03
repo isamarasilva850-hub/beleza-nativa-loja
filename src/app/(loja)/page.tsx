@@ -42,46 +42,6 @@ export default function Home() {
 
   const allProducts = [...supabaseProducts, ...staticProducts.filter(sp => !supabaseProducts.find(sup => sup.ref === sp.ref))];
 
-  // Get banners from filtered products or use static banners
-  const getActiveBanners = useCallback(() => {
-    let productsToUse = filteredProducts.slice(0, 3);
-    if (productsToUse.length > 0) {
-      return productsToUse.map(p => ({
-        src: p.images?.[0] || banners[0].src,
-        mobileSrc: p.images?.[0] || banners[0].mobileSrc,
-        alt: p.name || "Produto"
-      }));
-    }
-    return banners;
-  }, [filteredProducts]);
-
-  const activeBanners = getActiveBanners();
-
-  const nextBanner = useCallback(() => {
-    setCurrentBanner((prev) => (prev + 1) % activeBanners.length);
-  }, [activeBanners.length]);
-
-  const prevBanner = useCallback(() => {
-    setCurrentBanner((prev) => (prev - 1 + activeBanners.length) % activeBanners.length);
-  }, [activeBanners.length]);
-
-
-  // Reset banner when gender filter changes
-  useEffect(() => {
-    setCurrentBanner(0);
-  }, [urlGender]);
-
-  useEffect(() => {
-    let timerId: NodeJS.Timeout;
-    const tick = () => {
-      nextBanner();
-      const speed = hoveringRef.current ? 1500 : 5000;
-      timerId = setTimeout(tick, speed);
-    };
-    timerId = setTimeout(tick, 5000);
-    return () => clearTimeout(timerId);
-  }, [nextBanner]);
-
   // Read from custom hook that reliably reads URL query params
   const urlGender = queryParams.genero || null;
   const urlCategory = queryParams.categoria || null;
@@ -139,6 +99,45 @@ export default function Home() {
           return String(b.id || "").localeCompare(String(a.id || ""));
       }
     });
+
+  // Get banners from filtered products or use static banners
+  const getActiveBanners = useCallback(() => {
+    let productsToUse = filteredProducts.slice(0, 3);
+    if (productsToUse.length > 0) {
+      return productsToUse.map(p => ({
+        src: p.images?.[0] || banners[0].src,
+        mobileSrc: p.images?.[0] || banners[0].mobileSrc,
+        alt: p.name || "Produto"
+      }));
+    }
+    return banners;
+  }, [filteredProducts]);
+
+  const activeBanners = getActiveBanners();
+
+  const nextBanner = useCallback(() => {
+    setCurrentBanner((prev) => (prev + 1) % activeBanners.length);
+  }, [activeBanners.length]);
+
+  const prevBanner = useCallback(() => {
+    setCurrentBanner((prev) => (prev - 1 + activeBanners.length) % activeBanners.length);
+  }, [activeBanners.length]);
+
+  // Reset banner when gender filter changes
+  useEffect(() => {
+    setCurrentBanner(0);
+  }, [urlGender]);
+
+  useEffect(() => {
+    let timerId: NodeJS.Timeout;
+    const tick = () => {
+      nextBanner();
+      const speed = hoveringRef.current ? 1500 : 5000;
+      timerId = setTimeout(tick, speed);
+    };
+    timerId = setTimeout(tick, 5000);
+    return () => clearTimeout(timerId);
+  }, [nextBanner]);
 
   return (
     <div>
