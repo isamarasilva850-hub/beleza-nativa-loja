@@ -129,11 +129,11 @@ export default function LeadCaptureModal() {
           </div>
 
           <h2 className="text-3xl font-black text-gray-900 leading-tight mt-2">
-            Ganhe 20% OFF na 1ª Compra!
+            Pegue seu Cupom Surpresa!
           </h2>
 
           <p className="text-gray-600 text-sm mt-3 font-medium">
-            + Frete GRÁTIS para todo Brasil
+            🎁 Desconto só pra você + Frete GRÁTIS
           </p>
 
           <div className="flex justify-center gap-2 mt-3 text-xs text-gray-700">
@@ -143,19 +143,19 @@ export default function LeadCaptureModal() {
         </div>
 
         {/* Benefits highlight */}
-        <div className="bg-gradient-to-r from-[#7BC9C2]/10 to-yellow-50 rounded-xl p-4 border border-[#7BC9C2]/20">
-          <div className="space-y-2 text-sm">
+        <div className="bg-gradient-to-r from-yellow-100 to-orange-50 rounded-xl p-4 border-2 border-yellow-300">
+          <div className="space-y-2.5 text-sm">
             <div className="flex items-center gap-2">
-              <span className="text-lg">🚚</span>
-              <span className="text-gray-700"><strong>Frete grátis</strong> para todo o Brasil</span>
+              <span className="text-xl">🎯</span>
+              <span className="text-gray-800"><strong>Cupom surpresa</strong> no seu email</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-lg">⚡</span>
-              <span className="text-gray-700"><strong>Entrega rápida</strong> e segura</span>
+              <span className="text-xl">🚚</span>
+              <span className="text-gray-800"><strong>Frete grátis</strong> p/ todo Brasil</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-lg">👥</span>
-              <span className="text-gray-700">Ofertas <strong>exclusivas</strong> para você</span>
+              <span className="text-xl">⏰</span>
+              <span className="text-gray-800"><strong>Válido por 48h</strong> - não espere!</span>
             </div>
           </div>
         </div>
@@ -196,18 +196,21 @@ export default function LeadCaptureModal() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-gradient-to-r from-[#7BC9C2] via-[#5fb3ac] to-[#4a9b94] hover:shadow-xl text-white font-bold py-3.5 rounded-xl transition-all disabled:opacity-50 text-lg shadow-lg hover:scale-105 active:scale-95 transform duration-200 relative overflow-hidden"
+            className="w-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 hover:shadow-2xl text-white font-black py-3.5 rounded-xl transition-all disabled:opacity-50 text-lg shadow-lg hover:scale-105 active:scale-95 transform duration-200 relative overflow-hidden"
           >
             <span className="relative z-10">
-              {isSubmitting ? "⏳ Salvando..." : "🎉 GANHAR 20% OFF"}
+              {isSubmitting ? "⏳ Gerando cupom..." : "🔓 DESBLOQUEAR CUPOM"}
             </span>
           </button>
         </form>
 
         {/* Trust badges */}
-        <div className="text-center">
+        <div className="text-center space-y-2">
           <p className="text-[11px] text-gray-500 font-semibold">
-            ✓ Seus dados são seguros | 100% confidencial
+            ✓ Dados seguros | 100% confidencial
+          </p>
+          <p className="text-[10px] text-orange-600 font-bold animate-pulse">
+            ⚡ Cupom enviado por WhatsApp em segundos!
           </p>
         </div>
       </div>
