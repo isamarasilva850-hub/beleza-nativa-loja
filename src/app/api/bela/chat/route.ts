@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getModuleGuide, belaKnowledge } from '@/lib/belaKnowledge';
+import { getModuleGuideExtended } from '@/lib/belaKnowledge.extended';
 import { gerarMensagem } from '@/lib/messageGenerator';
 
 export async function POST(request: NextRequest) {
@@ -11,7 +12,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Mensagem é obrigatória' }, { status: 400 });
     }
 
-    // Primeiro, tenta encontrar uma resposta na base de conhecimento
+    // Primeiro, tenta encontrar uma resposta na base de conhecimento expandida (Palmira)
+    const moduleGuideExtended = getModuleGuideExtended(message);
+    if (moduleGuideExtended) {
+      return NextResponse.json({
+        response: moduleGuideExtended,
+        type: 'guide'
+      });
+    }
+
+    // Depois, tenta na base de conhecimento original
     const moduleGuide = getModuleGuide(message);
     if (moduleGuide) {
       return NextResponse.json({
