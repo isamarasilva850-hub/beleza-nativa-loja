@@ -4,11 +4,61 @@ import { useEffect, useState } from "react";
 
 export default function PalmiraDashboard() {
   const [productCount, setProductCount] = useState(0);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState("");
 
   useEffect(() => {
     const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
     setProductCount(uploads.length);
   }, []);
+
+  const syncToSupabase = async () => {
+    setSyncing(true);
+    setSyncMessage("🔄 Sincronizando com Supabase...");
+    try {
+      const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
+
+      if (uploads.length === 0) {
+        setSyncMessage("❌ Nenhum produto para sincronizar!");
+        setTimeout(() => setSyncMessage(""), 3000);
+        setSyncing(false);
+        return;
+      }
+
+      // Step 1: Sync to Supabase
+      const supabaseResponse = await fetch("/api/sync-products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ products: uploads }),
+      });
+
+      if (!supabaseResponse.ok) {
+        throw new Error("Erro ao sincronizar com Supabase");
+      }
+
+      setSyncMessage("📤 Enviando para GitHub...");
+
+      // Step 2: Sync to GitHub
+      const githubResponse = await fetch("/api/sync-github", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ products: uploads }),
+      });
+
+      if (!githubResponse.ok) {
+        throw new Error("Erro ao sincronizar com GitHub");
+      }
+
+      const githubResult = await githubResponse.json();
+      setSyncMessage(`✅ ${uploads.length} produtos sincronizados! Commit: ${githubResult.commit?.substring(0, 7) || "ok"}`);
+      setTimeout(() => setSyncMessage(""), 4000);
+    } catch (err: any) {
+      setSyncMessage(`❌ Erro: ${err.message}`);
+      setTimeout(() => setSyncMessage(""), 4000);
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8">
@@ -21,8 +71,27 @@ export default function PalmiraDashboard() {
           <p className="text-gray-600 mt-2">Gerencie produtos e pedidos de forma simples</p>
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
           <p className="text-sm text-blue-800 font-medium">💡 Dica: Comece pelo Upload de Produtos para adicionar novas peças com múltiplas fotos!</p>
+        </div>
+
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 flex items-center justify-between">
+          <div>
+            <p className="text-sm text-amber-800 font-medium">🔄 Sincronização com Supabase</p>
+            <p className="text-xs text-amber-700 mt-1">Envie seus produtos para o banco de dados ({productCount} produtos pendentes)</p>
+            {syncMessage && <p className="text-xs text-amber-900 mt-1 font-semibold">{syncMessage}</p>}
+          </div>
+          <button
+            onClick={syncToSupabase}
+            disabled={syncing || productCount === 0}
+            className={`whitespace-nowrap px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+              syncing || productCount === 0
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-amber-500 text-white hover:bg-amber-600"
+            }`}
+          >
+            {syncing ? "⏳ Sincronizando..." : "🚀 Sincronizar Agora"}
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

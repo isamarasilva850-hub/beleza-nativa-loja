@@ -10,6 +10,7 @@ interface UploadedProduct {
   name: string;
   price: number;
   color: string;
+  colorHex?: string;
   images: string[];
   sizes: string[];
   quantity: number;
@@ -19,11 +20,77 @@ interface UploadedProduct {
 export default function PalmiraProdutosPage() {
   const [products, setProducts] = useState<UploadedProduct[]>([]);
   const [search, setSearch] = useState("");
+  const [editingProduct, setEditingProduct] = useState<UploadedProduct | null>(null);
+  const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const uploads = JSON.parse(localStorage.getItem("belezanativa_product_uploads") || "[]");
     setProducts(uploads);
   }, []);
+
+  const saveProducts = (updated: UploadedProduct[]) => {
+    localStorage.setItem("belezanativa_product_uploads", JSON.stringify(updated));
+    setProducts(updated);
+    notifyStorageChange("belezanativa_product_uploads", updated);
+  };
+
+  const handleImageReorder = (fromIndex: number, toIndex: number) => {
+    if (!editingProduct) return;
+    const newImages = [...editingProduct.images];
+    const [moved] = newImages.splice(fromIndex, 1);
+    newImages.splice(toIndex, 0, moved);
+    setEditingProduct({ ...editingProduct, images: newImages });
+  };
+
+  const removeImage = (index: number) => {
+    if (!editingProduct) return;
+    const newImages = editingProduct.images.filter((_, i) => i !== index);
+    setEditingProduct({ ...editingProduct, images: newImages });
+  };
+
+  const addNewImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!editingProduct || !e.target.files) return;
+
+    const files = e.target.files;
+    const newImages: string[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
+
+      reader.onload = async (event) => {
+        const result = event.target?.result as string;
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = 800;
+          canvas.height = 800;
+          const ctx = canvas.getContext("2d");
+          if (ctx) ctx.drawImage(img, 0, 0, 800, 800);
+          newImages.push(canvas.toDataURL("image/webp", 0.85));
+
+          if (newImages.length === files.length) {
+            setEditingProduct({
+              ...editingProduct,
+              images: [...editingProduct.images, ...newImages],
+            });
+          }
+        };
+        img.src = result;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const saveEditedProduct = () => {
+    if (!editingProduct) return;
+
+    const updated = products.map((p) =>
+      p.ref === editingProduct.ref ? editingProduct : p
+    );
+    saveProducts(updated);
+    setEditingProduct(null);
+  };
 
   const filteredProducts = products.filter(
     (p) =>
@@ -95,7 +162,7 @@ export default function PalmiraProdutosPage() {
                       <div className="flex items-center gap-2">
                         <div
                           className="w-5 h-5 rounded-full border border-gray-300"
-                          style={{ backgroundColor: product.color }}
+                          style={{ backgroundColor: product.colorHex || product.color }}
                         />
                         <span className="text-xs text-gray-600">{product.color}</span>
                       </div>
@@ -109,6 +176,14 @@ export default function PalmiraProdutosPage() {
                       {new Date(product.timestamp).toLocaleDateString("pt-BR")}
                     </p>
                   </div>
+
+                  {/* Edit Button */}
+                  <button
+                    onClick={() => setEditingProduct(product)}
+                    className="mt-4 w-full bg-[#7BC9C2] hover:bg-[#5fb3ac] text-white py-2 rounded-lg text-xs font-semibold transition-colors"
+                  >
+                    ✏️ Editar Fotos & Dados
+                  </button>
                 </div>
               </div>
             ))}
@@ -122,6 +197,170 @@ export default function PalmiraProdutosPage() {
           </div>
         )}
       </div>
+
+      {/* Edit Modal */}
+      {editingProduct && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-800">
+                Editar: REF {editingProduct.ref}
+              </h2>
+              <button
+                onClick={() => setEditingProduct(null)}
+                className="text-gray-400 hover:text-gray-600 text-2xl"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              {/* Basic Info */}
+              <div className="space-y-3">
+                <h3 className="font-bold text-gray-800">📋 Informações Básicas</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-gray-600">Nome</label>
+                    <input
+                      type="text"
+                      value={editingProduct.name}
+                      onChange={(e) =>
+                        setEditingProduct({ ...editingProduct, name: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-600">Preço</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editingProduct.price}
+                      onChange={(e) =>
+                        setEditingProduct({
+                          ...editingProduct,
+                          price: parseFloat(e.target.value),
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-600">Cor</label>
+                    <input
+                      type="text"
+                      value={editingProduct.color}
+                      onChange={(e) =>
+                        setEditingProduct({ ...editingProduct, color: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-600">Quantidade</label>
+                    <input
+                      type="number"
+                      value={editingProduct.quantity}
+                      onChange={(e) =>
+                        setEditingProduct({
+                          ...editingProduct,
+                          quantity: parseInt(e.target.value),
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Photos - Reordenable */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-gray-800">📸 Fotos ({editingProduct.images.length})</h3>
+                  <label className="text-sm px-3 py-1 bg-blue-100 text-blue-700 rounded-lg cursor-pointer hover:bg-blue-200">
+                    ➕ Adicionar Fotos
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={addNewImages}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                {editingProduct.images.length > 0 ? (
+                  <div className="space-y-2">
+                    <p className="text-xs text-gray-500">
+                      Arraste para reordenar, clique no X para remover
+                    </p>
+                    <div className="grid grid-cols-3 gap-3">
+                      {editingProduct.images.map((img, index) => (
+                        <div
+                          key={index}
+                          draggable
+                          onDragStart={() => setDraggedImageIndex(index)}
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={() => {
+                            if (draggedImageIndex !== null && draggedImageIndex !== index) {
+                              handleImageReorder(draggedImageIndex, index);
+                              setDraggedImageIndex(null);
+                            }
+                          }}
+                          className={`relative group cursor-move rounded-lg overflow-hidden border-2 ${
+                            draggedImageIndex === index
+                              ? "border-[#7BC9C2] opacity-50"
+                              : "border-gray-200 hover:border-[#7BC9C2]"
+                          }`}
+                        >
+                          <img
+                            src={img}
+                            alt={`Foto ${index + 1}`}
+                            className="w-full h-20 object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                            <div className="opacity-0 group-hover:opacity-100 text-white text-xs font-bold">
+                              #{index + 1}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => removeImage(index)}
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-500 text-sm">
+                    Nenhuma foto. Clique em "➕ Adicionar Fotos" para começar!
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer - Buttons */}
+            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 p-4 flex gap-3 justify-end">
+              <button
+                onClick={() => setEditingProduct(null)}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={saveEditedProduct}
+                className="px-4 py-2 bg-[#7BC9C2] text-white rounded-lg hover:bg-[#5fb3ac] transition-colors font-semibold"
+              >
+                💾 Salvar Alterações
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
