@@ -1086,3 +1086,63 @@ function formatModuleGuide(module: any): string {
 
   return guide;
 }
+
+// Função INTELIGENTE - entende perguntas sobre o método
+export function findRelevantMethodModule(query: string): string {
+  const q = query.toLowerCase().trim();
+
+  // Palavras-chave para CADA PASSO do método
+  const stepKeywords: Record<string, string[]> = {
+    "1-abrir": ["abrir", "abertura", "primeira", "iniciar", "começar", "contato", "oi", "ola", "olá", "como começo"],
+    "2-conectar": ["conectar", "conhecer", "negócio", "canais", "como vende", "como trabalha", "entender negócio"],
+    "3-diagnosticar": ["diagnosticar", "problema", "dificuldade", "desafio", "necessidade", "o que ela precisa", "qual dificuldade"],
+    "4-divulgacao": ["divulgação", "postar", "conteúdo", "arte", "legenda", "instagram", "facebook", "social", "como posta"],
+    "5-personalizar": ["personalizar", "solução", "adequado", "certo para", "pensei", "separei"],
+    "6-apresentar": ["apresentar", "mostrar", "peças", "modelos", "qual gosto", "que acha"],
+    "7-fidelizar": ["fidelizar", "pós-venda", "recompra", "indicação", "depois da venda", "cliente voltou"],
+  };
+
+  // Palavras-chave para MÓDULOS específicos
+  const moduleKeywords: Record<string, string[]> = {
+    "objecoesHandling": ["objeção", "mas é caro", "está caro", "não tenho", "já tenho fornecedor", "vou pensar", "como respondo", "alguém diz", "dúvida", "resisti"],
+    "conducaoClientes": ["condução", "follow-up", "próximo contato", "nutrição", "cliente sumiu", "reativar", "reconquistar", "como manter"],
+    "mensagensEstagios": ["mensagem", "escrever", "o que falo", "como falo", "qual texto", "redação", "como mando"],
+  };
+
+  // Score do módulo mais relevante
+  let bestMatch = { module: null as string | null, score: 0 };
+
+  // Verifica cada passo do método
+  for (const [stepKey, keywords] of Object.entries(stepKeywords)) {
+    let score = 0;
+    for (const keyword of keywords) {
+      if (q.includes(keyword)) score += 2;
+    }
+    if (score > bestMatch.score) {
+      bestMatch = { module: "metodoBeiezaNativa", score };
+    }
+  }
+
+  // Verifica módulos específicos (pontuação maior porque são mais específicos)
+  for (const [moduleKey, keywords] of Object.entries(moduleKeywords)) {
+    let score = 0;
+    for (const keyword of keywords) {
+      if (q.includes(keyword)) score += 3;
+    }
+    if (score > bestMatch.score) {
+      bestMatch = { module: moduleKey, score };
+    }
+  }
+
+  // Se encontrou um match (score > 0), retorna o módulo
+  if (bestMatch.module && bestMatch.score > 0) {
+    const module = belaKnowledgeExtended.modules[bestMatch.module as keyof typeof belaKnowledgeExtended.modules];
+    if (module) {
+      console.log(`🧠 SMART MATCH: "${bestMatch.module}" (score: ${bestMatch.score})`);
+      return formatModuleGuide(module as any);
+    }
+  }
+
+  console.log('🧠 No smart match found');
+  return "";
+}

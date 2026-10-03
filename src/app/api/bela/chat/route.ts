@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getModuleGuide, belaKnowledge } from '@/lib/belaKnowledge';
-import { getModuleGuideExtended } from '@/lib/belaKnowledge.extended';
+import { getModuleGuideExtended, findRelevantMethodModule } from '@/lib/belaKnowledge.extended';
 import { gerarMensagem } from '@/lib/messageGenerator';
 
 export async function POST(request: NextRequest) {
@@ -12,13 +12,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Mensagem é obrigatória' }, { status: 400 });
     }
 
-    // Primeiro, tenta encontrar uma resposta na base de conhecimento expandida (Palmira)
+    // Primeiro, tenta encontrar uma resposta na base de conhecimento expandida (Palmira) - KEYWORD MATCH
     const moduleGuideExtended = getModuleGuideExtended(message);
-    console.log('🔍 Extended search for:', message);
-    console.log('📊 Extended result:', moduleGuideExtended ? '✅ FOUND' : '❌ NOT FOUND');
     if (moduleGuideExtended) {
       return NextResponse.json({
         response: moduleGuideExtended,
+        type: 'guide'
+      });
+    }
+
+    // Se não encontrou por keyword, tenta com inteligência - SEMANTIC MATCH
+    const semanticMatch = findRelevantMethodModule(message);
+    if (semanticMatch) {
+      return NextResponse.json({
+        response: semanticMatch,
         type: 'guide'
       });
     }
