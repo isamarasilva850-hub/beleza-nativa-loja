@@ -75,33 +75,51 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
   const sortOptions = ["MAIS VENDIDOS", "OFERTAS", "MENOR PREÇO", "MAIOR PREÇO"];
 
   return (
-    <aside className="w-full">
+    <aside className="w-full bg-gradient-to-b from-gray-50 to-white rounded-lg p-4 border border-gray-100 shadow-sm">
+      {/* Header */}
+      <div className="mb-6 pb-4 border-b border-gray-100">
+        <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+          <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          Filtrar
+        </h2>
+      </div>
+
       {/* Color Filter */}
-      <ColorFilter
-        products={allProducts}
-        onColorSelect={() => {}}
-      />
+      <div className="mb-6">
+        <ColorFilter
+          products={allProducts}
+          onColorSelect={() => {}}
+        />
+      </div>
 
       {/* Collections */}
-      <div className="border-b border-gray-200 pb-3 mb-3">
+      <div className="border-b border-gray-100 pb-4 mb-4">
         <button
           onClick={() => toggle("collections")}
-          className="flex items-center justify-between w-full text-left"
+          className="flex items-center justify-between w-full text-left hover:text-primary transition-colors group"
         >
-          <span className="text-xs font-bold text-gray-900 tracking-wide">COLEÇÕES</span>
-          <span className="text-gray-600 text-sm">{openSections.collections ? "−" : "+"}</span>
+          <span className="text-sm font-bold text-gray-900 tracking-wide flex items-center gap-2">
+            <span className="text-lg">◆</span> COLEÇÕES
+          </span>
+          <span className={`text-gray-400 text-lg transition-transform ${openSections.collections ? "rotate-180" : ""}`}>
+            ▼
+          </span>
         </button>
         {openSections.collections && (
-          <ul className="mt-2 space-y-1">
+          <ul className="mt-3 space-y-2 pl-6">
             {collections.map((c) => (
               <li key={c}>
                 <button
                   onClick={() => handleFilter("collection", c)}
-                  className={`text-xs hover:text-primary transition-colors ${
-                    selectedCollection === c ? "text-primary font-semibold" : "text-gray-800"
+                  className={`text-sm transition-all ${
+                    selectedCollection === c
+                      ? "text-primary font-semibold"
+                      : "text-gray-700 hover:text-primary"
                   }`}
                 >
-                  {c.toUpperCase()}
+                  ✓ {c}
                 </button>
               </li>
             ))}
@@ -110,25 +128,31 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
       </div>
 
       {/* Genders */}
-      <div className="border-b border-gray-200 pb-3 mb-3">
+      <div className="border-b border-gray-100 pb-4 mb-4">
         <button
           onClick={() => toggle("genders")}
-          className="flex items-center justify-between w-full text-left"
+          className="flex items-center justify-between w-full text-left hover:text-primary transition-colors"
         >
-          <span className="text-xs font-bold text-gray-900 tracking-wide">GÊNEROS</span>
-          <span className="text-gray-600 text-sm">{openSections.genders ? "−" : "+"}</span>
+          <span className="text-sm font-bold text-gray-900 tracking-wide flex items-center gap-2">
+            <span className="text-lg">👥</span> GÊNEROS
+          </span>
+          <span className={`text-gray-400 text-lg transition-transform ${openSections.genders ? "rotate-180" : ""}`}>
+            ▼
+          </span>
         </button>
         {openSections.genders && (
-          <ul className="mt-2 space-y-1">
+          <ul className="mt-3 space-y-2 pl-6">
             {genders.map((g) => (
               <li key={g}>
                 <button
                   onClick={() => handleFilter("gender", g)}
-                  className={`text-xs hover:text-primary transition-colors ${
-                    selectedGender === g ? "text-primary font-semibold" : "text-gray-800"
+                  className={`text-sm transition-all ${
+                    selectedGender === g
+                      ? "text-primary font-semibold"
+                      : "text-gray-700 hover:text-primary"
                   }`}
                 >
-                  {g.toUpperCase()}
+                  ✓ {g}
                 </button>
               </li>
             ))}
