@@ -34,6 +34,10 @@ export default function Home() {
   const [uploadedProducts] = useState<any[]>([]);
   const [searchInput, setSearchInput] = useState("");
 
+  const handleFilterChange = useCallback((f: any) => {
+    setFilters((prev) => ({ ...f, searchQuery: prev.searchQuery, sortBy: prev.sortBy }));
+  }, []);
+
   const allProducts = [...supabaseProducts, ...staticProducts.filter(sp => !supabaseProducts.find(sup => sup.ref === sp.ref))];
 
   const nextBanner = useCallback(() => {
@@ -44,17 +48,6 @@ export default function Home() {
     setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
   }, []);
 
-  useEffect(() => {
-    const genero = searchParams.get("genero");
-    const categoria = searchParams.get("categoria");
-    const busca = searchParams.get("busca");
-    setFilters((prev) => ({
-      ...prev,
-      gender: genero || null,
-      category: categoria || null,
-      searchQuery: busca || null,
-    }));
-  }, [searchParams]);
 
   useEffect(() => {
     let timerId: NodeJS.Timeout;
@@ -67,17 +60,44 @@ export default function Home() {
     return () => clearTimeout(timerId);
   }, [nextBanner]);
 
+  // Read from URL searchParams - using both useSearchParams and window.location as fallback
+  let urlGender = searchParams.get("genero");
+  let urlCategory = searchParams.get("categoria");
+  let urlSearch = searchParams.get("busca");
+
+  // Fallback to window.location if useSearchParams doesn't work
+  if (typeof window !== 'undefined' && !urlGender) {
+    const params = new URLSearchParams(window.location.search);
+    urlGender = params.get("genero");
+    urlCategory = params.get("categoria");
+    urlSearch = params.get("busca");
+  }
+
+  // Merge with local state
+  const effectiveFilters = {
+    ...filters,
+    gender: urlGender || filters.gender,
+    category: urlCategory || filters.category,
+    searchQuery: urlSearch || filters.searchQuery,
+  };
+
   const filteredProducts = allProducts
     .filter((p) => {
-      if (filters.collection && p.collection !== filters.collection) return false;
-      if (filters.gender && p.gender !== filters.gender) return false;
-      if (filters.category && p.category !== filters.category) return false;
-      if (filters.size) {
-        const hasSize = p.variants.some((v) => v.sizes.includes(filters.size!));
+      if (effectiveFilters.collection && p.collection?.toLowerCase() !== effectiveFilters.collection?.toLowerCase()) return false;
+      if (effectiveFilters.gender) {
+        const productGenderLower = p.gender?.toLowerCase() || "";
+        const filterGenderLower = effectiveFilters.gender?.toLowerCase() || "";
+        if (productGenderLower !== filterGenderLower) {
+          return false;
+        }
+      }
+      if (effectiveFilters.category && p.category?.toLowerCase() !== effectiveFilters.category?.toLowerCase()) return false;
+      if (effectiveFilters.size) {
+        const hasSize = p.variants.some((v) => v.sizes.includes(effectiveFilters.size!));
         if (!hasSize) return false;
       }
-      if (filters.searchQuery) {
-        const query = filters.searchQuery.toLowerCase();
+      if (effectiveFilters.searchQuery) {
+        const query = effectiveFilters.searchQuery.toLowerCase();
         const matchesName = p.name?.toLowerCase().includes(query);
         const matchesRef = p.ref?.toLowerCase().includes(query);
         if (!matchesName && !matchesRef) return false;
@@ -341,7 +361,9 @@ export default function Home() {
 
         <div className="flex gap-8">
           <div className={`${showFilters ? "block" : "hidden"} md:block w-full md:w-56 flex-shrink-0`}>
-            <Sidebar onFilterChange={(f) => setFilters({ ...f, searchQuery: filters.searchQuery, sortBy: filters.sortBy })} />
+            <Sidebar
+              onFilterChange={handleFilterChange}
+            />
           </div>
           <div className="flex-1">
             {uploadedProducts.length > 0 && (
@@ -395,10 +417,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Floating Button - Fixed */}
-      <div className="md:hidden">
-        <GanheButton size="md" position="fixed" />
-      </div>
     </div>
   );
 }

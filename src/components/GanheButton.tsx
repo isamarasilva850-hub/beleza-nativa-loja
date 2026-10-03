@@ -18,7 +18,7 @@ export default function GanheButton({ size = "md", position = "relative", classN
   const positionClasses = position === "fixed" ? "fixed bottom-4 right-4 z-40 md:bottom-6 md:right-6" : "relative";
 
   return (
-    <Link href="/cadastro">
+    <Link href="/quero-comecar">
       <div className={`${positionClasses} ${className}`}>
         <button
           className={`${sizeClasses[size]} bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-full flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-300 animate-pulse hover:animate-none border-3 border-white backdrop-blur-sm`}

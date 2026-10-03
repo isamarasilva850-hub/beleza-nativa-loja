@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { collections, genders, categories, sizes, products as allProducts } from "@/data/products";
-import ColorFilter from "@/components/ColorFilter";
+import { collections, genders, categories, sizes } from "@/data/products";
 
 interface SidebarProps {
   onFilterChange?: (filters: {
@@ -84,14 +83,6 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
           </svg>
           Filtrar
         </h2>
-      </div>
-
-      {/* Color Filter */}
-      <div className="mb-6">
-        <ColorFilter
-          products={allProducts}
-          onColorSelect={() => {}}
-        />
       </div>
 
       {/* Collections */}

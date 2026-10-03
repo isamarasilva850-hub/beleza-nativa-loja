@@ -15,6 +15,15 @@ export function useSupabaseProducts() {
 
         const data = await response.json();
 
+        const normalizeGender = (gender: string) => {
+          if (!gender) return "Feminino";
+          const normalized = gender.toLowerCase();
+          if (normalized.includes("infantil")) return "Infantil";
+          if (normalized.includes("masculino")) return "Masculino";
+          if (normalized.includes("feminino")) return "Feminino";
+          return "Feminino";
+        };
+
         const formattedProducts: Product[] = data.map((item: any, index: number) => ({
           id: index + 1,
           ref: item.ref,
@@ -25,7 +34,7 @@ export function useSupabaseProducts() {
           composition: "Veja a descrição completa na loja",
           care: "Lavar com sabão neutro",
           collection: "Lingerie",
-          gender: item.gender || "Feminino",
+          gender: normalizeGender(item.gender),
           category: item.category || "Lingerie",
           variants: item.colors?.map((color: any) => ({
             color: color.color_name,
