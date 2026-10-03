@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { collections, genders, categories, sizes } from "@/data/products";
+import { collections, genders, categories, sizes, products as allProducts } from "@/data/products";
+import ColorFilter from "@/components/ColorFilter";
 
 interface SidebarProps {
   onFilterChange?: (filters: {
@@ -75,6 +76,12 @@ export default function Sidebar({ onFilterChange }: SidebarProps) {
 
   return (
     <aside className="w-full">
+      {/* Color Filter */}
+      <ColorFilter
+        products={allProducts}
+        onColorSelect={() => {}}
+      />
+
       {/* Collections */}
       <div className="border-b border-gray-200 pb-3 mb-3">
         <button
