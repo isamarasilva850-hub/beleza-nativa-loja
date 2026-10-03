@@ -196,7 +196,7 @@ export default function LeadCaptureModal() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 hover:shadow-2xl text-white font-black py-3.5 rounded-xl transition-all disabled:opacity-50 text-lg shadow-lg hover:scale-105 active:scale-95 transform duration-200 relative overflow-hidden"
+            className="w-full bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] hover:shadow-2xl text-white font-black py-3.5 rounded-xl transition-all disabled:opacity-50 text-lg shadow-lg hover:scale-105 active:scale-95 transform duration-200 relative overflow-hidden"
           >
             <span className="relative z-10">
               {isSubmitting ? "⏳ Gerando cupom..." : "🔓 DESBLOQUEAR CUPOM"}
