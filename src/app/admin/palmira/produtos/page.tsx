@@ -5,6 +5,9 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { notifyStorageChange } from "@/lib/storageEvents";
 
+// Alias para o construtor Image do DOM (não confundir com Image do Next.js)
+const DOMImage = typeof window !== 'undefined' ? window.Image : Image;
+
 interface UploadedProduct {
   ref: string;
   name: string;
@@ -60,13 +63,13 @@ export default function PalmiraProdutosPage() {
 
       reader.onload = async (event) => {
         const result = event.target?.result as string;
-        const img = new Image();
-        img.onload = () => {
+        const imgElement = new DOMImage();
+        imgElement.onload = () => {
           const canvas = document.createElement("canvas");
           canvas.width = 800;
           canvas.height = 800;
           const ctx = canvas.getContext("2d");
-          if (ctx) ctx.drawImage(img, 0, 0, 800, 800);
+          if (ctx) ctx.drawImage(imgElement, 0, 0, 800, 800);
           newImages.push(canvas.toDataURL("image/webp", 0.85));
 
           if (newImages.length === files.length) {
@@ -76,7 +79,7 @@ export default function PalmiraProdutosPage() {
             });
           }
         };
-        img.src = result;
+        imgElement.src = result;
       };
       reader.readAsDataURL(file);
     }
