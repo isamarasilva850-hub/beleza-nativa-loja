@@ -79,65 +79,137 @@ export default function LeadCaptureModal() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fadeIn">
+      <style>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.8; }
+        }
+        .animate-slideUp {
+          animation: slideUp 0.4s ease-out;
+        }
+        .animate-pulse {
+          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+      `}</style>
+
+      <div className="bg-gradient-to-b from-white to-gray-50 rounded-3xl shadow-2xl w-full max-w-md p-8 space-y-5 animate-slideUp border-2 border-[#7BC9C2]/20 relative overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#7BC9C2]/5 rounded-full -mr-16 -mt-16" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-yellow-200/10 rounded-full -ml-12 -mb-12" />
+
         {/* Close button */}
         <button
           onClick={() => setIsOpen(false)}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
         >
           ✕
         </button>
 
-        {/* Header */}
-        <div className="text-center mb-6">
-          <div className="inline-block bg-gradient-to-br from-[#7BC9C2] to-[#5fb3ac] rounded-full p-3 mb-3">
-            <span className="text-2xl">💝</span>
+        {/* Header - Premium style */}
+        <div className="text-center mb-2 relative z-10">
+          <div className="inline-block mb-4">
+            <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-full p-4 animate-pulse">
+              <span className="text-4xl">💎</span>
+            </div>
           </div>
-          <h2 className="text-xl font-bold text-gray-800">Ganhe 20% de Desconto!</h2>
-          <p className="text-sm text-gray-600 mt-1">Receba ofertas exclusivas e frete grátis</p>
+
+          <div className="inline-block mb-3 bg-yellow-100 text-yellow-800 px-4 py-1.5 rounded-full text-xs font-bold">
+            🎁 OFERTA EXCLUSIVA
+          </div>
+
+          <h2 className="text-3xl font-black text-gray-900 leading-tight mt-2">
+            Ganhe 20% OFF na 1ª Compra!
+          </h2>
+
+          <p className="text-gray-600 text-sm mt-3 font-medium">
+            + Frete GRÁTIS para todo Brasil
+          </p>
+
+          <div className="flex justify-center gap-2 mt-3 text-xs text-gray-700">
+            <span className="bg-green-50 px-3 py-1 rounded-full">✓ Sem compromisso</span>
+            <span className="bg-green-50 px-3 py-1 rounded-full">✓ Rápido</span>
+          </div>
+        </div>
+
+        {/* Benefits highlight */}
+        <div className="bg-gradient-to-r from-[#7BC9C2]/10 to-yellow-50 rounded-xl p-4 border border-[#7BC9C2]/20">
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🚚</span>
+              <span className="text-gray-700"><strong>Frete grátis</strong> para todo o Brasil</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">⚡</span>
+              <span className="text-gray-700"><strong>Entrega rápida</strong> e segura</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">👥</span>
+              <span className="text-gray-700">Ofertas <strong>exclusivas</strong> para você</span>
+            </div>
+          </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-3 relative z-10">
           <div>
+            <label className="text-xs font-semibold text-gray-700 block mb-1.5">SEU NOME *</label>
             <input
               type="text"
-              placeholder="Seu nome completo"
+              placeholder="Ex: Maria Silva"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2] focus:ring-1 focus:ring-[#7BC9C2]"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#7BC9C2] focus:ring-2 focus:ring-[#7BC9C2]/20 transition-all font-medium"
               required
               autoFocus
             />
           </div>
 
           <div>
+            <label className="text-xs font-semibold text-gray-700 block mb-1.5">WHATSAPP (COM DDD) *</label>
             <input
               type="tel"
-              placeholder="Seu WhatsApp (com DDD)"
+              placeholder="Ex: (35) 99999-0000"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2] focus:ring-1 focus:ring-[#7BC9C2]"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#7BC9C2] focus:ring-2 focus:ring-[#7BC9C2]/20 transition-all font-medium"
               required
             />
           </div>
 
-          {error && <p className="text-xs text-red-500 text-center">{error}</p>}
+          {error && (
+            <p className="text-xs text-red-600 bg-red-50 p-2 rounded-lg text-center font-medium">
+              ⚠️ {error}
+            </p>
+          )}
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] hover:shadow-lg text-white font-semibold py-2.5 rounded-lg transition-all disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-[#7BC9C2] via-[#5fb3ac] to-[#4a9b94] hover:shadow-xl text-white font-bold py-3.5 rounded-xl transition-all disabled:opacity-50 text-lg shadow-lg hover:scale-105 active:scale-95 transform duration-200 relative overflow-hidden"
           >
-            {isSubmitting ? "Salvando..." : "Ganhar 20% OFF"}
+            <span className="relative z-10">
+              {isSubmitting ? "⏳ Salvando..." : "🎉 GANHAR 20% OFF"}
+            </span>
           </button>
         </form>
 
-        {/* Footer text */}
-        <p className="text-[10px] text-gray-400 text-center">
-          ✓ Frete grátis para todo Brasil | ✓ Sem compromisso
-        </p>
+        {/* Trust badges */}
+        <div className="text-center">
+          <p className="text-[11px] text-gray-500 font-semibold">
+            ✓ Seus dados são seguros | 100% confidencial
+          </p>
+        </div>
       </div>
     </div>
   );
