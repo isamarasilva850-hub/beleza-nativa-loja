@@ -2,10 +2,65 @@
  * Base de Conhecimento Expandida para Bela Assistant
  * Guias completos para todas as funcionalidades do Admin
  * Especialmente focado em Palmira (Vendas & Produtos)
+ * + Método Beleza Nativa (Venda Consultiva)
  */
 
 export const belaKnowledgeExtended = {
   modules: {
+    // ==================== MÉTODO BELEZA NATIVA ====================
+
+    metodoBeiezaNativa: {
+      title: "🌸 Método Beleza Nativa - Venda Consultiva",
+      description: "7 passos para transformar prospecção em relacionamento consultivo",
+      steps: [
+        {
+          number: 1,
+          title: "ABRIR - Conseguir atenção",
+          description: "Oi, [NOME]! 😊 Aqui é a Isa, consultora da Beleza Nativa. Vi que você trabalha com lingerie e fiquei curiosa para conhecer um pouquinho do seu negócio. Posso te fazer uma perguntinha?"
+        },
+        {
+          number: 2,
+          title: "CONECTAR - Conhecer o negócio",
+          description: "Hoje você vende lingerie mais pelo Instagram/WhatsApp ou também tem loja física? [AGUARDE RESPOSTA, não faça mais perguntas]"
+        },
+        {
+          number: 3,
+          title: "DIAGNOSTICAR - Entender necessidades",
+          description: "E o que suas clientes costumam procurar mais: peças básicas para o dia a dia, conjuntos ou modelos mais diferenciados?"
+        },
+        {
+          number: 4,
+          title: "DIVULGAÇÃO - Como ela posta",
+          description: "E na hora de divulgar as peças, como você costuma fazer suas postagens? Você mesma cria o conteúdo ou tem mais facilidade com isso?"
+        },
+        {
+          number: 5,
+          title: "PERSONALIZAR - Conectar à solução",
+          description: "Então deixa eu te contar uma coisa que pode facilitar bastante sua rotina. 😊 Na Beleza Nativa, além da peça, você recebe a arte e a legenda prontas."
+        },
+        {
+          number: 6,
+          title: "APRESENTAR & CONDUZIR - Mostrar produtos",
+          description: "Separei alguns modelos pensando no que você me contou. 😊 Quais desses você consegue imaginar vendendo melhor para suas clientes?"
+        },
+        {
+          number: 7,
+          title: "FIDELIZAR - Pós-venda → recompra → indicação",
+          description: "Oi, [NOME]! Seu pedido chegou certinho? Queria saber principalmente o que você achou das peças e como suas clientes reagiram."
+        }
+      ],
+      tips: [
+        "🎯 Regra de ouro: UMA pergunta por mensagem, não transforme em interrogatório",
+        "💬 O QUE ELA DISSE + SOLUÇÃO BN + PERMISSÃO = fórmula de personalização",
+        "⏰ Cadência: D0 (primeira), D1, D3, D7 depois nutrição",
+        "📊 Nunca termine conversa importante sem definir 'próximo passo'",
+        "🚫 Não faça todas as perguntas - 1-2 informações já são suficientes para personalizar",
+        "❌ Não venda em toda mensagem - algumas são para conhecer, outras para entender, outras para fechar",
+        "✅ Follow-up é nutrição, não cobrança - sempre com motivo real",
+        "🌟 Meta final: ela deve pensar 'essa consultora entendeu minha loja' e não 'ela está tentando me vender'"
+      ]
+    },
+
     // ==================== PALMIRA PANEL ====================
 
     palmiraUpload: {
@@ -819,10 +874,76 @@ export const belaKnowledgeExtended = {
         "🎁 Estágio mais importante pra retenção = COMPRA (expectativa) + RETENÇÃO (feedback). 70% volta se recebeu BEM e você perguntou como foi",
         "💡 Se cliente pula de INTERESSE direto pra COMPRA = impulso. Se sai de RETENÇÃO = marca ruim (não foi celebrado bem)"
       ]
+    },
+
+    objecoesHandling: {
+      title: "🛡️ Handling de Objeções - Método BN",
+      description: "Como responder objeções mantendo o relacionamento consultivo",
+      steps: [
+        {
+          number: 1,
+          title: "'ESTÁ CARO'",
+          description: "Nunca ofereça desconto de primeira. Descubra: Você está comparando com o preço de outro fornecedor ou pensando na margem que consegue trabalhar? [Ouça a resposta antes de responder]"
+        },
+        {
+          number: 2,
+          title: "'JÁ TENHO FORNECEDOR'",
+          description: "Não tente derrubar o fornecedor. Pergunte: Entendo perfeitamente 😊 E o que você mais valoriza no seu fornecedor atual? [Se houver lacuna, apresente a BN relacionada]"
+        },
+        {
+          number: 3,
+          title: "'VOU PENSAR'",
+          description: "Descubra o motivo real: Claro 😊 E o que você gostaria de avaliar antes de decidir: os modelos, os valores, as condições do pedido ou se as peças combinam com suas clientes?"
+        },
+        {
+          number: 4,
+          title: "'SÓ ESTOU OLHANDO'",
+          description: "Claro 😊 E o que você está procurando neste momento: novos modelos, fornecedor com preço melhor, qualidade ou simplesmente conhecer novidades?"
+        },
+        {
+          number: 5,
+          title: "'ME CHAMA MÊS QUE VEM'",
+          description: "Descubra motivo: Você pretende fazer uma reposição ou está pensando em conhecer um novo fornecedor nessa época? [Registre data EXATA no CRM, não 'mês que vem']"
+        },
+        {
+          number: 6,
+          title: "'NÃO TENHO INTERESSE'",
+          description: "Apenas uma pergunta: Claro, [nome] 😊 Sem problema. Só para eu não te incomodar novamente: hoje você já está satisfeita com os fornecedores que trabalha ou simplesmente não está buscando lingerie neste momento?"
+        }
+      ],
+      tips: [
+        "🎯 Nunca responda a objeção automaticamente - sempre pergunte ANTES de responder",
+        "❌ Desconto NÃO é a solução para 'está caro' - descubra se é preço ou margem",
+        "📊 'Vou pensar' é um SIM disfarçado - o que falta é clareza de qual etapa ela está",
+        "💬 Use objeção como DATA de conversa, não como fim - 'já tenho fornecedor' = lacuna = oportunidade",
+        "⏰ Follow-up após objeção: pergunte qual foi o motivo e use na próxima abordagem",
+        "🚫 Se disser 'não tenho interesse' → respeite na primeira vez. Não insista",
+        "✅ Se disser 'me chama mês que vem' → registre data EXATA no CRM, não deixe aberto",
+        "🌟 Objeção bem respondida = fortalece relacionamento, não enfraquece"
+      ]
     }
   },
 
   palmiraQuickAnswers: {
+    // Método Beleza Nativa
+    "método beleza nativa": "metodoBeiezaNativa",
+    "método venda": "metodoBeiezaNativa",
+    "venda consultiva": "metodoBeiezaNativa",
+    "como vender": "metodoBeiezaNativa",
+    "7 passos": "metodoBeiezaNativa",
+    "abrir conectar diagnosticar": "metodoBeiezaNativa",
+    "regra de ouro": "metodoBeiezaNativa",
+
+    // Objeções
+    "objeção": "objecoesHandling",
+    "está caro": "objecoesHandling",
+    "já tenho fornecedor": "objecoesHandling",
+    "vou pensar": "objecoesHandling",
+    "só estou olhando": "objecoesHandling",
+    "como lidar com objeção": "objecoesHandling",
+    "cliente disse não": "objecoesHandling",
+    "não tem interesse": "objecoesHandling",
+
     // Upload
     "como subir produto": "palmiraUpload",
     "como subo um produto": "palmiraUpload",
