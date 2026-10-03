@@ -678,6 +678,53 @@ export const belaKnowledgeExtended = {
         "💰 Geralmente 40-50% de desconto do varejo",
         "📱 Aparece no app de revendedora"
       ]
+    },
+
+    mensagensClientes: {
+      title: "💬 Como Escrever Mensagens para Clientes",
+      description: "Dicas de ouro para escrever mensagens que vendem no WhatsApp",
+      steps: [
+        {
+          number: 1,
+          title: "Personalize",
+          description: "Use o nome do cliente: 'Oi Mari!' vende mais que 'Oi!'"
+        },
+        {
+          number: 2,
+          title: "Seja breve",
+          description: "Máximo 3-4 linhas. Cliente com pressa ignora texto longo"
+        },
+        {
+          number: 3,
+          title: "Destaque o benefício",
+          description: "Não fale do produto, fale do que ele FAZ: 'Fica linda em você' não 'É um biquíni'"
+        },
+        {
+          number: 4,
+          title: "Use emojis",
+          description: "Deixa mais atrativo: '✨ Chegou novidade' vende mais que 'Chegou novidade'"
+        },
+        {
+          number: 5,
+          title: "Chame pra ação",
+          description: "Diga exatamente o que quer: 'Clica aqui' / 'Envia um oi' / 'Vem ver'"
+        },
+        {
+          number: 6,
+          title: "Melhor hora",
+          description: "Mande entre 9-12h ou 14-18h. Evite madrugada e horário de trabalho"
+        }
+      ],
+      tips: [
+        "💬 Teste 2-3 versões diferentes e veja qual vende mais",
+        "⏱️ Resonda rápido - 5min de demora já perde cliente",
+        "😊 Seja amigável, não robótica - é um relacionamento",
+        "📸 Foto do produto JUNTO com mensagem vende 50% mais",
+        "✅ Confirme recebimento: 'Recebeu meu oi?' traz 30% mais respostas",
+        "🚫 Evite: buzz words ('lindo', 'perfeito'), MAIÚSCULAS, muitos emojis",
+        "🎯 Segmente: mãe compra por conforto, adolescente por estilo",
+        "💝 Ofereça valor: desconto progressivo, frete grátis, presente surpresa"
+      ]
     }
   },
 
@@ -738,6 +785,15 @@ export const belaKnowledgeExtended = {
     "criar pedido": "montarPedido",
     "pedido cliente": "montarPedido",
     "resumo pedido": "montarPedido",
+
+    // Mensagens
+    "mensagem": "mensagensClientes",
+    "como escrevo mensagem": "mensagensClientes",
+    "como mandar mensagem": "mensagensClientes",
+    "escrever para cliente": "mensagensClientes",
+    "texto para whatsapp": "mensagensClientes",
+    "mensagem vendedora": "mensagensClientes",
+    "como vendo no whatsapp": "mensagensClientes",
 
     // Outros
     "pedidos": "pedidos",
