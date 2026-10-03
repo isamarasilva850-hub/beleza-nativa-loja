@@ -259,7 +259,7 @@ export default function AdminDashboard() {
           <div className="space-y-1">
             <Link href="/admin/pedidos" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Painel de Pedidos</Link>
             <Link href="/admin/parceiros" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Carteira de Clientes</Link>
-            <Link href="/admin/parceiros" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Gerenciar Cadastros</Link>
+            <Link href="/admin/leads" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Gerenciar Leads</Link>
           </div>
         </div>
 
@@ -271,7 +271,7 @@ export default function AdminDashboard() {
           </h3>
           <div className="space-y-1">
             <a href="https://wa.me/5535992100072" target="_blank" rel="noopener noreferrer" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">WhatsApp Comercial</a>
-            <Link href="/admin/produtos" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Imprimir Tabela de Preços</Link>
+            <Link href="/admin/tabela-precos" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Imprimir Tabela de Preços</Link>
             <Link href="/" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Ver Loja Virtual</Link>
           </div>
         </div>
