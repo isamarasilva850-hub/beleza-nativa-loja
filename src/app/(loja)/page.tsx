@@ -5,6 +5,7 @@ import Link from "next/link";
 import { products as staticProducts } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import Sidebar from "@/components/Sidebar";
+import GanheButton from "@/components/GanheButton";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSupabaseProducts } from "@/hooks/useSupabaseProducts";
@@ -274,12 +275,7 @@ export default function Home() {
               height={100}
               className="mx-auto mb-6"
             />
-            <Link
-              href="/cadastro"
-              className="inline-block bg-primary hover:bg-primary-dark text-white font-bold py-3 px-8 rounded-full text-sm tracking-wider transition-colors"
-            >
-              CADASTRE-SE AGORA
-            </Link>
+            <GanheButton size="lg" position="relative" />
           </div>
           <div className="hidden md:block w-1/4 relative h-[350px] overflow-hidden">
             <Image
@@ -398,6 +394,11 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Floating Button - Fixed */}
+      <div className="md:hidden">
+        <GanheButton size="md" position="fixed" />
+      </div>
     </div>
   );
 }
