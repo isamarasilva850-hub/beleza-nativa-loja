@@ -63,9 +63,6 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-4 text-gray-600">
-            <Link href="/parceiros" className="hidden md:block text-sm font-semibold text-primary hover:text-primary/80 whitespace-nowrap">
-              👩‍💼 Revendedora
-            </Link>
             {isLoggedIn ? (
               <div className="hidden md:block relative">
                 <button
