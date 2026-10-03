@@ -202,6 +202,14 @@ export default function LeadCaptureModal() {
               {isSubmitting ? "⏳ Gerando cupom..." : "🔓 DESBLOQUEAR CUPOM"}
             </span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setIsOpen(false)}
+            className="w-full text-gray-600 hover:text-gray-800 font-semibold py-2 rounded-lg transition-colors"
+          >
+            Não, obrigado
+          </button>
         </form>
 
         {/* Trust badges */}
