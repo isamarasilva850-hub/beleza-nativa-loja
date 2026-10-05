@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 interface Order {
   number: number;
@@ -36,6 +37,48 @@ export default function VendasTempoReal() {
   const totalVendas = filteredOrders.reduce((s, o) => s + o.total, 0);
   const totalPedidos = filteredOrders.length;
   const ticketMedio = totalPedidos > 0 ? totalVendas / totalPedidos : 0;
+
+  // Calcular gráfico de vendas por dia
+  const vendasPorDia: { [key: string]: number } = {};
+  filteredOrders.forEach((o) => {
+    const dia = new Date(o.date).toLocaleDateString("pt-BR");
+    vendasPorDia[dia] = (vendasPorDia[dia] || 0) + o.total;
+  });
+  const chartData = Object.entries(vendasPorDia).map(([dia, valor]) => ({ dia, valor: parseFloat(valor.toFixed(2)) }));
+
+  // Top 5 produtos
+  const produtosMap: { [key: string]: { name: string; quantidade: number; total: number } } = {};
+  filteredOrders.forEach((o) => {
+    o.items.forEach((item) => {
+      if (!produtosMap[item.ref]) {
+        produtosMap[item.ref] = { name: item.name, quantidade: 0, total: 0 };
+      }
+      produtosMap[item.ref].quantidade += item.quantity;
+      produtosMap[item.ref].total += item.total;
+    });
+  });
+  const topProdutos = Object.entries(produtosMap)
+    .sort((a, b) => b[1].total - a[1].total)
+    .slice(0, 5)
+    .map(([ref, data]) => ({ ref, ...data }));
+
+  // Top 5 revendedoras
+  const revendedorasMap: { [key: string]: { pedidos: number; total: number } } = {};
+  filteredOrders.forEach((o) => {
+    if (!revendedorasMap[o.revendedora]) {
+      revendedorasMap[o.revendedora] = { pedidos: 0, total: 0 };
+    }
+    revendedorasMap[o.revendedora].pedidos += 1;
+    revendedorasMap[o.revendedora].total += o.total;
+  });
+  const topRevendedoras = Object.entries(revendedorasMap)
+    .sort((a, b) => b[1].total - a[1].total)
+    .slice(0, 5)
+    .map(([nome, data]) => ({ nome, ...data }));
+
+  // Taxa de cancelamento
+  const pedidosCancelados = filteredOrders.filter((o) => o.status === "cancelado").length;
+  const taxaCancelamento = totalPedidos > 0 ? (pedidosCancelados / totalPedidos) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -126,6 +169,87 @@ export default function VendasTempoReal() {
             </table>
           </div>
         )}
+      </div>
+
+      {/* Gráfico de Vendas */}
+      {chartData.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="font-bold text-gray-700 mb-4">📈 Vendas por Dia</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="dia" stroke="#999" style={{ fontSize: "12px" }} />
+              <YAxis stroke="#999" style={{ fontSize: "12px" }} />
+              <Tooltip formatter={(value) => `R$ ${value.toFixed(2).replace(".", ",")}`} />
+              <Legend />
+              <Line type="monotone" dataKey="valor" stroke="#7BC9C2" dot={{ fill: "#7BC9C2", r: 5 }} name="Vendas (R$)" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Top Produtos */}
+        <div className="bg-white rounded-xl border border-gray-200">
+          <div className="p-4 border-b border-gray-100">
+            <h2 className="font-bold text-gray-700">🏆 Top 5 Produtos</h2>
+          </div>
+          {topProdutos.length === 0 ? (
+            <div className="p-8 text-center text-gray-400 text-sm">Nenhum produto vendido no período</div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {topProdutos.map((p, i) => (
+                <div key={p.ref} className="p-4 flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="bg-[#7BC9C2] text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">{i + 1}</span>
+                      <span className="font-semibold text-gray-800">{p.name}</span>
+                    </div>
+                    <p className="text-xs text-gray-500">REF: {p.ref} • Qtd: {p.quantidade}</p>
+                  </div>
+                  <p className="text-right font-bold text-gray-800">R$ {p.total.toFixed(2).replace(".", ",")}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Top Revendedoras */}
+        <div className="bg-white rounded-xl border border-gray-200">
+          <div className="p-4 border-b border-gray-100">
+            <h2 className="font-bold text-gray-700">👑 Top 5 Revendedoras</h2>
+          </div>
+          {topRevendedoras.length === 0 ? (
+            <div className="p-8 text-center text-gray-400 text-sm">Nenhuma revendedora no período</div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {topRevendedoras.map((r, i) => (
+                <div key={r.nome} className="p-4 flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="bg-yellow-400 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">{i + 1}</span>
+                      <span className="font-semibold text-gray-800">{r.nome}</span>
+                    </div>
+                    <p className="text-xs text-gray-500">{r.pedidos} pedido{r.pedidos !== 1 ? "s" : ""}</p>
+                  </div>
+                  <p className="text-right font-bold text-gray-800">R$ {r.total.toFixed(2).replace(".", ",")}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Taxa de Cancelamento */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-gray-500 uppercase tracking-wider">Taxa de Cancelamento</p>
+            <p className="text-3xl font-bold mt-2">{taxaCancelamento.toFixed(1)}%</p>
+            <p className="text-sm text-gray-600 mt-2">{pedidosCancelados} de {totalPedidos} pedidos cancelados</p>
+          </div>
+          <div className="text-6xl opacity-20">{taxaCancelamento > 5 ? "⚠️" : "✅"}</div>
+        </div>
       </div>
     </div>
   );
