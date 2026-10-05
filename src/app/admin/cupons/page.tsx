@@ -13,6 +13,7 @@ interface Coupon {
   validFrom: string;
   validUntil: string;
   active: boolean;
+  lastUsedAt?: string;
 }
 
 export default function Cupons() {
@@ -124,8 +125,12 @@ export default function Cupons() {
                   <div className="text-xs text-gray-500 mt-1">
                     {c.usedCount}/{c.maxUses} usos
                     {c.minOrder > 0 && ` · Min: R$ ${c.minOrder.toFixed(2).replace(".", ",")}`}
+                    {c.lastUsedAt && ` · Último uso: ${new Date(c.lastUsedAt).toLocaleDateString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`}
                     {c.validUntil && ` · Até: ${new Date(c.validUntil + "T00:00:00").toLocaleDateString("pt-BR")}`}
                   </div>
+                  {c.usedCount >= c.maxUses * 0.8 && (
+                    <div className="text-xs text-orange-600 font-semibold mt-1">⚠️ {Math.round((c.usedCount / c.maxUses) * 100)}% do limite atingido</div>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-2">
