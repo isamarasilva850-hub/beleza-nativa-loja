@@ -58,6 +58,13 @@ export default function AdminPedidos() {
     );
   };
 
+  const deleteOrder = (orderNumber: number) => {
+    if (confirm("Tem certeza que deseja deletar este pedido? Esta ação não pode ser desfeita.")) {
+      saveOrders(orders.filter((o) => o.number !== orderNumber));
+      setExpandedOrder(null);
+    }
+  };
+
   const sendToWhatsApp = (order: Order) => {
     // Buscar cliente no CRM para pegar o telefone
     const crmClientes = localStorage.getItem("belezanativa_crm_clientes");
@@ -347,6 +354,12 @@ export default function AdminPedidos() {
                         className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-medium transition-colors"
                       >
                         📄 PDF
+                      </button>
+                      <button
+                        onClick={() => deleteOrder(order.number)}
+                        className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs font-medium transition-colors"
+                      >
+                        🗑️ Deletar
                       </button>
                     </div>
                     <table className="w-full text-xs">
