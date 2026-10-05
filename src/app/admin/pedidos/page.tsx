@@ -156,17 +156,17 @@ export default function AdminPedidos() {
               </tr>
             </thead>
             <tbody>
-              ${order.items.map(item => \`
+              ${order.items.map(item => `
                 <tr>
-                  <td style="font-weight: bold;">\${item.ref}</td>
-                  <td>\${item.name}</td>
-                  <td>\${item.color}</td>
-                  <td>\${item.size}</td>
-                  <td style="text-align: center;">\${item.quantity}</td>
-                  <td class="amount">R$ \${item.unitPrice.toFixed(2).replace(".", ",")}</td>
-                  <td class="amount">R$ \${item.total.toFixed(2).replace(".", ",")}</td>
+                  <td style="font-weight: bold;">${item.ref}</td>
+                  <td>${item.name}</td>
+                  <td>${item.color}</td>
+                  <td>${item.size}</td>
+                  <td style="text-align: center;">${item.quantity}</td>
+                  <td class="amount">R$ ${item.unitPrice.toFixed(2).replace(".", ",")}</td>
+                  <td class="amount">R$ ${item.total.toFixed(2).replace(".", ",")}</td>
                 </tr>
-              \`).join('')}
+              `).join('')}
               <tr class="total-row">
                 <td colspan="6" style="text-align: right;">TOTAL:</td>
                 <td class="amount">R$ ${order.total.toFixed(2).replace(".", ",")}</td>
