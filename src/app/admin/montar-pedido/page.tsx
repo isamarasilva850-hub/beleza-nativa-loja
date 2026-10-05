@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { products } from "@/data/products";
 import { useReactiveStorage } from "@/hooks/useReactiveStorage";
 
@@ -14,6 +14,13 @@ interface ItemPedido {
   quantity: number;
 }
 
+interface Cliente {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+}
+
 export default function MontarPedidoPage() {
   const [items, setItems] = useState<ItemPedido[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,15 +28,56 @@ export default function MontarPedidoPage() {
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [searchCliente, setSearchCliente] = useState("");
 
   // Observa mudanças nos produtos da Palmira em tempo real
   useReactiveStorage("belezanativa_product_uploads");
+
+  // Carrega clientes do CRM
+  useEffect(() => {
+    const crmClientes = localStorage.getItem("belezanativa_crm_clientes");
+    if (crmClientes) {
+      try {
+        const parsed = JSON.parse(crmClientes);
+        setClientes(
+          parsed.map((c: any) => ({
+            id: c.id,
+            name: c.nome || c.name,
+            phone: c.telefone || c.phone || "",
+            email: c.email || "",
+          }))
+        );
+      } catch (e) {
+        console.error("Erro ao carregar clientes", e);
+      }
+    }
+  }, []);
 
   const filteredProducts = products.filter(
     (p) =>
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.ref.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const filteredClientes = clientes.filter(
+    (c) =>
+      c.name.toLowerCase().includes(searchCliente.toLowerCase()) ||
+      c.phone.includes(searchCliente)
+  );
+
+  const sendWhatsApp = () => {
+    if (!selectedCliente || items.length === 0) return;
+
+    const resumoTexto = `📦 *PEDIDO PARA ${selectedCliente.name.toUpperCase()}*\n\n${items
+      .map((item) => `*REF ${item.ref}*\n${item.name}\n${item.color} - ${item.size}\nQtd: ${item.quantity} x R$ ${item.price.toFixed(2).replace(".", ",")}`)
+      .join("\n\n")}\n\n${"─".repeat(25)}\n*TOTAL: R$ ${total.toFixed(2).replace(".", ",")}*\n\n✅ Confirme com 👍 ou 👎`;
+
+    const phone = selectedCliente.phone.replace(/\D/g, "");
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(resumoTexto)}`;
+    window.open(url, "_blank");
+  };
 
   const handleAddItem = () => {
     if (!selectedProduct || !selectedColor || !selectedSize || quantity < 1) return;
@@ -77,6 +125,47 @@ export default function MontarPedidoPage() {
           {/* Seção de Seleção */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              {/* Seleção de Cliente */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">👤 Selecionar Cliente</label>
+                <input
+                  type="text"
+                  placeholder="Nome ou telefone da cliente..."
+                  value={searchCliente}
+                  onChange={(e) => setSearchCliente(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+                />
+                {selectedCliente && (
+                  <div className="mt-2 p-3 bg-green-50 border border-green-300 rounded-lg">
+                    <p className="text-sm font-semibold text-green-800">✅ {selectedCliente.name}</p>
+                    <p className="text-xs text-green-600">{selectedCliente.phone}</p>
+                    <button
+                      onClick={() => setSelectedCliente(null)}
+                      className="text-xs text-red-500 hover:text-red-700 mt-1"
+                    >
+                      Mudar cliente
+                    </button>
+                  </div>
+                )}
+                {searchCliente && filteredClientes.length > 0 && !selectedCliente && (
+                  <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg mt-2">
+                    {filteredClientes.map((cliente) => (
+                      <button
+                        key={cliente.id}
+                        onClick={() => {
+                          setSelectedCliente(cliente);
+                          setSearchCliente("");
+                        }}
+                        className="w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-blue-50 transition-colors"
+                      >
+                        <p className="font-semibold text-gray-800">{cliente.name}</p>
+                        <p className="text-sm text-gray-500">{cliente.phone}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Busca de Produtos */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">🔍 Buscar Produto</label>
@@ -269,6 +358,16 @@ export default function MontarPedidoPage() {
                   📋 Copiar Resumo
                 </button>
               </div>
+            )}
+
+            {/* Botão WhatsApp */}
+            {items.length > 0 && selectedCliente && (
+              <button
+                onClick={sendWhatsApp}
+                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
+              >
+                💬 Enviar via WhatsApp
+              </button>
             )}
 
             {/* Botão Limpar */}
