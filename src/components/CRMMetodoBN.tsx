@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Lead {
   id: string;
@@ -34,11 +34,32 @@ const PERGUNTAS_POR_ETAPA = {
   convertido: "Seu pedido chegou! Quero muito saber o que você achou das peças. 🥰",
 };
 
+const LEADS_KEY = "belezanativa_crm_leads";
+
 export default function CRMMetodoBN() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [selecionado, setSelecionado] = useState<Lead | null>(null);
   const [mostrarNovo, setMostrarNovo] = useState(false);
   const [formNovo, setFormNovo] = useState({ nome: "", telefone: "" });
+
+  // Carregar leads do localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(LEADS_KEY);
+      if (saved) setLeads(JSON.parse(saved));
+    } catch (e) {
+      console.error("Erro ao carregar leads:", e);
+    }
+  }, []);
+
+  // Salvar leads no localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(LEADS_KEY, JSON.stringify(leads));
+    } catch (e) {
+      console.error("Erro ao salvar leads:", e);
+    }
+  }, [leads]);
 
   const adicionarLead = () => {
     if (!formNovo.nome || !formNovo.telefone) return;
