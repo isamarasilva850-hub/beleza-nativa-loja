@@ -88,6 +88,103 @@ export default function AdminPedidos() {
     window.open(url, "_blank");
   };
 
+  const generatePDF = (order: Order) => {
+    const htmlContent = `
+      <html dir="ltr">
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: white; }
+            .header { text-align: center; border-bottom: 3px solid #7BC9C2; padding-bottom: 20px; margin-bottom: 20px; }
+            .header h1 { margin: 0; color: #7BC9C2; font-size: 28px; }
+            .order-number { color: #666; font-size: 14px; margin-top: 5px; }
+            .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+            .info-box { }
+            .info-label { color: #999; font-size: 12px; font-weight: bold; margin-bottom: 5px; }
+            .info-value { color: #333; font-size: 14px; font-weight: bold; }
+            table { width: 100%; border-collapse: collapse; margin: 30px 0; }
+            th { background: #f0f0f0; border-bottom: 2px solid #ddd; padding: 10px; text-align: left; font-size: 12px; font-weight: bold; color: #666; }
+            td { padding: 12px 10px; border-bottom: 1px solid #eee; font-size: 12px; }
+            .amount { text-align: right; font-weight: bold; }
+            .total-row { background: #f9f9f9; border-top: 2px solid #ddd; border-bottom: 2px solid #ddd; }
+            .total-row td { font-weight: bold; color: #7BC9C2; font-size: 14px; }
+            .status { display: inline-block; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-top: 20px; }
+            .status.pendente { background: #FEF08A; color: #854D0E; }
+            .status.confirmado { background: #DBEAFE; color: #1E40AF; }
+            .status.enviado { background: #E9D5FF; color: #6B21A8; }
+            .status.entregue { background: #DCFCE7; color: #166534; }
+            .status.cancelado { background: #FEE2E2; color: #991B1B; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>📦 PEDIDO #${order.number}</h1>
+            <div class="order-number">Gerado em ${new Date(order.date).toLocaleDateString("pt-BR", { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-box">
+              <div class="info-label">REVENDEDORA</div>
+              <div class="info-value">${order.revendedora}</div>
+            </div>
+            <div class="info-box">
+              <div class="info-label">STATUS</div>
+              <div class="info-value" style="color: #7BC9C2;">${order.status.toUpperCase()}</div>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>REF</th>
+                <th>PRODUTO</th>
+                <th>COR</th>
+                <th>TAM</th>
+                <th style="text-align: center;">QTD</th>
+                <th class="amount">UNIT.</th>
+                <th class="amount">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${order.items.map(item => \`
+                <tr>
+                  <td style="font-weight: bold;">\${item.ref}</td>
+                  <td>\${item.name}</td>
+                  <td>\${item.color}</td>
+                  <td>\${item.size}</td>
+                  <td style="text-align: center;">\${item.quantity}</td>
+                  <td class="amount">R$ \${item.unitPrice.toFixed(2).replace(".", ",")}</td>
+                  <td class="amount">R$ \${item.total.toFixed(2).replace(".", ",")}</td>
+                </tr>
+              \`).join('')}
+              <tr class="total-row">
+                <td colspan="6" style="text-align: right;">TOTAL:</td>
+                <td class="amount">R$ ${order.total.toFixed(2).replace(".", ",")}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <span class="status ${order.status}">✓ ${order.status.toUpperCase()}</span>
+        </body>
+      </html>
+    `;
+
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = url;
+    document.body.appendChild(iframe);
+
+    iframe.onload = () => {
+      iframe.contentWindow?.print();
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+        URL.revokeObjectURL(url);
+      }, 1000);
+    };
+  };
+
   const filtered = orders.filter((o) => !statusFilter || o.status === statusFilter);
 
   return (
@@ -163,9 +260,15 @@ export default function AdminPedidos() {
                       ))}
                       <button
                         onClick={() => sendToWhatsApp(order)}
-                        className="ml-auto px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-medium transition-colors"
+                        className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-medium transition-colors"
                       >
                         📱 WhatsApp
+                      </button>
+                      <button
+                        onClick={() => generatePDF(order)}
+                        className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-medium transition-colors"
+                      >
+                        📄 PDF
                       </button>
                     </div>
                     <table className="w-full text-xs">
