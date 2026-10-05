@@ -637,11 +637,19 @@ export default function CartSidebar() {
               </div>
             </div>
 
-            <div className="bg-green-50 border border-green-100 rounded-lg p-3 mb-4">
-              <p className="text-xs text-green-700">
-                Seu pedido será enviado direto para o nosso WhatsApp. Lá finalizamos o pagamento e combinamos a entrega.
-              </p>
-            </div>
+            {isLoggedIn ? (
+              <div className="bg-green-50 border border-green-100 rounded-lg p-3 mb-4">
+                <p className="text-xs text-green-700">
+                  ✅ Seu pedido será enviado direto para o nosso WhatsApp com seu nome. Lá finalizamos o pagamento e combinamos a entrega.
+                </p>
+              </div>
+            ) : (
+              <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-4">
+                <p className="text-xs text-blue-700">
+                  ℹ️ Digite seu nome para identificarmos o seu pedido. Você pode se registrar na loja para futuras compras mais rápidas.
+                </p>
+              </div>
+            )}
 
 
             <label className="flex items-center gap-2 mb-4 cursor-pointer">
