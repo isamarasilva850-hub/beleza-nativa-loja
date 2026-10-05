@@ -55,6 +55,39 @@ export default function AdminPedidos() {
     );
   };
 
+  const sendToWhatsApp = (order: Order) => {
+    // Buscar cliente no CRM para pegar o telefone
+    const crmClientes = localStorage.getItem("belezanativa_crm_clientes");
+    let clientPhone = "";
+
+    if (crmClientes) {
+      try {
+        const clientes = JSON.parse(crmClientes);
+        const cliente = clientes.find((c: any) =>
+          (c.nome || c.name || "").toLowerCase() === order.revendedora.toLowerCase()
+        );
+        if (cliente) {
+          clientPhone = (cliente.telefone || cliente.phone || "").replace(/\D/g, "");
+        }
+      } catch (e) {
+        console.error("Erro ao buscar cliente", e);
+      }
+    }
+
+    if (!clientPhone) {
+      const phone = prompt(`Digite o WhatsApp de ${order.revendedora}:`, "55");
+      if (!phone) return;
+      clientPhone = phone.replace(/\D/g, "");
+    }
+
+    const resumoTexto = `📦 *PEDIDO #${order.number}*\n*PARA ${order.revendedora.toUpperCase()}*\n\n${order.items
+      .map((item) => `*REF ${item.ref}*\n${item.name}\n${item.color} - ${item.size}\nQtd: ${item.quantity} x R$ ${item.unitPrice.toFixed(2).replace(".", ",")} = R$ ${item.total.toFixed(2).replace(".", ",")}`)
+      .join("\n\n")}\n\n${"─".repeat(25)}\n*TOTAL: R$ ${order.total.toFixed(2).replace(".", ",")}*\n\n✅ Status: ${order.status.toUpperCase()}`;
+
+    const url = `https://wa.me/${clientPhone}?text=${encodeURIComponent(resumoTexto)}`;
+    window.open(url, "_blank");
+  };
+
   const filtered = orders.filter((o) => !statusFilter || o.status === statusFilter);
 
   return (
@@ -113,7 +146,7 @@ export default function AdminPedidos() {
 
                 {expandedOrder === order.number && (
                   <div className="px-4 pb-4 bg-gray-50/50">
-                    <div className="flex items-center gap-2 mb-3 pt-2">
+                    <div className="flex items-center gap-2 mb-3 pt-2 flex-wrap">
                       <span className="text-xs font-medium text-gray-500">Alterar status:</span>
                       {(["pendente", "confirmado", "enviado", "entregue", "cancelado"] as const).map((s) => (
                         <button
@@ -128,6 +161,12 @@ export default function AdminPedidos() {
                           {s}
                         </button>
                       ))}
+                      <button
+                        onClick={() => sendToWhatsApp(order)}
+                        className="ml-auto px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-xs font-medium transition-colors"
+                      >
+                        📱 WhatsApp
+                      </button>
                     </div>
                     <table className="w-full text-xs">
                       <thead>
