@@ -1,31 +1,47 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { NextResponse } from 'next/server';
+import { products } from '@/data/products';
+import fs from 'fs';
+import path from 'path';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabase = createClient(supabaseUrl || '', supabaseKey || '');
-
-export async function PUT(request: NextRequest) {
+export async function PUT(request: Request) {
   try {
-    const body = await request.json();
-    const { productId, newPrice } = body;
+    const { productId, newPrice } = await request.json();
 
     if (!productId || newPrice === undefined) {
-      return NextResponse.json({ error: 'Product ID and price are required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'productId e newPrice são obrigatórios' },
+        { status: 400 }
+      );
     }
 
-    const { error } = await supabase
-      .from('products')
-      .update({ price: parseFloat(newPrice) })
-      .eq('id', productId);
+    // Encontrar e atualizar o produto
+    const product = products.find(p => p.id === productId);
+    
+    if (!product) {
+      return NextResponse.json(
+        { error: 'Produto não encontrado' },
+        { status: 404 }
+      );
+    }
 
-    if (error) throw error;
+    product.price = parseFloat(newPrice);
 
-    return NextResponse.json({ success: true, productId, newPrice });
+    // Salvar de volta no arquivo (em desenvolvimento)
+    // Em produção, isso deveria usar um banco de dados
+    const dataDir = path.join(process.cwd(), 'src', 'data');
+    const filePath = path.join(dataDir, 'products.json');
+    
+    fs.writeFileSync(filePath, JSON.stringify(products, null, 2));
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Preço atualizado com sucesso',
+      product 
+    });
   } catch (error) {
     console.error('Erro ao atualizar preço:', error);
     return NextResponse.json(
-      { error: 'Erro ao atualizar preço do produto' },
+      { error: 'Erro ao atualizar preço' },
       { status: 500 }
     );
   }
