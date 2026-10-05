@@ -22,6 +22,16 @@ interface Order {
   status: string;
 }
 
+interface CRMLead {
+  id: string;
+  nome: string;
+  telefone: string;
+  etapa: string;
+  proximaAcao: string;
+  proximaData: string;
+  notas: string;
+}
+
 export default function AdminDashboard() {
   const [stockTotal, setStockTotal] = useState(0);
   const [partnersCount, setPartnersCount] = useState(0);
@@ -33,6 +43,8 @@ export default function AdminDashboard() {
   const [activeResellers, setActiveResellers] = useState(0);
   const [lastOrders, setLastOrders] = useState<Order[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
+  const [crmLeads, setCrmLeads] = useState<CRMLead[]>([]);
+  const [crmStats, setCrmStats] = useState({ total: 0, convertidos: 0, taxaConversao: "0" });
 
   useEffect(() => {
     const stock = localStorage.getItem("belezanativa_stock");
@@ -87,8 +99,17 @@ export default function AdminDashboard() {
     // CRM Data
     const crmClientes = localStorage.getItem("belezanativa_crm_clientes");
     if (crmClientes) setCrmClientes(JSON.parse(crmClientes).length);
-    const crmLeads = localStorage.getItem("belezanativa_crm_leads");
-    if (crmLeads) setCrmLeads(JSON.parse(crmLeads).length);
+    const crmLeadsRaw = localStorage.getItem("belezanativa_crm_leads");
+    if (crmLeadsRaw) {
+      const leads: CRMLead[] = JSON.parse(crmLeadsRaw);
+      setCrmLeads(leads);
+      const convertidos = leads.filter((l) => l.etapa === "convertido").length;
+      setCrmStats({
+        total: leads.length,
+        convertidos,
+        taxaConversao: leads.length > 0 ? ((convertidos / leads.length) * 100).toFixed(1) : "0",
+      });
+    }
   }, []);
 
 
@@ -293,6 +314,27 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* CRM Funnel Stats */}
+      {crmStats.total > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-xl border-2 border-pink-200 p-4">
+            <p className="text-xs font-semibold text-pink-600 uppercase">Leads no Funil</p>
+            <p className="text-3xl font-bold text-pink-700 mt-1">{crmStats.total}</p>
+            <p className="text-xs text-pink-600 mt-2">📞 Total de prospecções</p>
+          </div>
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200 p-4">
+            <p className="text-xs font-semibold text-green-600 uppercase">Convertidos</p>
+            <p className="text-3xl font-bold text-green-700 mt-1">{crmStats.convertidos}</p>
+            <p className="text-xs text-green-600 mt-2">🎉 Fechados como clientes</p>
+          </div>
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-200 p-4">
+            <p className="text-xs font-semibold text-blue-600 uppercase">Taxa de Conversão</p>
+            <p className="text-3xl font-bold text-blue-700 mt-1">{crmStats.taxaConversao}%</p>
+            <p className="text-xs text-blue-600 mt-2">📈 Efetividade do funil</p>
+          </div>
+        </div>
+      )}
+
       {/* Latest Orders */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-4">
@@ -338,6 +380,41 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+
+      {/* CRM Leads for Today */}
+      {crmLeads.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-gray-800">📅 Leads para Ação Hoje</h2>
+            <Link href="/admin/crm" className="text-xs text-[#7BC9C2] hover:underline font-semibold">Ver CRM →</Link>
+          </div>
+          {crmLeads.filter((l) => l.proximaData === new Date().toISOString().split("T")[0]).length === 0 ? (
+            <p className="text-center py-6 text-gray-400">Nenhum lead para contatar hoje</p>
+          ) : (
+            <div className="space-y-3">
+              {crmLeads
+                .filter((l) => l.proximaData === new Date().toISOString().split("T")[0])
+                .slice(0, 5)
+                .map((lead) => (
+                  <div key={lead.id} className="flex items-center justify-between p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg">
+                    <div>
+                      <p className="font-semibold text-gray-800">{lead.nome}</p>
+                      <p className="text-xs text-gray-600 mt-1">{lead.etapa.toUpperCase()}</p>
+                    </div>
+                    <a
+                      href={`https://wa.me/${lead.telefone.replace(/\D/g, "")}?text=${encodeURIComponent(lead.proximaAcao)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded transition-colors"
+                    >
+                      💬 WhatsApp
+                    </a>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Resumo + Produtos */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
