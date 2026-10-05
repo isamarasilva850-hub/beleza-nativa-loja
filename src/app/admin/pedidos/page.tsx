@@ -36,6 +36,9 @@ export default function AdminPedidos() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [statusFilter, setStatusFilter] = useState("");
   const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
     const saved = localStorage.getItem(ORDERS_KEY);
@@ -185,7 +188,35 @@ export default function AdminPedidos() {
     };
   };
 
-  const filtered = orders.filter((o) => !statusFilter || o.status === statusFilter);
+  const filtered = orders.filter((o) => {
+    // Status filter
+    if (statusFilter && o.status !== statusFilter) return false;
+
+    // Search filter (order number or revendedora name)
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      if (!o.number.toString().includes(searchLower) &&
+          !o.revendedora.toLowerCase().includes(searchLower)) {
+        return false;
+      }
+    }
+
+    // Date range filter
+    if (dateFrom) {
+      const orderDate = new Date(o.date).getTime();
+      const fromDate = new Date(dateFrom).getTime();
+      if (orderDate < fromDate) return false;
+    }
+
+    if (dateTo) {
+      const orderDate = new Date(o.date).getTime();
+      const toDate = new Date(dateTo);
+      toDate.setHours(23, 59, 59, 999); // Include entire day
+      if (orderDate > toDate.getTime()) return false;
+    }
+
+    return true;
+  });
 
   return (
     <div>
@@ -194,6 +225,7 @@ export default function AdminPedidos() {
         <span className="text-sm text-gray-500">{orders.length} pedidos</span>
       </div>
 
+      {/* Status filters */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
         {(["pendente", "confirmado", "enviado", "entregue", "cancelado"] as const).map((status) => {
           const count = orders.filter((o) => o.status === status).length;
@@ -210,6 +242,52 @@ export default function AdminPedidos() {
             </button>
           );
         })}
+      </div>
+
+      {/* Advanced filters */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="text-xs font-semibold text-gray-600 block mb-2">🔍 Buscar</label>
+            <input
+              type="text"
+              placeholder="Nº pedido ou revendedora..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2] focus:ring-2 focus:ring-[#7BC9C2]/20"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 block mb-2">📅 De</label>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2] focus:ring-2 focus:ring-[#7BC9C2]/20"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 block mb-2">📅 Até</label>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2] focus:ring-2 focus:ring-[#7BC9C2]/20"
+            />
+          </div>
+          <div className="flex items-end">
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                setDateFrom("");
+                setDateTo("");
+              }}
+              className="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+            >
+              Limpar filtros
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
