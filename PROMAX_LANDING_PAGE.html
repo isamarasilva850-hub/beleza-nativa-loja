@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRÓ MAX CRM - Sistema CRM para Fábricas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+        }
+
+        .hero {
+            padding: 60px 20px;
+            background: #f8f9fa;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #667eea;
+        }
+
+        .problem-solution {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin: 60px 0;
+        }
+
+        .problem, .solution {
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .problem {
+            background: #ffe6e6;
+            border-left: 5px solid #ff6b6b;
+        }
+
+        .solution {
+            background: #e6f7ff;
+            border-left: 5px solid #667eea;
+        }
+
+        .problem h3, .solution h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .features {
+            padding: 60px 20px;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            color: #667eea;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            padding: 25px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .feature-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .comparison {
+            padding: 60px 20px;
+            background: #f8f9fa;
+        }
+
+        .comparison h2 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            color: #667eea;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .check {
+            color: #51cf66;
+            font-weight: bold;
+        }
+
+        .cross {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .pricing {
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .pricing h2 {
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            color: #667eea;
+        }
+
+        .price-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            display: inline-block;
+            min-width: 300px;
+        }
+
+        .price-card .amount {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .price-card .period {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .cta {
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .cta p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .button {
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .button:hover {
+            transform: scale(1.05);
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .problem-solution {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+
+            .hero h2, .features h2, .comparison h2, .pricing h2, .cta h2 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>PRÓ MAX CRM</h1>
+            <p>O Sistema CRM que sua Viashop não tem</p>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h2>Suas revendedoras vendem 30-50% mais</h2>
+            <p>Com CRM consultivo + Artes prontas + WhatsApp integrado</p>
+        </div>
+    </section>
+
+    <section class="container" style="padding: 60px 20px;">
+        <div class="problem-solution">
+            <div class="problem">
+                <h3>❌ Problema: Viashop</h3>
+                <ul style="text-align: left; margin-top: 15px;">
+                    <li>Você não sabe quem vende mais</li>
+                    <li>Não sabe em qual etapa de venda cada revenda está</li>
+                    <li>Revendedora não tem artes prontas</li>
+                    <li>Comunicação lenta (email)</li>
+                    <li>Vendedor novo não sabe como vender</li>
+                </ul>
+            </div>
+
+            <div class="solution">
+                <h3>✅ Solução: PRÓ MAX CRM</h3>
+                <ul style="text-align: left; margin-top: 15px;">
+                    <li>CRM mostra quem vende e quanto</li>
+                    <li>7 etapas de venda estruturadas</li>
+                    <li>Artes prontas (Instagram-ready)</li>
+                    <li>WhatsApp integrado (90% taxa de abertura)</li>
+                    <li>Método consultivo + IA para treinar</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <h2>Módulos PRÓ MAX CRM</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>CRM Consultivo</h3>
+                    <p>7 etapas de venda estruturadas. Saiba exatamente em qual etapa está cada revendedora.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Artes Prontas</h3>
+                    <p>Gerador de imagens Instagram-ready + legendas profissionais. Revendedora vende fácil.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>WhatsApp Nativo</h3>
+                    <p>Envio automático de artes. 1 clique = mensagem pré-formatada. 90% taxa de abertura.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3>Método Consultivo</h3>
+                    <p>Manual pronto para treinar vendedor novo. Scripts, cadência, handling de objeções.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>IA de Suporte</h3>
+                    <p>Bela responde dúvidas sobre método de venda. Sugestões automáticas de mensagens.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>Dashboard</h3>
+                    <p>KPIs em tempo real. Veja quem vende mais, previsão de próximas vendas, relatórios automáticos.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="comparison">
+        <div class="container">
+            <h2>PRÓ MAX vs Viashop</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Recurso</th>
+                        <th>Viashop</th>
+                        <th>PRÓ MAX CRM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Loja Online</strong></td>
+                        <td><span class="check">✓</span></td>
+                        <td>Complementa</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CRM</strong></td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="check">✓ 7 etapas</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Artes Prontas</strong></td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="check">✓ Instagram-ready</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>WhatsApp</strong></td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="check">✓ Integrado</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Método Consultivo</strong></td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="check">✓ Documentado</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>IA de Suporte</strong></td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="check">✓ Bela</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Integração Fácil</strong></td>
+                        <td>N/A</td>
+                        <td><span class="check">✓ Sync automático</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Preço</strong></td>
+                        <td>R$ 500/mês</td>
+                        <td><span class="check">R$ 599/mês</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="pricing">
+        <div class="container">
+            <h2>Quanto Custa?</h2>
+            <div class="price-card">
+                <div class="amount">R$ 599</div>
+                <div class="period">Por mês</div>
+                <p style="margin-bottom: 20px;">Complementar ao seu Viashop</p>
+                <p style="margin-bottom: 20px;">✅ Setup grátis para os primeiros 10 clientes</p>
+                <p>✅ Primeiro mês com 50% de desconto</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <h2>Suas revendedoras estão prontas para vender mais</h2>
+            <p>Oferecemos 7 dias de teste grátis. Sem cartão de crédito.</p>
+            <button class="button" onclick="alert('Envie seu WhatsApp para agendar uma demo!')">Agendar Demo</button>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 PRÓ MAX CRM - Sistema CRM para Fábricas de Lingerie</p>
+            <p>Contato: (WhatsApp) | email@example.com</p>
+        </div>
+    </footer>
+</body>
+</html>
