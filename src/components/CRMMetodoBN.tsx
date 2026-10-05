@@ -70,7 +70,7 @@ export default function CRMMetodoBN() {
       telefone: formNovo.telefone,
       etapa: "abrir",
       proximaAcao: PERGUNTAS_POR_ETAPA.abrir,
-      proximaData: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split("T")[0], // D1
+      proximaData: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split("T")[0],
       notas: "",
     };
 
@@ -78,6 +78,42 @@ export default function CRMMetodoBN() {
     setFormNovo({ nome: "", telefone: "" });
     setMostrarNovo(false);
     setSelecionado(novoLead);
+  };
+
+  // Importar leads do site
+  const importarLeadsDoSite = () => {
+    try {
+      const capturedLeads = localStorage.getItem("belezanativa_leads");
+      if (!capturedLeads) {
+        alert("Nenhum lead capturado do site ainda!");
+        return;
+      }
+
+      const leadsSite = JSON.parse(capturedLeads);
+      const leadsImportados = leadsSite.map((l: any) => ({
+        id: l.id,
+        nome: l.name,
+        telefone: l.phone,
+        etapa: "abrir" as const,
+        proximaAcao: PERGUNTAS_POR_ETAPA.abrir,
+        proximaData: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        notas: "Importado do site",
+      }));
+
+      // Evitar duplicatas
+      const leadsExistentes = new Set(leads.map((l) => l.telefone));
+      const novoLeads = leadsImportados.filter((l) => !leadsExistentes.has(l.telefone));
+
+      if (novoLeads.length === 0) {
+        alert("Todos os leads do site já estão no CRM!");
+        return;
+      }
+
+      setLeads([...novoLeads, ...leads]);
+      alert(`${novoLeads.length} lead(s) importado(s) com sucesso!`);
+    } catch (e) {
+      alert("Erro ao importar leads: " + e);
+    }
   };
 
   const avancarEtapa = (lead: Lead, novaEtapa: Lead["etapa"]) => {
@@ -131,12 +167,20 @@ export default function CRMMetodoBN() {
           })}
         </div>
 
-        <button
-          onClick={() => setMostrarNovo(!mostrarNovo)}
-          className="m-3 bg-gradient-to-r from-pink-400 to-orange-400 text-white font-bold py-3 rounded-xl hover:shadow-lg transition-all"
-        >
-          ➕ Novo Lead
-        </button>
+        <div className="m-3 space-y-2">
+          <button
+            onClick={() => setMostrarNovo(!mostrarNovo)}
+            className="w-full bg-gradient-to-r from-pink-400 to-orange-400 text-white font-bold py-3 rounded-xl hover:shadow-lg transition-all"
+          >
+            ➕ Novo Lead
+          </button>
+          <button
+            onClick={importarLeadsDoSite}
+            className="w-full bg-gradient-to-r from-blue-400 to-cyan-400 text-white font-bold py-2 rounded-xl hover:shadow-lg transition-all text-sm"
+          >
+            📥 Importar do Site
+          </button>
+        </div>
 
         {mostrarNovo && (
           <div className="p-3 border-t-2 border-pink-200 bg-pink-50">
