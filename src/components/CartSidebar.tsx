@@ -107,6 +107,14 @@ export default function CartSidebar() {
     }
   };
 
+  // Auto-fill revendedora name if logged in
+  const handleCheckout = () => {
+    if (isLoggedIn && user?.name && !revendedora) {
+      setRevendedora(user.name);
+    }
+    setShowConfirm(true);
+  };
+
   if (!isOpen && !showReceipt) return null;
 
   const minOrderAdjusted = 0;
@@ -124,10 +132,6 @@ export default function CartSidebar() {
 
   const removeCoupon = () => {
     setAppliedCoupon(null);
-  };
-
-  const handleCheckout = () => {
-    setShowConfirm(true);
   };
 
   const confirmOrder = () => {
