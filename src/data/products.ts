@@ -1,4 +1,7 @@
-﻿export interface ProductVariant {
+﻿// NOTA: Os produtos agora são armazenados em products.json
+// Este arquivo mantém as interfaces TypeScript para tipagem
+
+export interface ProductVariant {
   color: string;
   colorHex: string;
   sizes: string[];
@@ -7,27 +10,23 @@
 export interface Product {
   id: number;
   ref: string;
-  slug: string;
+  slug?: string;
   name: string;
   price: number;
-  description: string;
-  composition: string;
-  care: string;
-  collection: string;
-  gender: string;
-  category: string;
-  variants: ProductVariant[];
-  images: string[];
+  description?: string;
+  composition?: string;
+  care?: string;
+  collection?: string;
+  gender?: string;
+  category?: string;
+  variants?: ProductVariant[];
+  images?: string[];
 }
 
-export const products: Product[] = [
-  // ============ CONJUNTOS ============
-  {
-    id: 1,
-    ref: "537",
-    slug: "conjunto-sem-bojo-com-aro",
-    name: "CONJUNTO SEM BOJO COM ARO",
-    price: 46.90,
+// Import dinâmico do JSON será feito no servidor
+// Para uso client-side, use a API /api/products
+// Mantemos um array vazio por compatibilidade
+export const products: Product[] = [];
     description: "Conjunto rendado com renda anti-alérgica. Elegante e confortável.",
     composition: "85% poliamida, 15% elastano. Forro: 100% algodão",
     care: "Lavar com sabão neutro e secar a sombra.",

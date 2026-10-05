@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { products } from '@/data/products';
 import fs from 'fs';
 import path from 'path';
 
@@ -14,9 +13,13 @@ export async function PUT(request: Request) {
       );
     }
 
+    const productsPath = path.join(process.cwd(), 'src', 'data', 'products.json');
+    const productsData = fs.readFileSync(productsPath, 'utf-8');
+    const products = JSON.parse(productsData);
+
     // Encontrar e atualizar o produto
-    const product = products.find(p => p.id === productId);
-    
+    const product = products.find((p: any) => p.id.toString() === productId.toString());
+
     if (!product) {
       return NextResponse.json(
         { error: 'Produto não encontrado' },
@@ -26,17 +29,13 @@ export async function PUT(request: Request) {
 
     product.price = parseFloat(newPrice);
 
-    // Salvar de volta no arquivo (em desenvolvimento)
-    // Em produção, isso deveria usar um banco de dados
-    const dataDir = path.join(process.cwd(), 'src', 'data');
-    const filePath = path.join(dataDir, 'products.json');
-    
-    fs.writeFileSync(filePath, JSON.stringify(products, null, 2));
+    // Salvar de volta no arquivo
+    fs.writeFileSync(productsPath, JSON.stringify(products, null, 2));
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: 'Preço atualizado com sucesso',
-      product 
+      product
     });
   } catch (error) {
     console.error('Erro ao atualizar preço:', error);
