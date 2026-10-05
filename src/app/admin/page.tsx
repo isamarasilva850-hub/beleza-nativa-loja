@@ -37,7 +37,6 @@ export default function AdminDashboard() {
   const [partnersCount, setPartnersCount] = useState(0);
   const [ordersCount, setOrdersCount] = useState(0);
   const [crmClientes, setCrmClientes] = useState(0);
-  const [crmLeads, setCrmLeads] = useState(0);
   const [salesData, setSalesData] = useState({ today: 0, week: 0, month: 0, total: 0 });
   const [pendingOrders, setPendingOrders] = useState(0);
   const [activeResellers, setActiveResellers] = useState(0);
@@ -237,7 +236,7 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xl">📊</div>
             <div>
-              <p className="text-2xl font-bold">{crmClientes + crmLeads}</p>
+              <p className="text-2xl font-bold">{crmClientes + crmLeads.length}</p>
               <p className="text-xs opacity-90">CRM (C+L)</p>
             </div>
           </div>
