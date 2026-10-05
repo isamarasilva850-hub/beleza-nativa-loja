@@ -96,8 +96,8 @@ export default function AdminDashboard() {
     }
 
     // CRM Data
-    const crmClientes = localStorage.getItem("belezanativa_crm_clientes");
-    if (crmClientes) setCrmClientes(JSON.parse(crmClientes).length);
+    const crmClientesData = localStorage.getItem("belezanativa_crm_clientes");
+    if (crmClientesData) setCrmClientes(JSON.parse(crmClientesData).length);
     const crmLeadsRaw = localStorage.getItem("belezanativa_crm_leads");
     if (crmLeadsRaw) {
       const leads: CRMLead[] = JSON.parse(crmLeadsRaw);
