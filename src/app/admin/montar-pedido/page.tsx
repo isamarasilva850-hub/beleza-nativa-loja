@@ -67,16 +67,58 @@ export default function MontarPedidoPage() {
       c.phone.includes(searchCliente)
   );
 
+  const saveOrderToPanel = () => {
+    if (!selectedCliente || items.length === 0) return null;
+
+    // Gerar número único para o pedido
+    const orderNumber = Date.now();
+
+    // Estrutura do pedido igual ao esperado pelo Painel de Pedidos
+    const newOrder = {
+      number: orderNumber,
+      date: new Date().toISOString(),
+      revendedora: selectedCliente.name,
+      items: items.map(item => ({
+        ref: item.ref,
+        name: item.name,
+        color: item.color,
+        size: item.size,
+        quantity: item.quantity,
+        unitPrice: item.price,
+        total: item.price * item.quantity,
+      })),
+      total: total,
+      totalItems: items.reduce((sum, item) => sum + item.quantity, 0),
+      status: "pendente" as const,
+    };
+
+    // Salvar no localStorage
+    const existingOrders = JSON.parse(localStorage.getItem("belezanativa_orders") || "[]");
+    existingOrders.push(newOrder);
+    localStorage.setItem("belezanativa_orders", JSON.stringify(existingOrders));
+
+    return orderNumber;
+  };
+
   const sendWhatsApp = () => {
     if (!selectedCliente || items.length === 0) return;
 
-    const resumoTexto = `📦 *PEDIDO PARA ${selectedCliente.name.toUpperCase()}*\n\n${items
+    // Salvar pedido antes de enviar
+    const orderNumber = saveOrderToPanel();
+
+    const resumoTexto = `📦 *PEDIDO #${orderNumber}*\n*PARA ${selectedCliente.name.toUpperCase()}*\n\n${items
       .map((item) => `*REF ${item.ref}*\n${item.name}\n${item.color} - ${item.size}\nQtd: ${item.quantity} x R$ ${item.price.toFixed(2).replace(".", ",")}`)
       .join("\n\n")}\n\n${"─".repeat(25)}\n*TOTAL: R$ ${total.toFixed(2).replace(".", ",")}*\n\n✅ Confirme com 👍 ou 👎`;
 
     const phone = selectedCliente.phone.replace(/\D/g, "");
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(resumoTexto)}`;
     window.open(url, "_blank");
+
+    // Limpar formulário após enviar
+    setItems([]);
+    setSelectedCliente(null);
+    setSearchCliente("");
+    alert(`✅ Pedido #${orderNumber} salvo com sucesso!`);
   };
 
   const handleAddItem = () => {
