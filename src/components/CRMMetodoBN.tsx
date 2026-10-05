@@ -137,8 +137,48 @@ export default function CRMMetodoBN() {
 
   const etapaAtual = ETAPAS.find((e) => e.id === selecionado?.etapa);
 
+  // Calcular estatísticas
+  const stats = {
+    total: leads.length,
+    convertidos: leads.filter((l) => l.etapa === "convertido").length,
+    taxaConversao: leads.length > 0 ? ((leads.filter((l) => l.etapa === "convertido").length / leads.length) * 100).toFixed(1) : "0",
+    porEtapa: ETAPAS.map((e) => ({
+      etapa: e.id,
+      nome: e.nome,
+      count: leads.filter((l) => l.etapa === e.id).length,
+    })),
+  };
+
   return (
-    <div className="grid grid-cols-3 gap-4 h-screen bg-gradient-to-br from-rose-50 to-orange-50 p-4">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-rose-50 to-orange-50 p-4 gap-4">
+      {/* HEADER COM ESTATÍSTICAS */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="bg-white rounded-xl shadow p-3 border-l-4 border-pink-500">
+          <p className="text-xs text-gray-600 font-semibold">Total de Leads</p>
+          <p className="text-2xl font-bold text-pink-600">{stats.total}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow p-3 border-l-4 border-green-500">
+          <p className="text-xs text-gray-600 font-semibold">Convertidos</p>
+          <p className="text-2xl font-bold text-green-600">{stats.convertidos}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow p-3 border-l-4 border-blue-500">
+          <p className="text-xs text-gray-600 font-semibold">Taxa de Conversão</p>
+          <p className="text-2xl font-bold text-blue-600">{stats.taxaConversao}%</p>
+        </div>
+        <div className="bg-white rounded-xl shadow p-3 overflow-x-auto">
+          <p className="text-xs text-gray-600 font-semibold mb-2">Por Etapa</p>
+          <div className="flex gap-1 text-[10px] font-semibold">
+            {stats.porEtapa.slice(0, 4).map((s) => (
+              <div key={s.etapa} className="bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                {s.count}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* CONTEÚDO PRINCIPAL */}
+      <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
       {/* COLUNA 1: LISTA DE LEADS */}
       <div className="col-span-1 bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col">
         <div className="bg-gradient-to-r from-pink-400 to-orange-400 text-white p-4">
@@ -318,6 +358,7 @@ export default function CRMMetodoBN() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );
