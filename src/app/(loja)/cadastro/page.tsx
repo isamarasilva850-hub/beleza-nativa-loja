@@ -60,10 +60,9 @@ export default function Cadastro() {
       return;
     }
 
-    // Salvar em 3 lugares: Partners, Lead e Cliente
+    // Salvar como PARTNER (obrigatório)
     try {
-      // 1. Salvar como PARTNER
-      await fetch('/api/partners', {
+      const partnerRes = await fetch('/api/partners', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -77,8 +76,13 @@ export default function Cadastro() {
         })
       });
 
-      // 2. Salvar como LEAD
-      await fetch('/api/crm/leads', {
+      if (!partnerRes.ok) {
+        const errorData = await partnerRes.json();
+        throw new Error(errorData.error || 'Erro ao salvar no cadastro de parceiros');
+      }
+
+      // Salvar como LEAD e CLIENTE (opcional - não bloqueia se falhar)
+      fetch('/api/crm/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -89,10 +93,9 @@ export default function Cadastro() {
           status: 'novo',
           notas: `Empresa: ${form.company || 'N/A'}\nCNPJ/CPF: ${form.cnpj || 'N/A'}\nCidade: ${form.city || 'N/A'}`,
         })
-      });
+      }).catch(err => console.warn('Erro ao salvar lead:', err));
 
-      // 3. Salvar como CLIENTE
-      await fetch('/api/crm/clientes', {
+      fetch('/api/crm/clientes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -102,9 +105,11 @@ export default function Cadastro() {
           tipo: form.company ? 'empresarial' : 'varejo',
           status: 'ativo',
         })
-      });
+      }).catch(err => console.warn('Erro ao salvar cliente:', err));
     } catch (err) {
-      console.error('Erro ao salvar no Supabase:', err);
+      setError(err instanceof Error ? err.message : 'Erro ao salvar cadastro');
+      setLoading(false);
+      return;
     }
 
     const msg = [

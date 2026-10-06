@@ -40,8 +40,9 @@ export default function QueroComecear() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formData,
-          phone: formData.phone.replace(/\D/g, '')
+          nome: formData.name,
+          telefone: formData.phone.replace(/\D/g, ''),
+          status: 'ativo'
         })
       });
 
