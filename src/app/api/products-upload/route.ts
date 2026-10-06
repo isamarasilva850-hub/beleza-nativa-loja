@@ -43,8 +43,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
     console.error('Erro ao salvar produto:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: 'Erro ao salvar produto' },
+      { error: 'Erro ao salvar produto', details: errorMessage },
       { status: 500 }
     );
   }
@@ -65,8 +66,9 @@ export async function GET() {
     return NextResponse.json(data || []);
   } catch (error) {
     console.error('Erro ao carregar produtos:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: 'Erro ao carregar produtos' },
+      { error: 'Erro ao carregar produtos', details: errorMessage },
       { status: 500 }
     );
   }
