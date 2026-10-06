@@ -98,10 +98,10 @@ PRIMEIRA RODADA (10 FÁBRICAS):
 
 Vi que vocês vendem lingerie aqui em Juruaia.
 
-Tô testando um sistema novo que complementa Viashop com:
+Criei um sistema novo com:
 ✅ CRM (saber quem vende mais)
 ✅ Artes prontas (revendedora vender fácil)
-✅ WhatsApp (comunicação rápida)
+✅ Mensagens consultivas (aumentam vendas em até 50%)
 
 Resultado: revendedora vende 30-50% mais.
 
@@ -174,8 +174,8 @@ PRAZO: 30 dias
 
 ### Resistências Comuns:
 ```
-❌ "Já temos Viashop"
-   → "Sim! PRÓ MAX complementa. Mantém Viashop."
+❌ "Já temos um sistema"
+   → "Ótimo! PRÓ MAX complementa o que você já tem."
 
 ❌ "Quanto custa?"
    → "R$ 599/mês. Já paga em 1 revenda vendendo mais."

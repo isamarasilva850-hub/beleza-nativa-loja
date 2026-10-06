@@ -14,13 +14,12 @@ Suas revendedoras vendem 30-50% mais
 
 ## Slide 2: O Problema
 ```
-❌ Seu Viashop é ótimo PARA LOJA
+❌ DESAFIOS ATUAIS:
 
-MAS:
 - Você não sabe quem vende mais
 - Não sabe em qual etapa de venda cada revenda está  
 - Revendedora não tem artes prontas (falta motivação)
-- Comunicação lenta (email, não WhatsApp)
+- Comunicação lenta (email)
 - Vendedor novo não sabe como vender (sem método)
 
 RESULTADO: Você deixa dinheiro na mesa
@@ -30,16 +29,15 @@ RESULTADO: Você deixa dinheiro na mesa
 
 ## Slide 3: A Solução
 ```
-✅ PRÓ MAX CRM complementa Viashop
-
-Você mantém Viashop (já funciona!)
-Adiciona PRÓ MAX para:
+✅ PRÓ MAX CRM oferece tudo que você precisa:
 
 🎯 CRM - saber QUEM vende
-🎨 Artes - revendedora vender FÁCIL  
-💬 WhatsApp - comunicação RÁPIDA
+🎨 Artes prontas - revendedora vender FÁCIL  
+💬 Mensagens consultivas - aumentam vendas em ATÉ 50%
 📚 Método - vendedor NOVO fechar mais
-🤖 IA - SUPORTE automático
+🤖 IA (Bela) - SUPORTE automático
+
+RESULTADO: Revendedora vende 30-50% mais
 ```
 
 ---
@@ -145,20 +143,19 @@ RESULTADO: Vendedor novo funciona no dia 1
 
 ---
 
-## Slide 10: Comparação
+## Slide 10: O que está incluído
 ```
-                Viashop    PRÓ MAX CRM
-Loja            ✓          Complementa
-CRM             ✗          ✓ (7 etapas)
-Artes           ✗          ✓ (Instagram-ready)
-WhatsApp        ✗          ✓ (Integrado)
-Método          ✗          ✓ (Documentado)
-IA              ✗          ✓ (Bela)
+✅ CRM Consultivo (7 etapas de venda)
+✅ Artes prontas (Instagram-ready)
+✅ Mensagens consultivas inteligentes (até +50% vendas)
+✅ Método de venda documentado
+✅ IA de suporte (Bela)
+✅ Dashboard com KPIs
+✅ Integração com sistemas existentes
+✅ Treinamento incluído
+✅ Suporte 24/7
 
-PREÇO:
-Viashop:        R$ 500/mês
-PRÓ MAX:        R$ 599/mês
-TOTAL:          R$ 1.099/mês
+PREÇO: R$ 599/mês
 
 RETORNO:
 1 revenda vendendo 10% a mais JÁ PAGA!
@@ -247,23 +244,24 @@ SEM COMPROMISSO
 
 ---
 
-## Slide 15: Perguntas
+## Slide 15: Perguntas Frequentes
 ```
-PERGUNTAS COMUNS?
-
-P: Vai substituir meu Viashop?
-R: Não! Complementa. Você mantém Viashop.
-
 P: Quanto tempo leva o setup?
-R: 2-4 horas. Somos nós que fazemos.
+R: 2-4 horas. Nós fazemos. Zero trabalho seu.
 
 P: E se não gostar?
 R: Teste 7 dias grátis. Sem compromisso.
 
 P: Preciso treinar minha equipe?
-R: Sim, 1 treinamento (2 horas). Nós fazemos.
+R: Sim, 1 treinamento (2 horas). Nós fazemos incluído.
 
-P: Dá pra começar com um módulo?
+P: Posso começar com um módulo?
 R: Claro. Pode começar com CRM e depois adicionar artes.
+
+P: Como é o suporte?
+R: 24/7 via WhatsApp. Resposta em até 2 horas.
+
+P: Qual é o retorno?
+R: 1 revenda a mais vendendo já paga tudo.
 ```
 

@@ -4,18 +4,18 @@
 
 ## EMAIL 1: Primeiro Contato (Dia 3)
 
-**Assunto**: CRM + Artes para sua loja Viashop 📱
+**Assunto**: CRM + Artes que aumentam vendas em até 50% 📱
 
 ```
 Oi [NOME],
 
 Vi que vocês vendem lingerie aqui em Juruaia.
 
-Excelente escolha usar Viashop para loja - funciona bem!
+Muito bom! Vocês já devem ter um sistema, né?
 
 Só achei que falta uma coisa: **Saber quem vende mais.**
 
-Tipo... com Viashop você vê:
+Tipo... você vê:
 - "Revenda X comprou 5 peças"
 
 Mas não vê:
@@ -23,13 +23,13 @@ Mas não vê:
 - "Qual revenda tem mais potencial"
 - "Como treinar vendedor novo pra fechar mais"
 
-Isso é onde PRÓ MAX CRM entra.
+É por isso que PRÓ MAX CRM existe.
 
-É um sistema que complementa Viashop com:
+É um sistema com:
 
 ✅ CRM consultivo (7 etapas de venda)
 ✅ Artes prontas (Instagram-ready)
-✅ WhatsApp integrado (comunicação que funciona)
+✅ Mensagens consultivas inteligentes (aumentam vendas em até 50%)
 ✅ Método consultivo (treina vendedor novo)
 ✅ IA de suporte (responde dúvidas sobre venda)
 

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRÓ MAX CRM - Deck de Vendas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .slide-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .slide {
+            width: 100%;
+            aspect-ratio: 16/9;
+            padding: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            page-break-after: always;
+            min-height: 600px;
+            position: relative;
+        }
+
+        .slide.dark {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .slide.light {
+            background: white;
+            color: #333;
+        }
+
+        .slide.problem {
+            background: #fff5f5;
+            color: #333;
+        }
+
+        .slide.solution {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .slide h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .slide h2 {
+            font-size: 3em;
+            margin-bottom: 40px;
+            font-weight: bold;
+        }
+
+        .slide h3 {
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+
+        .slide p {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .slide ul {
+            list-style: none;
+            font-size: 1.6em;
+            text-align: left;
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        .slide li {
+            margin: 15px 0;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .slide li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .slide.dark li:before {
+            color: #ffd700;
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            font-size: 1.2em;
+            opacity: 0.5;
+        }
+
+        .slide-nav {
+            padding: 20px;
+            text-align: center;
+            background: #f9f9f9;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 1em;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #764ba2;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .emoji {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .slide {
+                padding: 60px;
+            }
+            .slide h1 {
+                font-size: 2.5em;
+            }
+            .slide h2 {
+                font-size: 2em;
+            }
+            .slide p {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <!-- SLIDE 1: Capa -->
+        <div class="slide dark" id="slide1">
+            <div class="emoji">🚀</div>
+            <h1>PRÓ MAX CRM</h1>
+            <p style="font-size: 2.5em; margin-top: 30px;">Sistema CRM que aumenta vendas em até 50%</p>
+            <p style="font-size: 1.4em; opacity: 0.9; margin-top: 50px;">Suas revendedoras vendem 30-50% mais</p>
+            <div class="slide-number">1</div>
+        </div>
+
+        <!-- SLIDE 2: O Problema -->
+        <div class="slide problem" id="slide2">
+            <h2>❌ Desafios Atuais</h2>
+            <ul>
+                <li>Você não sabe quem vende mais</li>
+                <li>Não sabe em qual etapa de venda cada revenda está</li>
+                <li>Revendedora não tem artes prontas</li>
+                <li>Comunicação lenta (email)</li>
+                <li>Vendedor novo não sabe como vender</li>
+            </ul>
+            <p style="margin-top: 50px; font-size: 2em; color: #667eea;">Você deixa dinheiro na mesa</p>
+            <div class="slide-number">2</div>
+        </div>
+
+        <!-- SLIDE 3: A Solução -->
+        <div class="slide solution" id="slide3">
+            <h2>✅ A Solução: PRÓ MAX CRM</h2>
+            <ul>
+                <li>🎯 CRM - saber QUEM vende</li>
+                <li>🎨 Artes prontas - revendedora vender FÁCIL</li>
+                <li>💬 Mensagens consultivas - aumentam vendas em ATÉ 50%</li>
+                <li>📚 Método - vendedor NOVO fechar mais</li>
+                <li>🤖 IA (Bela) - SUPORTE automático</li>
+            </ul>
+            <div class="slide-number">3</div>
+        </div>
+
+        <!-- SLIDE 4: Como Funciona -->
+        <div class="slide light" id="slide4">
+            <h2>⚙️ Como Funciona</h2>
+            <ul style="text-align: center; display: block;">
+                <li>1️⃣ Revenda compra em seu sistema</li>
+                <li>2️⃣ PRÓ MAX puxa pedido automaticamente</li>
+                <li>3️⃣ Gera artes Instagram-ready</li>
+                <li>4️⃣ Envia mensagens consultivas</li>
+                <li>5️⃣ Revenda vende para clientes dela</li>
+                <li>6️⃣ Você acompanha tudo no dashboard</li>
+            </ul>
+            <p style="margin-top: 40px; font-size: 1.8em; color: #667eea;">SEM TRABALHO MANUAL!</p>
+            <div class="slide-number">4</div>
+        </div>
+
+        <!-- SLIDE 5: CRM Consultivo -->
+        <div class="slide light" id="slide5">
+            <div class="emoji">📊</div>
+            <h2>CRM Consultivo</h2>
+            <p style="margin-bottom: 40px;">7 Etapas de Venda Estruturadas:</p>
+            <ul>
+                <li>🔍 ABRIR - Conseguir atenção</li>
+                <li>🤝 CONECTAR - Conhecer o negócio</li>
+                <li>📊 DIAGNOSTICAR - Entender necessidades</li>
+                <li>📱 DIVULGAÇÃO - Como ela divulga</li>
+                <li>✨ PERSONALIZAR - Conectar necessidades</li>
+                <li>🎁 APRESENTAR - Mostrar produtos</li>
+                <li>💰 NEGOCIAR - Fechar venda</li>
+            </ul>
+            <p style="margin-top: 30px; color: #667eea; font-weight: bold;">Vendedor novo fecha 30% mais</p>
+            <div class="slide-number">5</div>
+        </div>
+
+        <!-- SLIDE 6: Artes Prontas -->
+        <div class="slide light" id="slide6">
+            <div class="emoji">🎨</div>
+            <h2>Artes Prontas</h2>
+            <p style="margin-bottom: 40px;"><strong>SEM PRÓ MAX:</strong></p>
+            <p>Revenda compra → recebe só produto 😞</p>
+            <p style="margin-bottom: 40px;"><strong>COM PRÓ MAX:</strong></p>
+            <ul>
+                <li>✅ Foto profissional (Instagram-ready)</li>
+                <li>✅ Legenda pronta (basta copiar)</li>
+                <li>✅ Sugestão de copy para WhatsApp</li>
+                <li>✅ Link personalizado do catálogo</li>
+            </ul>
+            <p style="margin-top: 30px; color: #667eea; font-weight: bold;">Revenda vende 50% mais (sem trabalho!)</p>
+            <div class="slide-number">6</div>
+        </div>
+
+        <!-- SLIDE 7: Mensagens Consultivas -->
+        <div class="slide light" id="slide7">
+            <div class="emoji">💬</div>
+            <h2>Mensagens Consultivas Inteligentes</h2>
+            <p style="margin: 40px 0; font-size: 1.8em;"><strong>O DIFERENCIAL PRINCIPAL</strong></p>
+            <ul>
+                <li>✅ Faz perguntas inteligentes sobre cliente</li>
+                <li>✅ Sugere argumentos de venda</li>
+                <li>✅ Dá dicas de quando fechar</li>
+                <li>✅ Aumenta conversão automaticamente</li>
+            </ul>
+            <p style="margin-top: 40px; color: #667eea; font-weight: bold; font-size: 2em;">Até +50% nas vendas</p>
+            <p style="font-size: 1.4em;">Clientes nossos vendem até 80% mais</p>
+            <div class="slide-number">7</div>
+        </div>
+
+        <!-- SLIDE 8: Dashboard -->
+        <div class="slide light" id="slide8">
+            <div class="emoji">📈</div>
+            <h2>Dashboard em Tempo Real</h2>
+            <ul>
+                <li>📊 TOP revendedoras (quem vende mais)</li>
+                <li>💰 Ticket médio por revenda</li>
+                <li>🎯 Etapa de cada revenda</li>
+                <li>🔮 Previsão de próximas vendas</li>
+                <li>📉 Taxa de conversão por etapa</li>
+                <li>⚠️ Revendedoras em risco de sair</li>
+            </ul>
+            <p style="margin-top: 40px; color: #667eea; font-weight: bold;">Decisões melhores = Vendas maiores</p>
+            <div class="slide-number">8</div>
+        </div>
+
+        <!-- SLIDE 9: IA Bela -->
+        <div class="slide light" id="slide9">
+            <div class="emoji">🤖</div>
+            <h2>IA Bela - Suporte Inteligente</h2>
+            <p style="margin: 40px 0;">A revenda pode perguntar:</p>
+            <ul>
+                <li>"Como abordar uma cliente?"</li>
+                <li>"Qual é a regra de ouro?"</li>
+                <li>"Como lidar com objeção?"</li>
+                <li>"Qual é o próximo passo?"</li>
+            </ul>
+            <p style="margin-top: 40px; color: #667eea; font-weight: bold;">IA responde em 1 segundo</p>
+            <p style="font-size: 1.4em;">Vendedor novo funciona no dia 1</p>
+            <div class="slide-number">9</div>
+        </div>
+
+        <!-- SLIDE 10: O que está incluído -->
+        <div class="slide light" id="slide10">
+            <h2>✅ O Que Está Incluído</h2>
+            <ul style="font-size: 1.5em;">
+                <li>CRM Consultivo (7 etapas)</li>
+                <li>Artes prontas (Instagram-ready)</li>
+                <li>Mensagens consultivas inteligentes</li>
+                <li>Método de venda documentado</li>
+                <li>IA de suporte (Bela)</li>
+                <li>Dashboard com KPIs</li>
+                <li>Integração com sistemas</li>
+                <li>Treinamento incluído</li>
+                <li>Suporte 24/7</li>
+            </ul>
+            <div class="slide-number">10</div>
+        </div>
+
+        <!-- SLIDE 11: Case de Sucesso -->
+        <div class="slide light" id="slide11">
+            <div class="emoji">🏆</div>
+            <h2>Case de Sucesso</h2>
+            <p style="margin: 30px 0;"><strong>ANTES (só sistema de loja):</strong></p>
+            <ul style="font-size: 1.4em;">
+                <li>50 revendedoras</li>
+                <li>Ticket: R$ 500/mês por revenda</li>
+                <li>Total: R$ 25.000/mês</li>
+            </ul>
+            <p style="margin: 30px 0;"><strong>DEPOIS (com PRÓ MAX):</strong></p>
+            <ul style="font-size: 1.4em;">
+                <li>50 revendedoras (+ 20 novas)</li>
+                <li>Ticket: R$ 650/mês (+30%)</li>
+                <li>Total: R$ 45.500/mês</li>
+            </ul>
+            <p style="margin-top: 30px; color: #667eea; font-weight: bold; font-size: 2em;">ROI: +82% em 3 meses</p>
+            <div class="slide-number">11</div>
+        </div>
+
+        <!-- SLIDE 12: Pricing -->
+        <div class="slide dark" id="slide12">
+            <h2>💰 Quanto Custa?</h2>
+            <div class="emoji">R$ 599/mês</div>
+            <p style="font-size: 2em; margin: 40px 0;"><strong>Sistema completo de CRM + Artes + Mensagens</strong></p>
+            <ul>
+                <li>✅ Setup grátis para os primeiros 10 clientes</li>
+                <li>✅ Primeiro mês com 50% de desconto</li>
+                <li>✅ 7 dias de teste (sem cartão de crédito)</li>
+            </ul>
+            <p style="margin-top: 40px; font-size: 1.8em;">1 revenda a mais vendendo 10% JÁ PAGA!</p>
+            <div class="slide-number">12</div>
+        </div>
+
+        <!-- SLIDE 13: Timeline -->
+        <div class="slide light" id="slide13">
+            <h2>📅 Timeline de Implementação</h2>
+            <ul style="font-size: 1.5em;">
+                <li><strong>SEMANA 1:</strong> Setup + integração + treinamento</li>
+                <li><strong>MÊS 1:</strong> CRM alimentado, artes prontas, WhatsApp funcionando</li>
+                <li><strong>MÊS 2-3:</strong> Padrão de vendas visível, identificar top revendedoras</li>
+                <li><strong>MÊS 3:</strong> ROI positivo, plano de expansão</li>
+            </ul>
+            <p style="margin-top: 40px; color: #667eea; font-weight: bold;">Tudo muito rápido!</p>
+            <div class="slide-number">13</div>
+        </div>
+
+        <!-- SLIDE 14: Call to Action -->
+        <div class="slide solution" id="slide14">
+            <h2>🎯 Call to Action</h2>
+            <p style="font-size: 2em; margin: 40px 0;">Suas revendedoras estão prontas para vender mais</p>
+            <p style="font-size: 1.8em; margin-bottom: 40px;"><strong>Agende uma demo de 15 minutos</strong></p>
+            <ul style="font-size: 1.6em;">
+                <li>✅ Como funciona com seu sistema</li>
+                <li>✅ Exemplos de artes prontas</li>
+                <li>✅ Método consultivo na prática</li>
+                <li>✅ Dashboard em tempo real</li>
+            </ul>
+            <p style="margin-top: 40px; font-size: 1.8em;"><strong>SEM COMPROMISSO</strong></p>
+            <p style="font-size: 1.6em;">7 DIAS DE TESTE GRÁTIS</p>
+            <div class="slide-number">14</div>
+        </div>
+
+        <!-- SLIDE 15: Perguntas -->
+        <div class="slide light" id="slide15">
+            <h2>❓ Perguntas Frequentes?</h2>
+            <ul style="font-size: 1.4em; text-align: left; display: inline-block;">
+                <li style="margin-bottom: 20px;"><strong>Quanto tempo leva o setup?</strong><br>2-4 horas. Nós fazemos. Zero trabalho seu.</li>
+                <li style="margin-bottom: 20px;"><strong>E se não gostar?</strong><br>Teste 7 dias grátis. Sem compromisso.</li>
+                <li style="margin-bottom: 20px;"><strong>Preciso treinar minha equipe?</strong><br>Sim, 1 treinamento (2h). Nós fazemos. Incluído.</li>
+                <li><strong>Como é o suporte?</strong><br>24/7 via WhatsApp. Resposta em até 2 horas.</li>
+            </ul>
+            <div class="slide-number">15</div>
+        </div>
+    </div>
+
+    <div class="slide-nav">
+        <button onclick="previousSlide()">← Anterior</button>
+        <span id="current-slide">Slide 1 de 15</span>
+        <button onclick="nextSlide()">Próximo →</button>
+        <br><br>
+        <small>Dica: Use Magnific para melhorar o design visualmente</small>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 15;
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            if (n > totalSlides) currentSlide = totalSlides;
+            if (n < 1) currentSlide = 1;
+
+            slides.forEach(slide => slide.style.display = 'none');
+            slides[currentSlide - 1].style.display = 'flex';
+            document.getElementById('current-slide').textContent = `Slide ${currentSlide} de ${totalSlides}`;
+        }
+
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+
+        function previousSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight') nextSlide();
+            if (event.key === 'ArrowLeft') previousSlide();
+        });
+
+        showSlide(currentSlide);
+    </script>
+</body>
+</html>
