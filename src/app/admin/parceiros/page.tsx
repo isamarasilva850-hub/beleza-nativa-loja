@@ -202,9 +202,9 @@ export default function AdminParceiros() {
                     <td className="px-4 py-3 text-xs text-gray-500">
                       {p.city ? `${p.city}/${p.state}` : "—"}
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-700">{p.totalorders || 0}</td>
+                    <td className="px-4 py-3 text-xs text-gray-700">{(p.totalorders ?? p.totalOrders ?? 0)}</td>
                     <td className="px-4 py-3 text-xs font-medium text-gray-700">
-                      R$ {((p.totalspent || p.totalSpent || 0) as number).toFixed(2).replace(".", ",")}
+                      R$ {((p.totalspent ?? p.totalSpent ?? 0) as number).toFixed(2).replace(".", ",")}
                     </td>
                     <td className="px-4 py-3">
                       <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
