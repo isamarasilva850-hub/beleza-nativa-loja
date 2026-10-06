@@ -13,7 +13,7 @@ export default function AdminParceiros() {
 
   useEffect(() => {
     loadPartners();
-  }, [loadPartners]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
