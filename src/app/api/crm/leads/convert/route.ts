@@ -73,7 +73,14 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Erro ao converter lead:', error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    let errorMessage = 'Erro desconhecido';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === 'object' && error !== null) {
+      errorMessage = JSON.stringify(error);
+    } else {
+      errorMessage = String(error);
+    }
     return NextResponse.json(
       { error: 'Erro ao converter lead para parceira', details: errorMessage },
       { status: 500 }
