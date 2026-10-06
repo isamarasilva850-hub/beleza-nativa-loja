@@ -10,9 +10,14 @@ export interface Partner {
   city?: string;
   state?: string;
   status: string;
-  createdAt: string;
-  totalOrders: number;
-  totalSpent: number;
+  createdAt?: string;
+  totalOrders?: number;
+  totalSpent?: number;
+  createdat?: string;
+  totalorders?: number;
+  totalspent?: number;
+  markuppercentage?: number;
+  logo?: string;
   created_at: string;
   updated_at: string;
 }
