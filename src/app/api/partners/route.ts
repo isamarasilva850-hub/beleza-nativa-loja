@@ -20,16 +20,16 @@ export async function POST(request: NextRequest) {
     const partnerId = `${Date.now().toString(36)}-${Math.random().toString(36).substr(2, 9)}`;
 
     const { data, error } = await supabase
-      .from('parceiros')
+      .from('partners')
       .insert({
         id: partnerId,
-        nome: name,
-        telefone: phone,
-        empresa: company || null,
+        name: name,
+        phone: phone,
+        company: company || null,
         cnpj: cnpj || null,
-        'e-mail': email || null,
-        cidade: city || null,
-        estado: state || null,
+        email: email || null,
+        city: city || null,
+        state: state || null,
         status: 'ativo',
       })
       .select()
@@ -54,9 +54,9 @@ export async function GET() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
     const { data, error } = await supabase
-      .from('parceiros')
+      .from('partners')
       .select('*')
-      .order('criado em', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
 
