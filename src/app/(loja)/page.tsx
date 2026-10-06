@@ -40,7 +40,10 @@ export default function Home() {
     setFilters((prev) => ({ ...f, searchQuery: prev.searchQuery, sortBy: prev.sortBy }));
   }, []);
 
-  const allProducts = [...supabaseProducts, ...staticProducts.filter(sp => !supabaseProducts.find(sup => sup.ref === sp.ref))];
+  const allProducts = [
+    ...(Array.isArray(supabaseProducts) ? supabaseProducts : []),
+    ...(Array.isArray(staticProducts) ? staticProducts.filter(sp => !supabaseProducts?.find(sup => sup.ref === sp.ref)) : [])
+  ];
 
   // Read from custom hook that reliably reads URL query params
   const urlGender = queryParams.genero || null;
@@ -59,29 +62,30 @@ export default function Home() {
     searchQuery: urlSearch || filters.searchQuery,
   };
 
-  const filteredProducts = allProducts
+  const filteredProducts = (Array.isArray(allProducts) ? allProducts : [])
     .filter((p) => {
+      if (!p || typeof p !== 'object') return false;
       if (effectiveFilters.collection && p.collection?.toLowerCase() !== effectiveFilters.collection?.toLowerCase()) return false;
       if (effectiveFilters.gender) {
-        const productGenderLower = p.gender?.toLowerCase() || "";
-        const filterGenderLower = effectiveFilters.gender?.toLowerCase() || "";
-        // Log to console for debugging
-        if (allProducts.indexOf(p) < 3) {
-          console.log(`Product: ${p.name}, gender: '${p.gender}' vs filter: '${effectiveFilters.gender}'`);
-        }
+        const productGenderLower = p.gender?.toLowerCase?.() || "";
+        const filterGenderLower = effectiveFilters.gender?.toLowerCase?.() || "";
         if (productGenderLower !== filterGenderLower) {
           return false;
         }
       }
-      if (effectiveFilters.category && p.category?.toLowerCase() !== effectiveFilters.category?.toLowerCase()) return false;
+      if (effectiveFilters.category && p.category?.toLowerCase?.() !== effectiveFilters.category?.toLowerCase?.()) return false;
       if (effectiveFilters.size) {
-        const hasSize = p.variants?.some((v) => v.sizes?.includes(effectiveFilters.size!)) ?? false;
-        if (!hasSize) return false;
+        try {
+          const hasSize = Array.isArray(p.variants) && p.variants.some((v) => Array.isArray(v.sizes) && v.sizes.includes(effectiveFilters.size!)) ? true : false;
+          if (!hasSize) return false;
+        } catch (e) {
+          return false;
+        }
       }
       if (effectiveFilters.searchQuery) {
-        const query = effectiveFilters.searchQuery.toLowerCase();
-        const matchesName = p.name?.toLowerCase().includes(query);
-        const matchesRef = p.ref?.toLowerCase().includes(query);
+        const query = effectiveFilters.searchQuery.toLowerCase?.() || "";
+        const matchesName = p.name?.toLowerCase?.().includes?.(query) ?? false;
+        const matchesRef = p.ref?.toLowerCase?.().includes?.(query) ?? false;
         if (!matchesName && !matchesRef) return false;
       }
       return true;
