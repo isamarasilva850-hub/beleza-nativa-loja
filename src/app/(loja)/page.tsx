@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { products as staticProducts } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
-import Sidebar from "@/components/Sidebar";
 import GanheButton from "@/components/GanheButton";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
@@ -385,13 +384,8 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex gap-8">
-          <div className={`${showFilters ? "block" : "hidden"} md:block w-full md:w-56 flex-shrink-0`}>
-            <Sidebar
-              onFilterChange={handleFilterChange}
-            />
-          </div>
-          <div className="flex-1">
+        <div>
+          <div>
             {uploadedProducts.length > 0 && (
               <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded">
                 <p className="text-sm font-semibold text-green-700">
