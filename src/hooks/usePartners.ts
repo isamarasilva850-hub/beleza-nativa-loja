@@ -65,7 +65,7 @@ export function usePartners() {
       total: partners.length,
       ativo: partners.filter(p => p.status === 'ativo').length,
       inativo: partners.filter(p => p.status === 'inativo').length,
-      totalSpent: partners.reduce((sum, p) => sum + p.totalSpent, 0),
+      totalSpent: partners.reduce((sum, p) => sum + ((p.totalspent as any) || (p.totalSpent as any) || 0), 0),
     };
   }, [partners]);
 
