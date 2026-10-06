@@ -37,11 +37,14 @@ export async function POST(request: NextRequest) {
       })
       .select();
 
-    const partnerData = partnerDataArray && partnerDataArray[0];
-
     if (partnerError) {
       console.error('Erro ao criar parceira:', partnerError);
       throw partnerError;
+    }
+
+    const partnerData = partnerDataArray && partnerDataArray[0];
+    if (!partnerData) {
+      throw new Error('Falha ao criar parceira: resposta vazia do servidor');
     }
 
     console.log('Parceira criada com sucesso:', partnerData.id);
