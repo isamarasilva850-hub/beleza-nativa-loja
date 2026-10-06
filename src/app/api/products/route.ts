@@ -1,7 +1,56 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
+
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    const body = await request.json();
+    const { ref, name, price, gender, colors, images } = body;
+
+    if (!ref || !name || !price) {
+      return NextResponse.json(
+        { error: 'Ref, nome e preço são obrigatórios' },
+        { status: 400 }
+      );
+    }
+
+    const productId = `${ref}-${Date.now().toString(36)}`;
+
+    const { data, error } = await supabase
+      .from('uploaded_products')
+      .insert({
+        id: productId,
+        ref,
+        name,
+        price: typeof price === 'string' ? parseFloat(price) : price,
+        images: images || [],
+        color: colors?.[0]?.name || '',
+        colorHex: colors?.[0]?.hex || '#000000',
+        sizes: [],
+        quantity: 0,
+        createdAt: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return NextResponse.json(data, { status: 201 });
+  } catch (error) {
+    console.error('Erro ao salvar produto:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json(
+      { error: 'Erro ao salvar produto', details: errorMessage },
+      { status: 500 }
+    );
+  }
+}
 
 export async function GET() {
   try {
