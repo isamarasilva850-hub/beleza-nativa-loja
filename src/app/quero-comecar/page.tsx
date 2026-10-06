@@ -36,7 +36,7 @@ export default function QueroComecear() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/leads', {
+      const response = await fetch('/api/parceiros', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
