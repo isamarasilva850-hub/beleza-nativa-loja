@@ -103,18 +103,10 @@ export default function Home() {
       }
     });
 
-  // Get banners from filtered products or use static banners
+  // Use static banners with model images
   const getActiveBanners = useCallback(() => {
-    let productsToUse = filteredProducts.slice(0, 3);
-    if (productsToUse.length > 0) {
-      return productsToUse.map(p => ({
-        src: p.images?.[0] || banners[0].src,
-        mobileSrc: p.images?.[0] || banners[0].mobileSrc,
-        alt: p.name || "Produto"
-      }));
-    }
     return banners;
-  }, [filteredProducts]);
+  }, []);
 
   const activeBanners = getActiveBanners();
   const bannersLength = activeBanners.length || 1;
