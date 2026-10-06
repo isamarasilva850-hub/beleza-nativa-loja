@@ -75,7 +75,7 @@ export default function Home() {
       }
       if (effectiveFilters.category && p.category?.toLowerCase() !== effectiveFilters.category?.toLowerCase()) return false;
       if (effectiveFilters.size) {
-        const hasSize = p.variants.some((v) => v.sizes.includes(effectiveFilters.size!));
+        const hasSize = p.variants?.some((v) => v.sizes?.includes(effectiveFilters.size!)) ?? false;
         if (!hasSize) return false;
       }
       if (effectiveFilters.searchQuery) {
