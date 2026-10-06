@@ -616,7 +616,7 @@ export const belaKnowledgeExtended = {
 
     crm: {
       title: "📊 CRM - Gerenciar Clientes e Leads",
-      description: "Banco de dados de clientes, leads, ações e propostas",
+      description: "Banco de dados de clientes, leads, ações, propostas + novo gerenciador de leads",
       url: "/admin/crm",
       steps: [
         {
@@ -627,25 +627,30 @@ export const belaKnowledgeExtended = {
         {
           number: 2,
           title: "Escolha seção",
-          description: "Clientes, Leads, Ações ou Propostas"
+          description: "Clientes, Leads, Ações, Propostas ou Gerenciador de Leads"
         },
         {
           number: 3,
           title: "Clientes",
-          description: "Veja quem já comprou, histórico, quanto gastou"
+          description: "Veja quem já comprou, histórico, quanto gastou - CARTEIRA DE OURO"
         },
         {
           number: 4,
-          title: "Leads",
-          description: "Novos contatos que ainda não compraram - acompanhe!"
+          title: "Leads (CRM tradicional)",
+          description: "Leads antigos do sistema. Novos leads aparecem em 'Gerenciador de Leads'"
         },
         {
           number: 5,
+          title: "🆕 Gerenciador de Leads",
+          description: "Novo painel para gerir leads do 'Quero Começar'. ACESSO: /admin/crm/leads-gerenciador"
+        },
+        {
+          number: 6,
           title: "Ações",
           description: "Tarefas que você precisa fazer hoje (em vermelho = atrasado)"
         },
         {
-          number: 6,
+          number: 7,
           title: "Propostas",
           description: "Propostas de venda que enviou - veja status"
         }
@@ -654,7 +659,61 @@ export const belaKnowledgeExtended = {
         "👥 Carteira de clientes = ouro, venda pra eles",
         "📌 Ações em vermelho = fazer hoje",
         "💬 Pode copiar mensagem sugerida pro cliente",
-        "📊 Mostra valor total que cada cliente gastou"
+        "📊 Mostra valor total que cada cliente gastou",
+        "🆕 Leads do 'Quero Começar' aparecem em 'Gerenciador de Leads' (novo painel)",
+        "➡️ Depois que confirmar interesse, clica 'Converter' para mover de lead → parceira"
+      ]
+    },
+
+    leadsGerenciador: {
+      title: "🆕 Gerenciador de Leads - Converter Leads em Parceiras",
+      description: "Novo painel para gerir leads do formulário 'Quero Começar' e convertê-los em parceiras",
+      url: "/admin/crm/leads-gerenciador",
+      steps: [
+        {
+          number: 1,
+          title: "Acesse o painel",
+          description: "ADMIN → Comercial → Gerenciador de Leads OU direto em /admin/crm/leads-gerenciador"
+        },
+        {
+          number: 2,
+          title: "Veja estatísticas",
+          description: "Quantas leads novas chegaram, quantas você já converteu e quantas descartou"
+        },
+        {
+          number: 3,
+          title: "Veja leads em status 'Novo'",
+          description: "Use o filtro 'Novos (não convertidos)' para ver as leads que acabaram de chegar"
+        },
+        {
+          number: 4,
+          title: "Clique em 'WhatsApp'",
+          description: "Entra em contato com a lead. Oferece mais detalhes sobre como revender com você"
+        },
+        {
+          number: 5,
+          title: "Se confirmou interesse",
+          description: "Clique em '➡️ Converter' para mover de lead → parceira"
+        },
+        {
+          number: 6,
+          title: "Confirme conversão",
+          description: "Sistema cria registro em Parceiras + marca lead como 'convertido'"
+        },
+        {
+          number: 7,
+          title: "Lead aparece em Carteira de Clientes",
+          description: "Agora ela aparece em /admin/parceiros como parceira ativa"
+        }
+      ],
+      tips: [
+        "🆕 Leads vêm do formulário 'Quero Começar' (botão flutuante no site)",
+        "📊 Mostra: nome, telefone, email, origem, status, data de chegada",
+        "💬 Botão WhatsApp leva direto pra conversa",
+        "➡️ Clique 'Converter' DEPOIS de confirmar interesse via WhatsApp",
+        "🎯 Estratégia: Lead → (Follow-up via WhatsApp) → Parceira",
+        "✅ Status muda automaticamente quando converte",
+        "📌 Filtre por status para organizar: Novos, Convertidas, Descartadas"
       ]
     },
 
