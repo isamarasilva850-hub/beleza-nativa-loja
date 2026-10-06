@@ -36,13 +36,15 @@ export default function QueroComecear() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/parceiros', {
+      const response = await fetch('/api/crm/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nome: formData.name,
           telefone: formData.phone.replace(/\D/g, ''),
-          status: 'ativo'
+          origem: 'quero_comecar_site',
+          status: 'novo',
+          notas: `Tipo: ${formData.type} | Status: ${formData.status}`
         })
       });
 
