@@ -189,40 +189,54 @@ export default function AdminParceiros() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((p) => (
-                  <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-gray-800 text-xs">{p.name}</p>
-                      <p className="text-xs text-gray-400">{p.company || "—"}</p>
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="text-xs text-gray-700">{p.phone}</p>
-                      <p className="text-xs text-gray-400">{p.email || "—"}</p>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-gray-500">
-                      {p.city ? `${p.city}/${p.state}` : "—"}
-                    </td>
-                    <td className="px-4 py-3 text-xs text-gray-700">{(p.totalorders ?? p.totalOrders ?? 0)}</td>
-                    <td className="px-4 py-3 text-xs font-medium text-gray-700">
-                      R$ {((p.totalspent ?? p.totalSpent ?? 0) as number).toFixed(2).replace(".", ",")}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                        p.status === "ativo" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
-                      }`}>
-                        {p.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <a
-                        href={`/admin/parceiros/${p.id}`}
-                        className="text-xs text-blue-500 hover:underline"
-                      >
-                        📦 Catálogo
-                      </a>
-                    </td>
-                  </tr>
-                ))}
+                {filtered.map((p) => {
+                  try {
+                    const totalSpent = (p.totalspent ?? p.totalSpent ?? 0) as number;
+                    const totalOrders = (p.totalorders ?? p.totalOrders ?? 0);
+                    return (
+                      <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50">
+                        <td className="px-4 py-3">
+                          <p className="font-medium text-gray-800 text-xs">{p.name}</p>
+                          <p className="text-xs text-gray-400">{p.company || "—"}</p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="text-xs text-gray-700">{p.phone}</p>
+                          <p className="text-xs text-gray-400">{p.email || "—"}</p>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-500">
+                          {p.city ? `${p.city}/${p.state}` : "—"}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-gray-700">{totalOrders}</td>
+                        <td className="px-4 py-3 text-xs font-medium text-gray-700">
+                          R$ {totalSpent.toFixed(2).replace(".", ",")}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                            p.status === "ativo" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
+                          }`}>
+                            {p.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <a
+                            href={`/admin/parceiros/${p.id}`}
+                            className="text-xs text-blue-500 hover:underline"
+                          >
+                            📦 Catálogo
+                          </a>
+                        </td>
+                      </tr>
+                    );
+                  } catch (err) {
+                    return (
+                      <tr key={p.id} className="border-b border-gray-50">
+                        <td colSpan={7} className="px-4 py-3 text-xs text-red-600">
+                          Erro ao renderizar: {p.name}
+                        </td>
+                      </tr>
+                    );
+                  }
+                })}
               </tbody>
             </table>
           </div>
