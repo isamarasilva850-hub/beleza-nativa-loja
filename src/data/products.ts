@@ -28,3 +28,6 @@ export interface Product {
 // Mantemos um array vazio por compatibilidade
 export const products: Product[] = [];
 export const categories: string[] = [];
+export const collections: string[] = [];
+export const genders: string[] = [];
+export const sizes: string[] = [];
