@@ -27,3 +27,4 @@ export interface Product {
 // Para uso client-side, use a API /api/products
 // Mantemos um array vazio por compatibilidade
 export const products: Product[] = [];
+export const categories: string[] = [];
