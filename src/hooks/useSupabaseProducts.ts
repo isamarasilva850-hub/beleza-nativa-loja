@@ -36,7 +36,7 @@ export function useSupabaseProducts() {
           collection: "Lingerie",
           gender: normalizeGender(item.gender),
           category: item.category || "Lingerie",
-          variants: item.colors?.map((color: any) => ({
+          variants: (item.variants || item.colors?.map((color: any) => ({
             color: color.color_name,
             colorHex: color.color_hex || "#000000",
             sizes: [
@@ -45,7 +45,7 @@ export function useSupabaseProducts() {
               ...(parseInt(color.qty_g) > 0 ? ['G'] : []),
               ...(parseInt(color.qty_gg) > 0 ? ['GG'] : []),
             ],
-          })) || [],
+          }))) || [],
           images: item.images?.map((img: any) => img.image_base64 || img.image_url) || [],
         }));
 

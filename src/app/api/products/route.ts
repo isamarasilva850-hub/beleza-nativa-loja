@@ -66,10 +66,7 @@ export async function GET() {
       gender: p.gender,
       category: p.category,
       collection: p.collection,
-      colors: p.variants?.map((v: any) => ({
-        color_name: v.color,
-        color_hex: v.colorHex,
-      })) || [],
+      variants: p.variants || [],
     }));
 
     // Produtos uploadados do Supabase
