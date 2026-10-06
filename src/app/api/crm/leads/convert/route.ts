@@ -30,8 +30,8 @@ export async function POST(request: NextRequest) {
       .from('partners')
       .insert({
         id: partnerId,
-        nome,
-        telefone,
+        name: nome,
+        phone: telefone,
         email: email || null,
         status: 'ativo',
       })
