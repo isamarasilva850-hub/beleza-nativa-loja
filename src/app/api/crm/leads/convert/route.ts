@@ -25,14 +25,14 @@ export async function POST(request: NextRequest) {
 
     const partnerId = `${Date.now().toString(36)}-${Math.random().toString(36).substr(2, 9)}`;
 
-    // 1. Criar registro em parceiros
+    // 1. Criar registro em partners
     const { data: partnerDataArray, error: partnerError } = await supabase
-      .from('parceiros')
+      .from('partners')
       .insert({
         id: partnerId,
         nome,
         telefone,
-        'e-mail': email || null,
+        email: email || null,
         status: 'ativo',
       })
       .select();
