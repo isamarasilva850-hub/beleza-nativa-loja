@@ -18,6 +18,7 @@ export default function LeadsGerenciadorPage() {
   const [loading, setLoading] = useState(true);
   const [converting, setConverting] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'todos' | 'novo' | 'convertido' | 'descartado'>('novo');
+  const [confirmLead, setConfirmLead] = useState<Lead | null>(null);
 
   useEffect(() => {
     loadLeads();
@@ -36,8 +37,11 @@ export default function LeadsGerenciadorPage() {
   };
 
   const convertLead = async (lead: Lead) => {
-    if (!window.confirm(`Converter "${lead.nome}" para parceira?`)) return;
+    setConfirmLead(lead);
+  };
 
+  const confirmConvert = async (lead: Lead) => {
+    setConfirmLead(null);
     setConverting(lead.id);
     try {
       const res = await fetch('/api/crm/leads/convert', {
@@ -185,6 +189,32 @@ export default function LeadsGerenciadorPage() {
           </div>
         )}
       </div>
+
+      {/* MODAL DE CONFIRMAÇÃO */}
+      {confirmLead && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm">
+            <h2 className="text-lg font-bold mb-4">Confirmar Conversão</h2>
+            <p className="text-gray-600 mb-6">
+              Tem certeza que quer converter <strong>"{confirmLead.nome}"</strong> para parceira?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmLead(null)}
+                className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-900 px-4 py-2 rounded font-semibold transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => confirmConvert(confirmLead)}
+                className="flex-1 bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded font-semibold transition"
+              >
+                Converter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* INFO */}
       <div className="mt-6 bg-teal-50 p-4 rounded-lg border border-teal-200">
