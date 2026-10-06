@@ -14,11 +14,14 @@ export async function POST(request: NextRequest) {
     // Convert lead to partner - moves from crm_leads to parceiros table
 
     if (!leadId || !nome || !telefone) {
+      console.error('Campos obrigatórios faltando:', { leadId, nome, telefone });
       return NextResponse.json(
         { error: 'leadId, nome e telefone são obrigatórios' },
         { status: 400 }
       );
     }
+
+    console.log('Convertendo lead para parceira:', { leadId, nome, telefone, email });
 
     const partnerId = `${Date.now().toString(36)}-${Math.random().toString(36).substr(2, 9)}`;
 
@@ -35,7 +38,12 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (partnerError) throw partnerError;
+    if (partnerError) {
+      console.error('Erro ao criar parceira:', partnerError);
+      throw partnerError;
+    }
+
+    console.log('Parceira criada com sucesso:', partnerData.id);
 
     // 2. Atualizar lead status para "convertido"
     const { error: updateError } = await supabase
@@ -46,7 +54,12 @@ export async function POST(request: NextRequest) {
       })
       .eq('id', leadId);
 
-    if (updateError) throw updateError;
+    if (updateError) {
+      console.error('Erro ao atualizar lead:', updateError);
+      throw updateError;
+    }
+
+    console.log('Lead atualizado para convertido');
 
     return NextResponse.json({
       success: true,
@@ -56,8 +69,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Erro ao converter lead:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: 'Erro ao converter lead para parceira' },
+      { error: 'Erro ao converter lead para parceira', details: errorMessage },
       { status: 500 }
     );
   }
