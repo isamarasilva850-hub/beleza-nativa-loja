@@ -77,7 +77,20 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error) {
       errorMessage = error.message;
     } else if (typeof error === 'object' && error !== null) {
-      errorMessage = JSON.stringify(error);
+      // Handle Supabase or other complex errors
+      if ('message' in error) {
+        errorMessage = String((error as any).message);
+      } else if ('hint' in error) {
+        errorMessage = String((error as any).hint);
+      } else if ('details' in error) {
+        errorMessage = String((error as any).details);
+      } else {
+        try {
+          errorMessage = JSON.stringify(error);
+        } catch {
+          errorMessage = Object.prototype.toString.call(error);
+        }
+      }
     } else {
       errorMessage = String(error);
     }
