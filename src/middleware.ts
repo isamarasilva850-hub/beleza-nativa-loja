@@ -2,11 +2,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
-  // TODO: Implement proper auth check with Supabase
-  // For now, allow all requests to proceed
+  // Disabled temporarily to debug page load issues
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/login'],
+  matcher: [],  // Disabled - no matchers
 };
