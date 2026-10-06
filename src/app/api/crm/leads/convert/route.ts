@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const partnerId = `${Date.now().toString(36)}-${Math.random().toString(36).substr(2, 9)}`;
 
     // 1. Criar registro em parceiros
-    const { data: partnerData, error: partnerError } = await supabase
+    const { data: partnerDataArray, error: partnerError } = await supabase
       .from('parceiros')
       .insert({
         id: partnerId,
@@ -35,8 +35,9 @@ export async function POST(request: NextRequest) {
         'e-mail': email || null,
         status: 'ativo',
       })
-      .select()
-      .single();
+      .select();
+
+    const partnerData = partnerDataArray && partnerDataArray[0];
 
     if (partnerError) {
       console.error('Erro ao criar parceira:', partnerError);
