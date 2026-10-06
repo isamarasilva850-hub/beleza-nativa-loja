@@ -62,6 +62,14 @@ export async function GET() {
       ref: p.ref,
       name: p.name,
       price: p.price,
+      images: p.images || [],
+      gender: p.gender,
+      category: p.category,
+      collection: p.collection,
+      colors: p.variants?.map((v: any) => ({
+        color_name: v.color,
+        color_hex: v.colorHex,
+      })) || [],
     }));
 
     // Produtos uploadados do Supabase
