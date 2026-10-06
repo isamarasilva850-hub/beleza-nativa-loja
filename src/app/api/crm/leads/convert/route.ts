@@ -11,6 +11,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { leadId, nome, telefone, email } = body;
 
+    // Convert lead to partner - moves from crm_leads to parceiros table
+
     if (!leadId || !nome || !telefone) {
       return NextResponse.json(
         { error: 'leadId, nome e telefone são obrigatórios' },
