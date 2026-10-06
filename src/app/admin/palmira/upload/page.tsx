@@ -120,8 +120,12 @@ export default function PalmiraUploadPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Erro ao deletar");
+        try {
+          const errorData = await response.json();
+          throw new Error(errorData.error || errorData.details || "Erro ao deletar");
+        } catch (parseErr) {
+          throw new Error(`Erro ao deletar: ${response.status} ${response.statusText}`);
+        }
       }
 
       setSuccess(`🗑️ Produto "${deleteRef}" deletado com sucesso!`);
@@ -188,11 +192,16 @@ export default function PalmiraUploadPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Erro ao salvar");
+        try {
+          const errorData = await response.json();
+          throw new Error(errorData.error || errorData.details || "Erro ao salvar");
+        } catch (parseErr) {
+          throw new Error(`Erro ao salvar: ${response.status} ${response.statusText}`);
+        }
       }
 
-      setSuccess(`✅ Produto "${formData.name}" salvo com sucesso! Aparecerá na loja em segundos!`);
+      const data = await response.json();
+      setSuccess(`✅ Produto "${formData.name}" salvo com sucesso! ID: ${data.id}`);
       setFormData({ ref: "", name: "", price: "", gender: "Feminino" });
       setColors([]);
       setImages([]);
