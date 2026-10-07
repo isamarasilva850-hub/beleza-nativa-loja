@@ -105,9 +105,18 @@ export async function GET() {
     );
 
     // Buscar produtos da tabela products
+    console.log('🔍 [DEBUG] About to fetch from products table...');
     const { data: newProducts, error: newError } = await supabase
       .from('products')
       .select('id, ref, name, price, images');
+
+    console.log('🔍 [DEBUG] Supabase response:', {
+      hasError: !!newError,
+      errorMessage: newError?.message,
+      errorCode: newError?.code,
+      dataLength: newProducts?.length || 0,
+      dataPreview: newProducts?.slice(0, 2)
+    });
 
     if (newError) {
       console.error('❌ Error fetching products:', newError.message);
