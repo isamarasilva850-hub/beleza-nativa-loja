@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/data/products";
 import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 import { useEffect, useState } from "react";
 
 interface ProductCardProps {
@@ -15,6 +16,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const retailPrice = product.price * 2;
   const { user } = useAuth();
   const isReseller = user?.type === 'revendedor';
+  const { addItem } = useCart();
   const [colorOverrides, setColorOverrides] = useState<any[]>([]);
 
   useEffect(() => {
@@ -143,6 +145,15 @@ export default function ProductCard({ product }: ProductCardProps) {
         <p className="text-xs text-gray-600 mt-1 font-mono font-bold">
           REF {product.ref}
         </p>
+
+        {/* Add to Cart Button */}
+        <Link
+          href={`/produto/${product.slug}`}
+          onClick={(e) => e.stopPropagation()}
+          className="block mt-4 w-full py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary-dark transition-colors text-center"
+        >
+          🛍️ ADICIONAR À SACOLA
+        </Link>
       </div>
     </Link>
   );
