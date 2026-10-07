@@ -33,6 +33,7 @@ export default function PalmiraUploadPage() {
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [loadingSearchExisting, setLoadingSearchExisting] = useState(false);
+  const [activeTab, setActiveTab] = useState("criar");
 
   const optimizeImage = (imgBase64: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -288,10 +289,60 @@ export default function PalmiraUploadPage() {
           ← Voltar
         </Link>
 
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">📦 Upload de Produtos</h1>
-        <p className="text-gray-600 mb-8">Adicione fotos quantas quiser!</p>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">📦 Gerenciar Produtos</h1>
+        <p className="text-gray-600 mb-8">Um painel para tudo!</p>
+
+        {/* Abas */}
+        <div className="flex gap-2 mb-8 flex-wrap">
+          <button
+            type="button"
+            onClick={() => setActiveTab("criar")}
+            className={`px-6 py-3 rounded-lg font-bold transition-all ${
+              activeTab === "criar"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            📦 Criar Produto
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("editar")}
+            className={`px-6 py-3 rounded-lg font-bold transition-all ${
+              activeTab === "editar"
+                ? "bg-purple-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            ✏️ Editar Produto
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("preco")}
+            className={`px-6 py-3 rounded-lg font-bold transition-all ${
+              activeTab === "preco"
+                ? "bg-yellow-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            💰 Corrigir Preço
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("deletar")}
+            className={`px-6 py-3 rounded-lg font-bold transition-all ${
+              activeTab === "deletar"
+                ? "bg-red-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            🗑️ Deletar Produto
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-8 bg-white rounded-xl shadow-sm p-8">
+          {/* TAB: Criar Produto */}
+          {activeTab === "criar" && (
           {/* Dados do Produto */}
           <div>
             <h2 className="text-lg font-bold text-gray-800 mb-4">📋 Dados do Produto</h2>
