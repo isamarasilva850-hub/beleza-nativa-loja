@@ -39,7 +39,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       className="group block bg-white rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 border-2 border-gray-200 hover:border-primary"
     >
       <div className="aspect-[3/4] bg-gray-100 relative overflow-hidden">
-        {hasImage && product.images ? (
+        {hasImage && product.images && product.images[0] ? (
           product.images[0].startsWith('data:') ? (
             // Renderizar base64 com tag img normal
             <img
