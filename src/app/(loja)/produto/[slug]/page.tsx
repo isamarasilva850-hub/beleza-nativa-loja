@@ -101,17 +101,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
     );
   }
 
-  const variant = product.variants?.[selectedVariant];
-
-  if (!variant) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">Produto sem variantes</h1>
-        <Link href="/" className="text-primary hover:underline">Voltar para a loja</Link>
-      </div>
-    );
-  }
-
+  const variant = product.variants[selectedVariant];
   const retailPrice = product.price * 2;
   const priceToCart = isLoggedIn ? product.price : retailPrice;
 
