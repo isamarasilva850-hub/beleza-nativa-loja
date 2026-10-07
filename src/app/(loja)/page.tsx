@@ -260,9 +260,9 @@ export default function Home() {
 
       {/* 3. Secondary Banners */}
       <section className="max-w-7xl mx-auto px-4 py-8 md:py-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link href="/cadastro" className="block">
-            <div className="relative rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all" style={{ aspectRatio: "460/242" }}>
+            <div className="relative overflow-hidden" style={{ aspectRatio: "460/242" }}>
               <Image
                 src="/banners/banner-secundario-1.jpg"
                 alt="Cadastre-se e aproveite!"
@@ -274,7 +274,7 @@ export default function Home() {
             </div>
           </Link>
           <Link href="/" className="block">
-            <div className="relative rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all" style={{ aspectRatio: "460/242" }}>
+            <div className="relative overflow-hidden" style={{ aspectRatio: "460/242" }}>
               <Image
                 src="/banners/banner-secundario-2.jpg"
                 alt="Atacado para todo Brasil"
