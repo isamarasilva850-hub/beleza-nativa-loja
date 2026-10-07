@@ -15,7 +15,7 @@ export default function GanheButton({ size = "md", position = "relative", classN
     lg: "px-6 py-4 text-base gap-3",
   };
 
-  const positionClasses = position === "fixed" ? "fixed bottom-4 right-4 z-40 md:bottom-6 md:right-6" : "relative";
+  const positionClasses = position === "fixed" ? "fixed bottom-4 right-4 z-40 md:bottom-6 md:right-6" : "relative flex justify-center";
 
   return (
     <Link href="/quero-comecar">
