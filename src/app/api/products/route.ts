@@ -91,40 +91,40 @@ export async function POST(request: NextRequest) {
     if (images && images.length > 0) {
       console.log(`📸 [DEBUG] Iniciando upload de ${images.length} imagem(ns) para product_id: ${productId}`);
 
-      // Tentar descobrir o nome correto da coluna lendo uma linha vazia
-      const { data: existingImg } = await supabase
-        .from('product_images')
-        .select('*')
-        .limit(1);
+      // Tentar com diferentes nomes de coluna até encontrar o correto
+      const colNames = ['url', 'image', 'image_base64', 'data', 'image_url', 'image_data'];
+      let successCol = '';
+      let lastError: any = null;
 
-      if (existingImg && existingImg.length > 0) {
-        const cols = Object.keys(existingImg[0]);
-        console.log('🔍 [DEBUG] Colunas reais de product_images:', cols.join(', '));
+      for (const colName of colNames) {
+        const imageInserts = images.map((image: string, index: number) => {
+          const insert: any = {
+            product_id: productId,
+            order_index: index,
+          };
+          insert[colName] = image;
+          return insert;
+        });
+
+        console.log(`🔄 Tentando com coluna: "${colName}"...`);
+        const { error } = await supabase
+          .from('product_images')
+          .insert(imageInserts);
+
+        if (!error) {
+          console.log(`✅ SUCESSO! Coluna correta é: "${colName}"`);
+          successCol = colName;
+          break;
+        } else {
+          console.log(`  ❌ Falhou: ${error.message}`);
+          lastError = error;
+        }
       }
 
-      const imageInserts = images.map((image: string, index: number) => {
-        const imgSize = Math.round(image.length / 1024); // KB
-        console.log(`  📷 Imagem ${index + 1}: ${imgSize}KB`);
-        return {
-          product_id: productId,
-          image_data: image,
-          order_index: index,
-        };
-      });
-
-      console.log(`📤 Enviando ${imageInserts.length} imagens pro Supabase...`);
-      const { error: imageError } = await supabase
-        .from('product_images')
-        .insert(imageInserts);
-
-      if (imageError) {
-        console.error('❌ Erro ao salvar imagens:', {
-          message: imageError.message,
-          code: imageError.code,
-          details: imageError.details,
-        });
-      } else {
-        console.log(`✅ ${images.length} imagem(ns) salva(s) com sucesso!`);
+      if (successCol) {
+        console.log(`✅ ${images.length} imagem(ns) salva(s) com coluna: ${successCol}!`);
+      } else if (lastError) {
+        console.error('❌ Nenhuma coluna funcionou. Detalhes:', lastError.message);
       }
     }
 
