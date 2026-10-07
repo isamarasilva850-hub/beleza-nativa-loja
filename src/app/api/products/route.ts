@@ -87,66 +87,25 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 3. Upload imagens para Supabase Storage e salvar URLs
+    // 3. Salvar imagens base64 diretamente na tabela
     if (images && images.length > 0) {
-      console.log(`📸 [DEBUG] Iniciando upload de ${images.length} imagem(ns) para product_id: ${productId}`);
+      console.log(`📸 [DEBUG] Salvando ${images.length} imagem(ns) base64 para product_id: ${productId}`);
 
       for (let i = 0; i < images.length; i++) {
-        const imageBase64 = images[i];
-        const fileName = `${productId}-img-${i}.webp`;
-        const filePath = `products/${fileName}`;
-
         try {
-          // Converter base64 para buffer
-          const base64Data = imageBase64.split(',')[1] || imageBase64;
-          const buffer = Buffer.from(base64Data, 'base64');
-
-          // Upload para Supabase Storage (tenta diferentes buckets)
-          let uploadError: any = null;
-          let bucketName = 'products';
-
-          const { error: err1 } = await supabase.storage
-            .from(bucketName)
-            .upload(filePath, buffer, {
-              contentType: 'image/webp',
-              upsert: true,
-            });
-
-          if (err1) {
-            console.log(`❌ Bucket '${bucketName}' não encontrado, tentando 'images'...`);
-            bucketName = 'images';
-            const { error: err2 } = await supabase.storage
-              .from(bucketName)
-              .upload(filePath, buffer, {
-                contentType: 'image/webp',
-                upsert: true,
-              });
-            uploadError = err2;
-          }
-
-          if (uploadError) {
-            console.error(`❌ Erro ao upload imagem ${i + 1}:`, uploadError.message);
-            continue;
-          }
-
-          // Gerar URL pública
-          const { data: publicUrl } = supabase.storage
-            .from(bucketName)
-            .getPublicUrl(filePath);
-
-          // Salvar URL na tabela
           const { error: dbError } = await supabase
             .from('product_images')
             .insert({
               id: `${productId}-img-${i}`,
               product_id: productId,
-              image_base64: publicUrl.publicUrl,
+              image_base64: images[i],
             });
 
           if (dbError) {
-            console.error(`❌ Erro ao salvar URL ${i + 1}:`, dbError.message);
+            console.error(`❌ Erro ao salvar imagem ${i + 1}:`, dbError.message);
           } else {
-            console.log(`✅ Imagem ${i + 1} uploaded e URL salva!`);
+            const sizeKB = Math.round(images[i].length / 1024);
+            console.log(`✅ Imagem ${i + 1} salva (${sizeKB}KB base64)`);
           }
         } catch (err) {
           console.error(`❌ Erro ao processar imagem ${i + 1}:`, err);
