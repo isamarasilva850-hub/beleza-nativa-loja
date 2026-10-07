@@ -159,22 +159,25 @@ export async function GET() {
       console.log('🆕 First new products:', allUploadedProducts.slice(0, 3).map(p => p.ref));
     }
 
-    // Buscar cores de product_colors para produtos que não têm no JSON
-    const productsWithColors = await Promise.all(
+    // Buscar cores e imagens
+    const productsWithDetails = await Promise.all(
       allUploadedProducts.map(async (product: any) => {
-        // Se já tem cores no JSON, usar essas
-        if (product.colors && product.colors.length > 0) {
-          return product;
-        }
-
-        // Senão, tentar buscar de product_colors (fallback)
+        // Buscar cores
         const { data: colors } = await supabase
           .from('product_colors')
           .select('color_name, color_hex, qty_p, qty_m, qty_g, qty_gg')
           .eq('product_id', product.id);
 
+        // Buscar imagens 🖼️
+        const { data: images } = await supabase
+          .from('product_images')
+          .select('image_url, order_index')
+          .eq('product_id', product.id)
+          .order('order_index', { ascending: true });
+
         return {
           ...product,
+          images: images?.map((img: any) => img.image_url) || product.images || [],
           colors: colors?.map((c: any) => ({
             color_name: c.color_name,
             color_hex: c.color_hex,
@@ -190,7 +193,7 @@ export async function GET() {
     // Combina ambos
     const allProducts = [
       ...staticProducts,
-      ...productsWithColors
+      ...productsWithDetails
     ];
 
     return NextResponse.json(allProducts);
