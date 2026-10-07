@@ -87,44 +87,55 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 3. Insert imagens em product_images se houver
+    // 3. Upload imagens para Supabase Storage e salvar URLs
     if (images && images.length > 0) {
       console.log(`📸 [DEBUG] Iniciando upload de ${images.length} imagem(ns) para product_id: ${productId}`);
 
-      // Tentar com diferentes nomes de coluna até encontrar o correto
-      const colNames = ['url', 'image_base64', 'image', 'data', 'image_url', 'image_data'];
-      let successCol = '';
-      let lastError: any = null;
+      for (let i = 0; i < images.length; i++) {
+        const imageBase64 = images[i];
+        const fileName = `${productId}-img-${i}.webp`;
+        const filePath = `products/${fileName}`;
 
-      for (const colName of colNames) {
-        const imageInserts = images.map((image: string, index: number) => {
-          const insert: any = {
-            id: `${productId}-img-${index}`,
-            product_id: productId,
-          };
-          insert[colName] = image;
-          return insert;
-        });
+        try {
+          // Converter base64 para buffer
+          const base64Data = imageBase64.split(',')[1] || imageBase64;
+          const buffer = Buffer.from(base64Data, 'base64');
 
-        console.log(`🔄 Tentando com coluna: "${colName}" (SEM order_index)...`);
-        const { error } = await supabase
-          .from('product_images')
-          .insert(imageInserts);
+          // Upload para Supabase Storage
+          const { error: uploadError } = await supabase.storage
+            .from('products')
+            .upload(filePath, buffer, {
+              contentType: 'image/webp',
+              upsert: true,
+            });
 
-        if (!error) {
-          console.log(`✅ SUCESSO! Coluna correta é: "${colName}"`);
-          successCol = colName;
-          break;
-        } else {
-          console.log(`  ❌ Falhou: ${error.message}`);
-          lastError = error;
+          if (uploadError) {
+            console.error(`❌ Erro ao upload imagem ${i + 1}:`, uploadError.message);
+            continue;
+          }
+
+          // Gerar URL pública
+          const { data: publicUrl } = supabase.storage
+            .from('products')
+            .getPublicUrl(filePath);
+
+          // Salvar URL na tabela
+          const { error: dbError } = await supabase
+            .from('product_images')
+            .insert({
+              id: `${productId}-img-${i}`,
+              product_id: productId,
+              image_base64: publicUrl.publicUrl,
+            });
+
+          if (dbError) {
+            console.error(`❌ Erro ao salvar URL ${i + 1}:`, dbError.message);
+          } else {
+            console.log(`✅ Imagem ${i + 1} uploaded e URL salva!`);
+          }
+        } catch (err) {
+          console.error(`❌ Erro ao processar imagem ${i + 1}:`, err);
         }
-      }
-
-      if (successCol) {
-        console.log(`✅ ${images.length} imagem(ns) salva(s) com coluna: "${successCol}"!`);
-      } else if (lastError) {
-        console.error('❌ Nenhuma coluna funcionou. Detalhes:', lastError.message);
       }
     }
 
