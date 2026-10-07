@@ -311,10 +311,6 @@ export default function PalmiraUploadPage() {
         throw new Error("❌ Adicione pelo menos uma cor!");
       }
 
-      if (savedImages.length === 0) {
-        throw new Error("❌ Salve as imagens clicando em '💾 Salvar Imagens' antes de enviar!");
-      }
-
       const hasQty = colors.some(
         (c) =>
           parseInt(c.qty_p) > 0 ||
@@ -815,35 +811,16 @@ export default function PalmiraUploadPage() {
               <div className="mt-4">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-sm font-bold text-gray-700">
-                    {previews.length} foto(s) {savedImages.length > 0 && <span className="text-green-600">✅ salva(s)</span>}
+                    {previews.length} foto(s) adicionada(s)
                   </p>
-                  {previews.length > 0 && savedImages.length === 0 && (
-                    <button
-                      type="button"
-                      onClick={handleSaveImages}
-                      disabled={savingImages}
-                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white rounded-lg text-sm font-bold transition-colors"
-                    >
-                      💾 Salvar Imagens
-                    </button>
-                  )}
-                  {savedImages.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => { setSavedImages([]); setSuccess(""); }}
-                      className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-bold transition-colors"
-                    >
-                      🔄 Alterar
-                    </button>
-                  )}
                 </div>
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
                   {previews.map((preview, index) => (
-                    <div key={index} className={`relative group ${savedImages.length > 0 ? 'opacity-75' : ''}`}>
+                    <div key={index} className="relative group">
                       <img
                         src={preview}
                         alt={`Preview ${index + 1}`}
-                        className={`w-full h-24 object-cover rounded-lg border ${savedImages.length > 0 ? 'border-green-400' : 'border-gray-200'}`}
+                        className="w-full h-24 object-cover rounded-lg border border-gray-200"
                       />
                       <button
                         type="button"
