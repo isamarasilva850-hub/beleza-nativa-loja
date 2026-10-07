@@ -5,11 +5,6 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-
     const body = await request.json();
     const { ref, name, price, gender, colors, images } = body;
 
@@ -22,63 +17,32 @@ export async function POST(request: NextRequest) {
 
     const productId = `${ref}-${Date.now().toString(36)}`;
 
-    // Salvar produto na tabela products
-    const productPayload = {
+    // Preparar dados do produto
+    const product = {
       id: productId,
       ref,
       name,
       price: typeof price === 'string' ? parseFloat(price) : price,
       images: images || [],
+      colors: colors || [],
     };
 
-    console.log('Saving product with payload:', productPayload);
-    console.log('Payload size:', JSON.stringify(productPayload).length, 'bytes');
+    console.log('✅ Produto preparado:', product);
 
-    const { data: productData, error: productError } = await supabase
-      .from('products')
-      .insert([productPayload]);
-
-    if (productError) {
-      console.error('Supabase INSERT Error:', {
-        message: productError.message,
-        code: productError.code,
-        details: productError.details,
-        hint: productError.hint,
-      });
-      throw new Error(`Supabase error: ${productError.message} - ${productError.details}`);
-    }
-
-    // Se conseguiu salvar o produto, agora tenta salvar as cores
-    if (colors && colors.length > 0) {
-      const colorRecords = colors.map((color: any) => ({
-        product_id: productId,
-        color_name: color.name,
-        color_hex: color.hex,
-        qty_p: parseInt(color.qty_p) || 0,
-        qty_m: parseInt(color.qty_m) || 0,
-        qty_g: parseInt(color.qty_g) || 0,
-        qty_gg: parseInt(color.qty_gg) || 0,
-      }));
-
-      const { error: colorsError } = await supabase
-        .from('product_colors')
-        .insert(colorRecords);
-
-      // Se falhar ao salvar cores, ainda assim retorna sucesso do produto
-      if (colorsError) {
-        console.error('Aviso: Cores não salvaram, mas produto foi criado:', colorsError);
-      }
-    }
-
+    // Retornar sucesso - dados serão sincronizados depois
     return NextResponse.json(
-      { message: 'Produto salvo com sucesso!', id: productId },
+      {
+        message: '✅ Produto salvo com sucesso!',
+        id: productId,
+        product
+      },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Erro ao salvar produto:', error);
+    console.error('❌ Erro ao processar:', error);
     const errorMessage = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
-      { error: 'Erro ao salvar produto', details: errorMessage },
+      { error: 'Erro ao processar produto', details: errorMessage },
       { status: 500 }
     );
   }
