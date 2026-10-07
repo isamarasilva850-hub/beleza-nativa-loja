@@ -69,12 +69,14 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
   }, [slug]);
 
   useEffect(() => {
-    if (!product) return;
+    if (!product || !product.variants) return;
     const map: Record<string, number> = {};
     product.variants.forEach((v: any) => {
-      v.sizes.forEach((s: any) => {
-        map[`${v.color}-${s}`] = getStockQuantity(product.ref, v.color, s);
-      });
+      if (v.sizes) {
+        v.sizes.forEach((s: any) => {
+          map[`${v.color}-${s}`] = getStockQuantity(product.ref, v.color, s);
+        });
+      }
     });
     setStockMap(map);
 
