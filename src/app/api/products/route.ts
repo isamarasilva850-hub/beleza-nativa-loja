@@ -118,7 +118,33 @@ export async function GET() {
 
     console.log('Total products from Supabase:', allUploadedProducts.length);
 
-    const productsWithColors = allUploadedProducts;
+    // Buscar cores de product_colors para produtos que não têm no JSON
+    const productsWithColors = await Promise.all(
+      allUploadedProducts.map(async (product: any) => {
+        // Se já tem cores no JSON, usar essas
+        if (product.colors && product.colors.length > 0) {
+          return product;
+        }
+
+        // Senão, tentar buscar de product_colors (fallback)
+        const { data: colors } = await supabase
+          .from('product_colors')
+          .select('color_name, color_hex, qty_p, qty_m, qty_g, qty_gg')
+          .eq('product_id', product.id);
+
+        return {
+          ...product,
+          colors: colors?.map((c: any) => ({
+            color_name: c.color_name,
+            color_hex: c.color_hex,
+            qty_p: c.qty_p,
+            qty_m: c.qty_m,
+            qty_g: c.qty_g,
+            qty_gg: c.qty_gg,
+          })) || [],
+        };
+      })
+    );
 
     // Combina ambos
     const allProducts = [
