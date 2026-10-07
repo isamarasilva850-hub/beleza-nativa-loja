@@ -145,15 +145,6 @@ export default function ProductCard({ product }: ProductCardProps) {
         <p className="text-xs text-gray-600 mt-1 font-mono font-bold">
           REF {product.ref}
         </p>
-
-        {/* Add to Cart Button */}
-        <Link
-          href={`/produto/${product.slug}`}
-          onClick={(e) => e.stopPropagation()}
-          className="block mt-4 w-full py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary-dark transition-colors text-center"
-        >
-          🛍️ ADICIONAR À SACOLA
-        </Link>
       </div>
     </Link>
   );
