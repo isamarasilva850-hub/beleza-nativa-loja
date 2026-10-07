@@ -29,6 +29,8 @@ export default function PalmiraUploadPage() {
   const [loading, setLoading] = useState(false);
   const [deleteRef, setDeleteRef] = useState("");
   const [loadingDelete, setLoadingDelete] = useState(false);
+  const [foundProduct, setFoundProduct] = useState<any>(null);
+  const [loadingSearch, setLoadingSearch] = useState(false);
 
   const optimizeImage = (imgBase64: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -102,6 +104,33 @@ export default function PalmiraUploadPage() {
     );
   };
 
+  const handleSearchProduct = async () => {
+    setError("");
+    setSuccess("");
+    setLoadingSearch(true);
+
+    try {
+      if (!deleteRef.trim()) {
+        throw new Error("❌ Digite a REF do produto!");
+      }
+
+      const res = await fetch("/api/products");
+      const products = await res.json();
+      const product = products.find((p: any) => p.ref === deleteRef);
+
+      if (!product) {
+        throw new Error(`❌ Produto com REF "${deleteRef}" não encontrado`);
+      }
+
+      setFoundProduct(product);
+    } catch (err: any) {
+      setError(err.message);
+      setFoundProduct(null);
+    } finally {
+      setLoadingSearch(false);
+    }
+  };
+
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -130,6 +159,7 @@ export default function PalmiraUploadPage() {
 
       setSuccess(`🗑️ Produto "${deleteRef}" deletado com sucesso!`);
       setDeleteRef("");
+      setFoundProduct(null);
       setTimeout(() => setSuccess(""), 4000);
     } catch (err: any) {
       setError(err.message);
@@ -385,22 +415,51 @@ export default function PalmiraUploadPage() {
           {/* Seção de Deletar Produto */}
           <div className="border-t pt-8">
             <h3 className="text-lg font-bold text-red-600 mb-4">🗑️ Deletar Produto</h3>
-            <form onSubmit={handleDelete} className="flex gap-4 mb-6">
-              <input
-                type="text"
-                placeholder="Digite a REF do produto para deletar"
-                value={deleteRef}
-                onChange={(e) => setDeleteRef(e.target.value)}
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
-              />
-              <button
-                type="submit"
-                disabled={loadingDelete}
-                className="bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-lg transition-colors"
-              >
-                {loadingDelete ? "⏳ Deletando..." : "🗑️ DELETAR"}
-              </button>
-            </form>
+            <div className="mb-6">
+              <div className="flex gap-4 mb-4">
+                <input
+                  type="text"
+                  placeholder="Digite a REF do produto para deletar"
+                  value={deleteRef}
+                  onChange={(e) => setDeleteRef(e.target.value)}
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
+                />
+                <button
+                  type="button"
+                  onClick={handleSearchProduct}
+                  disabled={loadingSearch || !deleteRef.trim()}
+                  className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-lg transition-colors"
+                >
+                  {loadingSearch ? "🔍 Buscando..." : "🔍 BUSCAR"}
+                </button>
+              </div>
+
+              {foundProduct && (
+                <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mb-4">
+                  <p className="font-bold text-gray-800 mb-2">✅ Produto encontrado:</p>
+                  <div className="space-y-2 text-sm">
+                    <p><strong>Nome:</strong> {foundProduct.name}</p>
+                    <p><strong>REF:</strong> {foundProduct.ref}</p>
+                    <p><strong>Preço:</strong> R$ {foundProduct.price?.toFixed(2).replace(".", ",")}</p>
+                    {foundProduct.images && foundProduct.images.length > 0 && (
+                      <div>
+                        <strong>Imagem:</strong>
+                        <img src={foundProduct.images[0]} alt={foundProduct.name} className="mt-2 w-24 h-24 object-cover rounded" />
+                      </div>
+                    )}
+                  </div>
+                  <form onSubmit={handleDelete} className="mt-4">
+                    <button
+                      type="submit"
+                      disabled={loadingDelete}
+                      className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-lg transition-colors"
+                    >
+                      {loadingDelete ? "⏳ Deletando..." : "🗑️ DELETAR ESTE PRODUTO"}
+                    </button>
+                  </form>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Botão Submit */}
