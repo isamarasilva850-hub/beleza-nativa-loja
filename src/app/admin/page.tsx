@@ -465,7 +465,7 @@ export default function AdminDashboard() {
                     <td className="py-2 text-xs text-gray-700">R$ {(p.price * 2).toFixed(2).replace(".", ",")}</td>
                     <td className="py-2">
                       <div className="flex gap-0.5">
-                        {p.variants.map((v, i) => (
+                        {p.variants?.map((v, i) => (
                           <span key={i} className="w-3.5 h-3.5 rounded-full border border-gray-200" style={{ backgroundColor: v.colorHex }} title={v.color} />
                         ))}
                       </div>

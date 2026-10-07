@@ -243,8 +243,8 @@ export default function CRMMetodoBN() {
       }));
 
       // Evitar duplicatas
-      const leadsExistentes = new Set(leads.map((l) => l.telefone));
-      const novoLeads = leadsImportados.filter((l) => !leadsExistentes.has(l.telefone));
+      const leadsExistentes = new Set(leads.map((l: any) => l.telefone));
+      const novoLeads = leadsImportados.filter((l: any) => !leadsExistentes.has(l.telefone));
 
       if (novoLeads.length === 0) {
         alert("Todos os leads do site já estão no CRM!");

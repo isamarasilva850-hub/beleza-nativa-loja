@@ -280,7 +280,7 @@ export default function MontarPedidoPage() {
                   <label className="block text-sm font-bold text-gray-700 mb-2">📐 Tamanho</label>
                   <div className="flex flex-wrap gap-2">
                     {selectedProduct.variants
-                      .find((v) => v.color === selectedColor)
+                      ?.find((v) => v.color === selectedColor)
                       ?.sizes.map((size) => (
                         <button
                           key={size}
