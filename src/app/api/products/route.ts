@@ -22,39 +22,59 @@ export async function POST(request: NextRequest) {
 
     const productId = `${ref}-${Date.now().toString(36)}`;
 
-    // Salvar em uploaded_products
-    const { data, error } = await supabase
-      .from('uploaded_products')
+    // 1. Insert produto em products
+    const { data: productData, error: productError } = await supabase
+      .from('products')
       .insert({
         id: productId,
         ref,
         name,
         price: typeof price === 'string' ? parseFloat(price) : price,
-        color: colors?.[0]?.name || '',
-        colorHex: colors?.[0]?.hex || '#000000',
-        sizes: [],
-        quantity: 0,
-      });
+      })
+      .select()
+      .single();
 
-    if (error) {
-      console.error('❌ SUPABASE INSERT ERROR:', {
-        message: error.message,
-        code: error.code,
-        status: error.status,
-        details: error.details,
-        hint: error.hint,
+    if (productError) {
+      console.error('Supabase insert error (products):', {
+        message: productError.message,
+        code: productError.code,
+        details: productError.details,
       });
-      throw new Error(`Supabase: ${error.message} (${error.code})`);
+      throw new Error(`[${productError.code}] ${productError.message}${productError.details ? ': ' + productError.details : ''}`);
     }
 
-    return NextResponse.json(
-      { message: '✅ Produto salvo!', id: productId },
-      { status: 201 }
-    );
+    // 2. Insert cores em product_colors se houver
+    if (colors && colors.length > 0) {
+      const colorInserts = colors.map((color: any) => ({
+        product_id: productId,
+        color_name: color.name || '',
+        color_hex: color.hex || '#000000',
+        qty_p: parseInt(color.qty_p) || 0,
+        qty_m: parseInt(color.qty_m) || 0,
+        qty_g: parseInt(color.qty_g) || 0,
+        qty_gg: parseInt(color.qty_gg) || 0,
+      }));
+
+      const { error: colorError } = await supabase
+        .from('product_colors')
+        .insert(colorInserts);
+
+      if (colorError) {
+        console.error('Supabase insert error (product_colors):', {
+          message: colorError.message,
+          code: colorError.code,
+          details: colorError.details,
+        });
+        // Não falha se cores falharem, apenas loga
+      }
+    }
+
+    return NextResponse.json(productData, { status: 201 });
   } catch (error) {
-    console.error('Erro:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('POST /api/products error:', errorMessage);
     return NextResponse.json(
-      { error: 'Erro ao salvar', details: String(error) },
+      { error: 'Erro ao salvar produto', details: errorMessage },
       { status: 500 }
     );
   }
