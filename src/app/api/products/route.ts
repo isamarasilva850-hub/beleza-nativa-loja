@@ -10,6 +10,15 @@ export async function POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
+    // Debug: descobrir colunas da tabela
+    const { data: schemaInfo } = await supabase
+      .from('information_schema.columns')
+      .select('column_name')
+      .eq('table_name', 'product_images')
+      .limit(10);
+
+    console.log('🔍 [DEBUG] Colunas de product_images:', schemaInfo?.map(c => (c as any).column_name).join(', ') || 'não conseguiu');
+
     const body = await request.json();
     const { ref, name, price, gender, colors, images } = body;
 
@@ -81,6 +90,17 @@ export async function POST(request: NextRequest) {
     // 3. Insert imagens em product_images se houver
     if (images && images.length > 0) {
       console.log(`📸 [DEBUG] Iniciando upload de ${images.length} imagem(ns) para product_id: ${productId}`);
+
+      // Tentar descobrir o nome correto da coluna lendo uma linha vazia
+      const { data: existingImg } = await supabase
+        .from('product_images')
+        .select('*')
+        .limit(1);
+
+      if (existingImg && existingImg.length > 0) {
+        const cols = Object.keys(existingImg[0]);
+        console.log('🔍 [DEBUG] Colunas reais de product_images:', cols.join(', '));
+      }
 
       const imageInserts = images.map((image: string, index: number) => {
         const imgSize = Math.round(image.length / 1024); // KB
