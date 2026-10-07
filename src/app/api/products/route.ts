@@ -72,23 +72,31 @@ export async function POST(request: NextRequest) {
 
     // 3. Insert imagens em product_images se houver
     if (images && images.length > 0) {
-      const imageInserts = images.map((image: string, index: number) => ({
-        product_id: productId,
-        image_url: image,
-        order: index,
-      }));
+      console.log(`📸 [DEBUG] Iniciando upload de ${images.length} imagem(ns) para product_id: ${productId}`);
 
+      const imageInserts = images.map((image: string, index: number) => {
+        const imgSize = Math.round(image.length / 1024); // KB
+        console.log(`  📷 Imagem ${index + 1}: ${imgSize}KB`);
+        return {
+          product_id: productId,
+          image_url: image,
+          order_index: index,
+        };
+      });
+
+      console.log(`📤 Enviando ${imageInserts.length} imagens pro Supabase...`);
       const { error: imageError } = await supabase
         .from('product_images')
         .insert(imageInserts);
 
       if (imageError) {
-        console.error('Supabase insert error (product_images):', {
+        console.error('❌ Erro ao salvar imagens:', {
           message: imageError.message,
           code: imageError.code,
           details: imageError.details,
         });
-        // Não falha se imagens falharem, apenas loga
+      } else {
+        console.log(`✅ ${images.length} imagem(ns) salva(s) com sucesso!`);
       }
     }
 
