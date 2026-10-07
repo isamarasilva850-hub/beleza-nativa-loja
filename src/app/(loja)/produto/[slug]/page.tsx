@@ -267,7 +267,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
                     <div className="flex justify-between items-center pt-2 border-t border-green-200">
                       <span className="text-sm text-gray-600">Margem de lucro:</span>
                       <span className="text-lg font-bold text-green-600">
-                        {((((retailPrice - product.price) / retailPrice) * 100).toFixed(1)).replace(".", ",")}%
+                        {((((retailPrice - product.price) / product.price) * 100).toFixed(1)).replace(".", ",")}%
                       </span>
                     </div>
                   </div>
