@@ -73,16 +73,24 @@ export default function ProductCard({ product }: ProductCardProps) {
         </p>
 
         {/* Prices */}
-        <div className="mb-2 bg-gray-50 p-2 rounded-lg border border-gray-200">
-          <p className="text-primary-dark font-bold text-lg">
+        <div className="mb-2 bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-lg border-2 border-gray-200">
+          <p className="text-gray-600 font-semibold text-xs mb-1">Preço ao consumidor</p>
+          <p className="text-gray-800 font-bold text-base line-through">
             R$ {retailPrice.toFixed(2).replace(".", ",")}
           </p>
-          <p className="text-xs text-gray-600 font-semibold -mt-0.5">para uso próprio</p>
 
           {isReseller ? (
-            <p className="text-sm font-bold text-primary mt-1">
-              R$ {product.price.toFixed(2).replace(".", ",")} <span className="text-xs font-semibold text-gray-700">revenda</span>
-            </p>
+            <div className="mt-3 pt-3 border-t-2 border-green-200">
+              <div className="inline-block bg-gradient-to-r from-green-400 to-green-500 text-white px-2.5 py-1 rounded-full text-xs font-black mb-2">
+                💰 PREÇO REVENDA
+              </div>
+              <p className="text-green-600 font-black text-2xl">
+                R$ {product.price.toFixed(2).replace(".", ",")}
+              </p>
+              <p className="text-xs text-green-600 font-semibold">
+                ✓ Você economiza R$ {(retailPrice - product.price).toFixed(2).replace(".", ",")}
+              </p>
+            </div>
           ) : (
             <button
               onClick={(e) => {
@@ -90,9 +98,9 @@ export default function ProductCard({ product }: ProductCardProps) {
                 e.stopPropagation();
                 window.location.href = "/quero-comecar";
               }}
-              className="text-xs text-primary font-semibold hover:text-primary-dark mt-1 block bg-none border-none p-0 cursor-pointer underline"
+              className="text-xs text-primary font-semibold hover:text-primary-dark mt-2 block bg-none border-none p-0 cursor-pointer underline"
             >
-              Comece como revendedora para preço especial
+              → Comece como revendedora para preço especial
             </button>
           )}
         </div>
