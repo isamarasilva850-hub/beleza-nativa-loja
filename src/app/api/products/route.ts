@@ -5,6 +5,11 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
     const body = await request.json();
     const { ref, name, price, gender, colors, images } = body;
 
@@ -17,32 +22,31 @@ export async function POST(request: NextRequest) {
 
     const productId = `${ref}-${Date.now().toString(36)}`;
 
-    // Preparar dados do produto
-    const product = {
-      id: productId,
-      ref,
-      name,
-      price: typeof price === 'string' ? parseFloat(price) : price,
-      images: images || [],
-      colors: colors || [],
-    };
-
-    console.log('✅ Produto preparado:', product);
-
-    // Retornar sucesso - dados serão sincronizados depois
-    return NextResponse.json(
-      {
-        message: '✅ Produto salvo com sucesso!',
+    // Salvar em uploaded_products (tabela que funciona)
+    const { data, error } = await supabase
+      .from('uploaded_products')
+      .insert({
         id: productId,
-        product
-      },
+        ref,
+        name,
+        price: typeof price === 'string' ? parseFloat(price) : price,
+        images: images || [],
+        colors: colors || [],
+      });
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
+
+    return NextResponse.json(
+      { message: '✅ Produto salvo!', id: productId },
       { status: 201 }
     );
   } catch (error) {
-    console.error('❌ Erro ao processar:', error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Erro:', error);
     return NextResponse.json(
-      { error: 'Erro ao processar produto', details: errorMessage },
+      { error: 'Erro ao salvar', details: String(error) },
       { status: 500 }
     );
   }
