@@ -78,7 +78,7 @@ export default function AdminEstoque() {
 
   const fillAllProduct = (product: typeof products[0], qty: number) => {
     const newStock = [...stock];
-    product.variants.forEach((v) => {
+    product.variants?.forEach((v) => {
       v.sizes.forEach((size) => {
         const idx = newStock.findIndex((s) => s.ref === product.ref && s.color === v.color && s.size === size);
         if (idx >= 0) {
@@ -232,7 +232,7 @@ export default function AdminEstoque() {
 
       <div className="space-y-3">
         {filtered.map((p) => {
-          const allSizes = [...new Set(p.variants.flatMap((v) => v.sizes))];
+          const allSizes = [...new Set(p.variants?.flatMap((v) => v.sizes))];
           const productTotal = getProductTotal(p.ref);
           const isExpanded = expandedProducts.has(p.id);
           const qfKey = `${p.ref}`;
@@ -255,7 +255,7 @@ export default function AdminEstoque() {
                   <span className="text-xs text-gray-400 hidden sm:inline">{p.category}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400">{p.variants.length} cores</span>
+                  <span className="text-xs text-gray-400">{p.variants?.length} cores</span>
                   <span
                     className={`text-xs font-bold px-2.5 py-1 rounded-full ${
                       productTotal === 0
@@ -312,7 +312,7 @@ export default function AdminEstoque() {
                         </tr>
                       </thead>
                       <tbody>
-                        {p.variants.map((v, vi) => {
+                        {p.variants?.map((v, vi) => {
                           const variantTotal = v.sizes.reduce((sum, size) => sum + getQuantity(p.ref, v.color, size), 0);
                           const vfKey = `${p.ref}-${v.color}`;
                           return (

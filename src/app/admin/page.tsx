@@ -171,7 +171,7 @@ export default function AdminDashboard() {
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="dia" stroke="#999" style={{ fontSize: "12px" }} />
               <YAxis stroke="#999" style={{ fontSize: "12px" }} />
-              <Tooltip formatter={(value) => `R$ ${value.toFixed(2).replace(".", ",")}`} />
+              <Tooltip formatter={(value: any) => `R$ ${(typeof value === "number" ? value : parseFloat(value || "0")).toFixed(2).replace(".", ",")}`} />
               <Line type="monotone" dataKey="valor" stroke="#7BC9C2" strokeWidth={2} dot={{ fill: "#7BC9C2", r: 5 }} />
             </LineChart>
           </ResponsiveContainer>

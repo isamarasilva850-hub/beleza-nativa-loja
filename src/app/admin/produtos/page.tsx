@@ -68,7 +68,7 @@ export default function AdminProdutos() {
             </thead>
             <tbody>
               {filtered.map((p) => {
-                const allSizes = [...new Set(p.variants.flatMap((v) => v.sizes))];
+                const allSizes = [...new Set(p.variants?.flatMap((v) => v.sizes))];
                 return (
                   <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 font-mono text-xs font-semibold text-[#7BC9C2]">{p.ref}</td>
@@ -83,7 +83,7 @@ export default function AdminProdutos() {
                     <td className="px-4 py-3 text-xs font-medium text-gray-700">R$ {(p.price * 2).toFixed(2).replace(".", ",")}</td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1">
-                        {p.variants.map((v, i) => (
+                        {p.variants?.map((v, i) => (
                           <span key={i} className="w-4 h-4 rounded-full border border-gray-200" style={{ backgroundColor: v.colorHex }} title={v.color} />
                         ))}
                       </div>

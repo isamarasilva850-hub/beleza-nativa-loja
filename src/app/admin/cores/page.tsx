@@ -70,12 +70,12 @@ export default function CoresPage() {
                 <p className="text-xs text-gray-500">REF {product.ref}</p>
               </div>
               <span className="px-2 py-1 bg-gray-100 rounded text-xs font-semibold text-gray-600">
-                {product.variants.length} cores
+                {product.variants?.length} cores
               </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {product.variants.map((variant, idx) => {
+              {product.variants?.map((variant, idx) => {
                 const key = `${product.ref}-${variant.color}`;
                 const isEditing = editingKey === key;
                 const displayColor = getDisplayColor(product.ref, variant.color);

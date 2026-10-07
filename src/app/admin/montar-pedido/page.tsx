@@ -253,7 +253,7 @@ export default function MontarPedidoPage() {
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">🎨 Cor</label>
                   <div className="flex flex-wrap gap-2">
-                    {selectedProduct.variants.map((variant) => (
+                    {selectedProduct.variants?.map((variant) => (
                       <button
                         key={variant.color}
                         onClick={() => {

@@ -100,7 +100,7 @@ export default function Etiquetas() {
                 )}
                 {etiquetaType === "completa" && (
                   <p className="text-[9px] text-gray-400 mt-0.5">
-                    {[...new Set(p.variants.flatMap((v) => v.sizes))].join(" / ")}
+                    {[...new Set(p.variants?.flatMap((v) => v.sizes))].join(" / ")}
                   </p>
                 )}
               </div>

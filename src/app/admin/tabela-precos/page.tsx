@@ -74,8 +74,8 @@ export default function TabelaPrecos() {
                   <td className="px-3 py-2 text-xs text-gray-500">{p.category}</td>
                   {showWholesale && <td className="px-3 py-2 text-right font-bold text-xs text-gray-700">R$ {p.price.toFixed(2).replace(".", ",")}</td>}
                   <td className="px-3 py-2 text-right font-bold text-xs text-[#7BC9C2]">R$ {(p.price * 2).toFixed(2).replace(".", ",")}</td>
-                  <td className="px-3 py-2 text-xs text-gray-500">{p.variants.map((v) => v.color).join(", ")}</td>
-                  <td className="px-3 py-2 text-xs text-gray-500">{[...new Set(p.variants.flatMap((v) => v.sizes))].join(", ")}</td>
+                  <td className="px-3 py-2 text-xs text-gray-500">{p.variants?.map((v) => v.color).join(", ")}</td>
+                  <td className="px-3 py-2 text-xs text-gray-500">{[...new Set(p.variants?.flatMap((v) => v.sizes))].join(", ")}</td>
                 </tr>
               ))}
             </tbody>
