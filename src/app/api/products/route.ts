@@ -37,8 +37,14 @@ export async function POST(request: NextRequest) {
       });
 
     if (error) {
-      console.error('Supabase error:', error);
-      throw error;
+      console.error('❌ SUPABASE INSERT ERROR:', {
+        message: error.message,
+        code: error.code,
+        status: error.status,
+        details: error.details,
+        hint: error.hint,
+      });
+      throw new Error(`Supabase: ${error.message} (${error.code})`);
     }
 
     return NextResponse.json(
