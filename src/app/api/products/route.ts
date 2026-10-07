@@ -13,6 +13,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { ref, name, price, gender, colors, images } = body;
 
+    console.log('🔍 [POST /api/products] Recebido:');
+    console.log(`  ref: ${ref}`);
+    console.log(`  name: ${name}`);
+    console.log(`  images: ${images?.length || 0} imagens`);
+    if (images?.length > 0) {
+      console.log(`    Primeira imagem: ${images[0].substring(0, 50)}...`);
+    }
+
     if (!ref || !name || !price) {
       return NextResponse.json(
         { error: 'Ref, nome e preço são obrigatórios' },
