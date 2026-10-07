@@ -215,43 +215,43 @@ export default function Home() {
       </section>
 
       {/* 2. Benefits Bar */}
-      <section className="bg-primary text-white">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="flex items-center gap-3 justify-center">
-              <svg className="w-7 h-7 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+      <section className="bg-gradient-to-r from-primary via-primary to-primary text-white">
+        <div className="max-w-7xl mx-auto px-4 py-6 md:py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            <div className="flex items-center gap-4 justify-center">
+              <svg className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
               <div>
-                <p className="text-xs md:text-sm font-bold tracking-wide uppercase">Cadastre-se</p>
-                <p className="text-[10px] md:text-[11px] opacity-80 uppercase">Seja uma revendedora</p>
+                <p className="text-sm md:text-base font-black tracking-wide uppercase">Cadastre-se</p>
+                <p className="text-xs md:text-sm opacity-90 uppercase font-semibold">Seja uma revendedora</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 justify-center">
-              <svg className="w-7 h-7 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center gap-4 justify-center">
+              <svg className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
               </svg>
               <div>
-                <p className="text-xs md:text-sm font-bold tracking-wide uppercase">Pra você</p>
-                <p className="text-[10px] md:text-[11px] opacity-80 uppercase">Peças que são tendências!</p>
+                <p className="text-sm md:text-base font-black tracking-wide uppercase">Pra você</p>
+                <p className="text-xs md:text-sm opacity-90 uppercase font-semibold">Peças que são tendências!</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 justify-center">
-              <svg className="w-7 h-7 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+            <div className="flex items-center gap-4 justify-center">
+              <svg className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
-                <p className="text-xs md:text-sm font-bold tracking-wide uppercase">Pronta-entrega</p>
-                <p className="text-[10px] md:text-[11px] opacity-80 uppercase">Da fábrica para sua loja</p>
+                <p className="text-sm md:text-base font-black tracking-wide uppercase">Pronta-entrega</p>
+                <p className="text-xs md:text-sm opacity-90 uppercase font-semibold">Da fábrica para sua loja</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 justify-center">
-              <svg className="w-7 h-7 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+            <div className="flex items-center gap-4 justify-center">
+              <svg className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
               </svg>
               <div>
-                <p className="text-xs md:text-sm font-bold tracking-wide uppercase">Frete grátis</p>
-                <p className="text-[10px] md:text-[11px] opacity-80 uppercase">Consulte as nossas condições</p>
+                <p className="text-sm md:text-base font-black tracking-wide uppercase">Frete grátis</p>
+                <p className="text-xs md:text-sm opacity-90 uppercase font-semibold">Consulte as nossas condições</p>
               </div>
             </div>
           </div>
@@ -259,10 +259,10 @@ export default function Home() {
       </section>
 
       {/* 3. Secondary Banners */}
-      <section className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <section className="max-w-7xl mx-auto px-4 py-8 md:py-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link href="/cadastro" className="block">
-            <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: "460/242" }}>
+            <div className="relative rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all" style={{ aspectRatio: "460/242" }}>
               <Image
                 src="/banners/banner-secundario-1.jpg"
                 alt="Cadastre-se e aproveite!"
@@ -273,7 +273,7 @@ export default function Home() {
             </div>
           </Link>
           <Link href="/" className="block">
-            <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: "460/242" }}>
+            <div className="relative rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all" style={{ aspectRatio: "460/242" }}>
               <Image
                 src="/banners/banner-secundario-2.jpg"
                 alt="Atacado para todo Brasil"
@@ -329,7 +329,7 @@ export default function Home() {
       {/* 5. Products */}
       <section className="max-w-7xl mx-auto px-4 py-8 pb-12">
         {/* Search Bar */}
-        <div className="mb-6">
+        <div className="mb-8">
           <div className="relative">
             <input
               type="text"
@@ -339,15 +339,15 @@ export default function Home() {
                 setSearchInput(e.target.value);
                 setFilters({ ...filters, searchQuery: e.target.value || null });
               }}
-              className="w-full px-4 py-3 rounded-lg bg-gray-100 border-2 border-gray-200 focus:border-primary focus:bg-white outline-none transition-colors"
+              className="w-full px-6 py-4 rounded-lg bg-gray-50 border-3 border-gray-300 focus:border-primary focus:bg-white outline-none transition-colors text-base md:text-lg font-semibold"
             />
           </div>
         </div>
 
         {/* Controls Bar */}
-        <div className="flex flex-col md:flex-row gap-3 mb-6 items-start md:items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-base md:text-lg font-bold text-gray-800">
+        <div className="flex flex-col md:flex-row gap-4 mb-8 items-start md:items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-lg md:text-2xl font-black text-primary bg-primary/10 px-4 py-2 rounded-lg">
               {filteredProducts.length} {filteredProducts.length === 1 ? "produto" : "produtos"} encontrado{filteredProducts.length !== 1 ? "s" : ""}
             </span>
           </div>
