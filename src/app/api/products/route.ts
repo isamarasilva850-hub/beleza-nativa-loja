@@ -92,21 +92,20 @@ export async function POST(request: NextRequest) {
       console.log(`📸 [DEBUG] Iniciando upload de ${images.length} imagem(ns) para product_id: ${productId}`);
 
       // Tentar com diferentes nomes de coluna até encontrar o correto
-      const colNames = ['url', 'image', 'image_base64', 'data', 'image_url', 'image_data'];
+      const colNames = ['url', 'image_base64', 'image', 'data', 'image_url', 'image_data'];
       let successCol = '';
       let lastError: any = null;
 
       for (const colName of colNames) {
-        const imageInserts = images.map((image: string, index: number) => {
+        const imageInserts = images.map((image: string) => {
           const insert: any = {
             product_id: productId,
-            order_index: index,
           };
           insert[colName] = image;
           return insert;
         });
 
-        console.log(`🔄 Tentando com coluna: "${colName}"...`);
+        console.log(`🔄 Tentando com coluna: "${colName}" (SEM order_index)...`);
         const { error } = await supabase
           .from('product_images')
           .insert(imageInserts);
@@ -122,7 +121,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (successCol) {
-        console.log(`✅ ${images.length} imagem(ns) salva(s) com coluna: ${successCol}!`);
+        console.log(`✅ ${images.length} imagem(ns) salva(s) com coluna: "${successCol}"!`);
       } else if (lastError) {
         console.error('❌ Nenhuma coluna funcionou. Detalhes:', lastError.message);
       }
@@ -207,13 +206,14 @@ export async function GET() {
         // Buscar imagens 🖼️
         const { data: images } = await supabase
           .from('product_images')
-          .select('image_data, order_index')
-          .eq('product_id', product.id)
-          .order('order_index', { ascending: true });
+          .select('url, image_base64')
+          .eq('product_id', product.id);
 
+        // Tentar url primeiro, se não houver tenta image_base64
+        let imageList = images?.map((img: any) => img.url || img.image_base64).filter(Boolean) || product.images || [];
         return {
           ...product,
-          images: images?.map((img: any) => img.image_data) || product.images || [],
+          images: imageList,
           colors: colors?.map((c: any) => ({
             color_name: c.color_name,
             color_hex: c.color_hex,
