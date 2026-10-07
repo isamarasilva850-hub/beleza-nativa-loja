@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
         console.log(`  📷 Imagem ${index + 1}: ${imgSize}KB`);
         return {
           product_id: productId,
-          image_url: image,
+          image_data: image,
           order_index: index,
         };
       });
@@ -187,13 +187,13 @@ export async function GET() {
         // Buscar imagens 🖼️
         const { data: images } = await supabase
           .from('product_images')
-          .select('image_url, order_index')
+          .select('image_data, order_index')
           .eq('product_id', product.id)
           .order('order_index', { ascending: true });
 
         return {
           ...product,
-          images: images?.map((img: any) => img.image_url) || product.images || [],
+          images: images?.map((img: any) => img.image_data) || product.images || [],
           colors: colors?.map((c: any) => ({
             color_name: c.color_name,
             color_hex: c.color_hex,
