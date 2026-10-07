@@ -88,9 +88,11 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Salvar imagens base64 diretamente na tabela
+    const debugLogs: string[] = [];
     if (images && images.length > 0) {
-      console.log(`📸 [DEBUG] Salvando ${images.length} imagem(ns) base64 para product_id: ${productId}`);
-      console.log(`📸 [DEBUG] Imagens recebidas:`, images.map((img: string, i: number) => ({ index: i, length: img.length, preview: img.substring(0, 50) })));
+      const msg1 = `📸 Salvando ${images.length} imagem(ns) base64`;
+      console.log(msg1);
+      debugLogs.push(msg1);
 
       for (let i = 0; i < images.length; i++) {
         try {
@@ -100,7 +102,9 @@ export async function POST(request: NextRequest) {
             image_base64: images[i],
           };
 
-          console.log(`📸 [DEBUG] Tentando salvar imagem ${i + 1}:`, { id: imageData.id, imageLength: imageData.image_base64.length });
+          const msg2 = `📸 Tentando salvar imagem ${i + 1}: ${imageData.image_base64.length} bytes`;
+          console.log(msg2);
+          debugLogs.push(msg2);
 
           const { data: insertResult, error: dbError } = await supabase
             .from('product_images')
@@ -108,24 +112,28 @@ export async function POST(request: NextRequest) {
             .select();
 
           if (dbError) {
-            console.error(`❌ ERRO Supabase ao salvar imagem ${i + 1}:`, {
-              code: dbError.code,
-              message: dbError.message,
-              details: dbError.details,
-            });
+            const errMsg = `❌ ERRO ao salvar imagem ${i + 1}: [${dbError.code}] ${dbError.message} ${dbError.details || ''}`.trim();
+            console.error(errMsg);
+            debugLogs.push(errMsg);
           } else {
             const sizeKB = Math.round(images[i].length / 1024);
-            console.log(`✅ Imagem ${i + 1} salva com sucesso (${sizeKB}KB base64)`, insertResult);
+            const successMsg = `✅ Imagem ${i + 1} salva: ${sizeKB}KB`;
+            console.log(successMsg);
+            debugLogs.push(successMsg);
           }
         } catch (err) {
-          console.error(`❌ ERRO ao processar imagem ${i + 1}:`, err);
+          const errMsg = `❌ ERRO: ${err instanceof Error ? err.message : String(err)}`;
+          console.error(errMsg);
+          debugLogs.push(errMsg);
         }
       }
     } else {
-      console.log(`⚠️ [DEBUG] Nenhuma imagem recebida. images:`, images);
+      const warnMsg = `⚠️ Nenhuma imagem recebida`;
+      console.log(warnMsg);
+      debugLogs.push(warnMsg);
     }
 
-    return NextResponse.json(productData, { status: 201 });
+    return NextResponse.json({ ...productData, debug_image_logs: debugLogs }, { status: 201 });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('POST /api/products error:', errorMessage);
