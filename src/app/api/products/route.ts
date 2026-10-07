@@ -94,15 +94,25 @@ export async function GET() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    const { data: uploadedProducts, error: supabaseError } = await supabase
+    // Buscar de AMBAS as tabelas (produtos novos e antigos)
+    const { data: newProducts, error: newError } = await supabase
       .from('products')
       .select('id, ref, name, price, images');
 
-    if (supabaseError) {
-      console.error('Supabase error:', supabaseError);
-    } else {
-      console.log('Uploaded products from Supabase:', uploadedProducts?.length);
+    const { data: oldProducts, error: oldError } = await supabase
+      .from('uploaded_products')
+      .select('id, ref, name, price, images');
+
+    if (newError) {
+      console.error('Supabase error (products):', newError);
     }
+    if (oldError) {
+      console.error('Supabase error (uploaded_products):', oldError);
+    }
+
+    // Combinar ambas as listas
+    const uploadedProducts = [...(newProducts || []), ...(oldProducts || [])];
+    console.log('Total products from Supabase:', uploadedProducts.length);
 
     // Buscar cores para cada produto uploadado
     const productsWithColors = await Promise.all(
