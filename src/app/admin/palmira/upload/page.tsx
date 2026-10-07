@@ -34,6 +34,9 @@ export default function PalmiraUploadPage() {
   const [editMode, setEditMode] = useState(false);
   const [loadingSearchExisting, setLoadingSearchExisting] = useState(false);
   const [activeTab, setActiveTab] = useState("criar");
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loadingProducts, setLoadingProducts] = useState(false);
 
   const optimizeImage = (imgBase64: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -131,6 +134,19 @@ export default function PalmiraUploadPage() {
       setFoundProduct(null);
     } finally {
       setLoadingSearch(false);
+    }
+  };
+
+  const loadAllProducts = async () => {
+    setLoadingProducts(true);
+    try {
+      const res = await fetch("/api/products");
+      const products = await res.json();
+      setAllProducts(products);
+    } catch (err) {
+      setError("❌ Erro ao carregar produtos");
+    } finally {
+      setLoadingProducts(false);
     }
   };
 
@@ -296,6 +312,20 @@ export default function PalmiraUploadPage() {
         <div className="flex gap-2 mb-8 flex-wrap">
           <button
             type="button"
+            onClick={() => {
+              setActiveTab("listar");
+              loadAllProducts();
+            }}
+            className={`px-6 py-3 rounded-lg font-bold transition-all ${
+              activeTab === "listar"
+                ? "bg-green-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            📋 Meus Produtos
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab("criar")}
             className={`px-6 py-3 rounded-lg font-bold transition-all ${
               activeTab === "criar"
@@ -341,6 +371,112 @@ export default function PalmiraUploadPage() {
         </div>
 
         <div className="space-y-8 bg-white rounded-xl shadow-sm p-8">
+          {/* TAB: Listar Produtos */}
+          {activeTab === "listar" && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-lg font-bold text-gray-800 mb-4">📋 Meus Produtos</h2>
+                <input
+                  type="text"
+                  placeholder="🔍 Buscar por REF, nome ou categoria..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 mb-4"
+                />
+              </div>
+
+              {loadingProducts ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">⏳ Carregando produtos...</p>
+                </div>
+              ) : allProducts.length === 0 ? (
+                <div className="text-center py-8 bg-gray-50 rounded-lg">
+                  <p className="text-gray-500">📭 Nenhum produto encontrado</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-100 border-b-2 border-gray-300">
+                      <tr>
+                        <th className="px-4 py-3 text-left font-bold text-gray-800">REF</th>
+                        <th className="px-4 py-3 text-left font-bold text-gray-800">Nome</th>
+                        <th className="px-4 py-3 text-left font-bold text-gray-800">Preço</th>
+                        <th className="px-4 py-3 text-left font-bold text-gray-800">Cores</th>
+                        <th className="px-4 py-3 text-left font-bold text-gray-800">Fotos</th>
+                        <th className="px-4 py-3 text-left font-bold text-gray-800">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {allProducts
+                        .filter(
+                          (p) =>
+                            p.ref?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            p.category?.toLowerCase().includes(searchQuery.toLowerCase())
+                        )
+                        .map((product) => (
+                          <tr key={product.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 font-mono font-bold text-gray-900">{product.ref}</td>
+                            <td className="px-4 py-3 text-gray-700">{product.name}</td>
+                            <td className="px-4 py-3 font-bold text-green-600">R$ {product.price?.toFixed(2).replace(".", ",")}</td>
+                            <td className="px-4 py-3 text-center">
+                              <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-bold">
+                                {product.variants?.length || 0}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span className="inline-block bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-bold">
+                                {product.images?.length || 0}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setActiveTab("editar");
+                                    setFormData({
+                                      ref: product.ref,
+                                      name: product.name,
+                                      price: product.price?.toString() || "",
+                                      gender: product.gender || "Feminino",
+                                    });
+                                    setEditMode(true);
+                                    setSuccess(`✅ Produto "${product.name}" carregado! Adicione mais fotos/cores.`);
+                                  }}
+                                  className="text-xs bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded font-bold"
+                                >
+                                  ✏️
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setDeleteRef(product.ref);
+                                    setActiveTab("deletar");
+                                    handleSearchProduct();
+                                  }}
+                                  className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded font-bold"
+                                >
+                                  🗑️
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              <div className="text-xs text-gray-500 bg-blue-50 p-3 rounded-lg">
+                💡 Total: <strong>{allProducts.length} produtos</strong> | Mostrando: <strong>{allProducts.filter((p) =>
+                  p.ref?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  p.name?.toLowerCase().includes(searchQuery.toLowerCase())
+                ).length}</strong>
+              </div>
+            </div>
+          )}
+
           {/* TAB: Criar Produto */}
           {activeTab === "criar" && (
             <form onSubmit={handleSubmit} className="space-y-8">
