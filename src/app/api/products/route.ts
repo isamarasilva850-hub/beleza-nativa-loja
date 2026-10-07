@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
         ref,
         name,
         price: typeof price === 'string' ? parseFloat(price) : price,
+        gender: gender || 'Feminino',
       })
       .select()
       .single();
@@ -66,6 +67,28 @@ export async function POST(request: NextRequest) {
           details: colorError.details,
         });
         // Não falha se cores falharem, apenas loga
+      }
+    }
+
+    // 3. Insert imagens em product_images se houver
+    if (images && images.length > 0) {
+      const imageInserts = images.map((image: string, index: number) => ({
+        product_id: productId,
+        image_url: image,
+        order: index,
+      }));
+
+      const { error: imageError } = await supabase
+        .from('product_images')
+        .insert(imageInserts);
+
+      if (imageError) {
+        console.error('Supabase insert error (product_images):', {
+          message: imageError.message,
+          code: imageError.code,
+          details: imageError.details,
+        });
+        // Não falha se imagens falharem, apenas loga
       }
     }
 
