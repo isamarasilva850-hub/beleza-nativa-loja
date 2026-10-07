@@ -40,13 +40,23 @@ export default function ProductCard({ product }: ProductCardProps) {
     >
       <div className="aspect-[3/4] bg-gray-100 relative overflow-hidden">
         {hasImage && product.images ? (
-          <Image
-            src={product.images[0]}
-            alt={`${product.ref} - ${product.name}`}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 768px) 50vw, 33vw"
-          />
+          product.images[0].startsWith('data:') ? (
+            // Renderizar base64 com tag img normal
+            <img
+              src={product.images[0]}
+              alt={`${product.ref} - ${product.name}`}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          ) : (
+            // Renderizar URL com Next.js Image otimizado
+            <Image
+              src={product.images[0]}
+              alt={`${product.ref} - ${product.name}`}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 768px) 50vw, 33vw"
+            />
+          )
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-gray-300">
             <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
