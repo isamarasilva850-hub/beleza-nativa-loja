@@ -78,7 +78,7 @@ export async function GET() {
 
     const { data: uploadedProducts, error: supabaseError } = await supabase
       .from('products')
-      .select('id, ref, name, price');
+      .select('id, ref, name, price, images');
 
     if (supabaseError) {
       console.error('Supabase error:', supabaseError);
