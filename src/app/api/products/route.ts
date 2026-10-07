@@ -90,27 +90,39 @@ export async function POST(request: NextRequest) {
     // 3. Salvar imagens base64 diretamente na tabela
     if (images && images.length > 0) {
       console.log(`📸 [DEBUG] Salvando ${images.length} imagem(ns) base64 para product_id: ${productId}`);
+      console.log(`📸 [DEBUG] Imagens recebidas:`, images.map((img: string, i: number) => ({ index: i, length: img.length, preview: img.substring(0, 50) })));
 
       for (let i = 0; i < images.length; i++) {
         try {
-          const { error: dbError } = await supabase
+          const imageData = {
+            id: `${productId}-img-${i}`,
+            product_id: productId,
+            image_base64: images[i],
+          };
+
+          console.log(`📸 [DEBUG] Tentando salvar imagem ${i + 1}:`, { id: imageData.id, imageLength: imageData.image_base64.length });
+
+          const { data: insertResult, error: dbError } = await supabase
             .from('product_images')
-            .insert({
-              id: `${productId}-img-${i}`,
-              product_id: productId,
-              image_base64: images[i],
-            });
+            .insert([imageData])
+            .select();
 
           if (dbError) {
-            console.error(`❌ Erro ao salvar imagem ${i + 1}:`, dbError.message);
+            console.error(`❌ ERRO Supabase ao salvar imagem ${i + 1}:`, {
+              code: dbError.code,
+              message: dbError.message,
+              details: dbError.details,
+            });
           } else {
             const sizeKB = Math.round(images[i].length / 1024);
-            console.log(`✅ Imagem ${i + 1} salva (${sizeKB}KB base64)`);
+            console.log(`✅ Imagem ${i + 1} salva com sucesso (${sizeKB}KB base64)`, insertResult);
           }
         } catch (err) {
-          console.error(`❌ Erro ao processar imagem ${i + 1}:`, err);
+          console.error(`❌ ERRO ao processar imagem ${i + 1}:`, err);
         }
       }
+    } else {
+      console.log(`⚠️ [DEBUG] Nenhuma imagem recebida. images:`, images);
     }
 
     return NextResponse.json(productData, { status: 201 });
