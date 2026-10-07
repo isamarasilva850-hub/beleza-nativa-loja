@@ -389,7 +389,10 @@ export default function PalmiraUploadPage() {
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab("reordenar")}
+            onClick={() => {
+              setActiveTab("reordenar");
+              loadAllProducts();
+            }}
             className={`px-6 py-3 rounded-lg font-bold transition-all ${
               activeTab === "reordenar"
                 ? "bg-indigo-500 text-white"
@@ -554,9 +557,19 @@ export default function PalmiraUploadPage() {
           {/* TAB: Reordenar Produtos */}
           {activeTab === "reordenar" && (
             <div className="space-y-6">
-              <div>
-                <h2 className="text-lg font-bold text-gray-800 mb-2">🔄 Reordenar Produtos na Loja</h2>
-                <p className="text-sm text-gray-600 mb-4">Arraste os produtos para mudar a ordem ou use os botões ⬆️ ⬇️</p>
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-800 mb-2">🔄 Reordenar Produtos na Loja</h2>
+                  <p className="text-sm text-gray-600 mb-4">Arraste os produtos para mudar a ordem ou use os botões ⬆️ ⬇️</p>
+                </div>
+                <a
+                  href="/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-4 py-2 rounded-lg font-bold text-sm transition-colors whitespace-nowrap"
+                >
+                  👀 Ver Loja
+                </a>
               </div>
 
               {loadingProducts ? (
