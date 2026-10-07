@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { supabase, Partner, OrderRecord, PurchasedProduct, CartItem } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
+
+type Partner = any;
+type OrderRecord = any;
+type PurchasedProduct = any;
+type CartItem = any;
 
 // ============ PARTNERS HOOK ============
 export function usePartners() {
