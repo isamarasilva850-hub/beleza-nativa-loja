@@ -22,17 +22,7 @@ export async function POST(request: NextRequest) {
 
     const productId = `${ref}-${Date.now().toString(36)}`;
 
-    // Preparar cores para salvar junto com o produto
-    const colorRecords = (colors || []).map((color: any) => ({
-      color_name: color.name,
-      color_hex: color.hex,
-      qty_p: parseInt(color.qty_p) || 0,
-      qty_m: parseInt(color.qty_m) || 0,
-      qty_g: parseInt(color.qty_g) || 0,
-      qty_gg: parseInt(color.qty_gg) || 0,
-    }));
-
-    // Salvar produto na tabela products (com cores embutidas)
+    // Salvar produto na tabela products (apenas o básico por enquanto)
     const { data: productData, error: productError } = await supabase
       .from('products')
       .insert({
@@ -41,7 +31,6 @@ export async function POST(request: NextRequest) {
         name,
         price: typeof price === 'string' ? parseFloat(price) : price,
         images: images || [],
-        colors: colorRecords,
       })
       .select()
       .single();
@@ -49,6 +38,28 @@ export async function POST(request: NextRequest) {
     if (productError) {
       console.error('Erro ao salvar produto:', productError);
       throw productError;
+    }
+
+    // Se conseguiu salvar o produto, agora tenta salvar as cores
+    if (colors && colors.length > 0) {
+      const colorRecords = colors.map((color: any) => ({
+        product_id: productId,
+        color_name: color.name,
+        color_hex: color.hex,
+        qty_p: parseInt(color.qty_p) || 0,
+        qty_m: parseInt(color.qty_m) || 0,
+        qty_g: parseInt(color.qty_g) || 0,
+        qty_gg: parseInt(color.qty_gg) || 0,
+      }));
+
+      const { error: colorsError } = await supabase
+        .from('product_colors')
+        .insert(colorRecords);
+
+      // Se falhar ao salvar cores, ainda assim retorna sucesso do produto
+      if (colorsError) {
+        console.error('Aviso: Cores não salvaram, mas produto foi criado:', colorsError);
+      }
     }
 
     return NextResponse.json(productData, { status: 201 });
