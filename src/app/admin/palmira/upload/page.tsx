@@ -340,9 +340,10 @@ export default function PalmiraUploadPage() {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8 bg-white rounded-xl shadow-sm p-8">
+        <div className="space-y-8 bg-white rounded-xl shadow-sm p-8">
           {/* TAB: Criar Produto */}
           {activeTab === "criar" && (
+            <form onSubmit={handleSubmit} className="space-y-8">
           {/* Dados do Produto */}
           <div>
             <h2 className="text-lg font-bold text-gray-800 mb-4">📋 Dados do Produto</h2>
@@ -516,11 +517,301 @@ export default function PalmiraUploadPage() {
           {success && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
           {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
 
-          {/* Seção de Deletar Produto */}
-          <div className="border-t pt-8">
-            <h3 className="text-lg font-bold text-red-600 mb-4">🗑️ Deletar Produto</h3>
-            <div className="mb-6">
-              <div className="flex gap-4 mb-4">
+          {/* Botão Submit */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#7BC9C2] hover:bg-[#5fb3ac] disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-colors"
+          >
+            {loading ? "⏳ Salvando..." : "✅ SALVAR PRODUTO"}
+          </button>
+            </form>
+          )}
+
+          {/* TAB: Editar Produto */}
+          {activeTab === "editar" && (
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-lg font-bold text-gray-800 mb-4">📋 Buscar Produto Existente</h2>
+                <div className="flex gap-2 mb-4">
+                  <input
+                    type="text"
+                    placeholder="Digite a REF do produto (ex: REF001)"
+                    value={formData.ref}
+                    onChange={(e) => setFormData({ ...formData, ref: e.target.value })}
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSearchExistingProduct}
+                    disabled={loadingSearchExisting || !formData.ref.trim()}
+                    className="bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-lg transition-colors whitespace-nowrap"
+                  >
+                    {loadingSearchExisting ? "🔍 Buscando..." : "🔍 BUSCAR"}
+                  </button>
+                </div>
+
+                {editMode && (
+                  <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded mb-6">
+                    <p className="text-sm text-green-700 font-semibold">✅ Produto carregado! Agora você pode:</p>
+                    <ul className="text-sm text-green-700 mt-2 space-y-1 ml-4">
+                      <li>✓ Adicionar mais cores</li>
+                      <li>✓ Adicionar mais fotos</li>
+                      <li>✓ Editar preço</li>
+                    </ul>
+                  </div>
+                )}
+
+                {editMode && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="text-xs font-bold text-gray-700 mb-1">Nome</p>
+                        <p className="text-lg font-bold text-gray-900">{formData.name}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-gray-700 mb-1">Preço</p>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={formData.price}
+                          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                        />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-gray-700 mb-1">Gênero</p>
+                        <select
+                          value={formData.gender}
+                          onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                        >
+                          <option value="Feminino">👧 Feminino</option>
+                          <option value="Masculino">👨 Masculino</option>
+                          <option value="Infantil">👶 Infantil</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Adicionar Cores */}
+                    <div className="mb-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-bold text-gray-800">🎨 Cores e Estoque</h3>
+                        <button
+                          type="button"
+                          onClick={addColor}
+                          className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition-colors"
+                        >
+                          + Cor
+                        </button>
+                      </div>
+
+                      {colors.length === 0 ? (
+                        <p className="text-gray-500 text-sm">Clique em "+ Cor" para adicionar cores ao produto</p>
+                      ) : (
+                        <div className="space-y-4">
+                          {colors.map((color) => (
+                            <div key={color.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-4">
+                              <div className="flex justify-between items-start">
+                                <div className="flex gap-4 flex-1">
+                                  <input
+                                    type="text"
+                                    placeholder="Nome da cor"
+                                    value={color.name}
+                                    onChange={(e) => updateColor(color.id, "name", e.target.value)}
+                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                                  />
+                                  <input
+                                    type="color"
+                                    value={color.hex}
+                                    onChange={(e) => updateColor(color.id, "hex", e.target.value)}
+                                    className="w-14 h-10 border border-gray-300 rounded-lg cursor-pointer"
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeColor(color.id)}
+                                  className="text-red-500 hover:text-red-700 font-bold text-lg ml-2"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+
+                              <div className="grid grid-cols-4 gap-2">
+                                {["P", "M", "G", "GG"].map((size) => (
+                                  <div key={size} className="flex flex-col">
+                                    <label className="text-xs font-bold text-gray-700 mb-1">{size}</label>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      placeholder="0"
+                                      value={color[`qty_${size.toLowerCase()}` as keyof ColorInput] || ""}
+                                      onChange={(e) =>
+                                        updateColor(color.id, `qty_${size.toLowerCase()}`, e.target.value)
+                                      }
+                                      className="px-2 py-2 border border-gray-300 rounded-lg text-sm text-center focus:outline-none focus:border-purple-500"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Adicionar Fotos */}
+                    <div className="mb-6">
+                      <h3 className="text-lg font-bold text-gray-800 mb-4">📷 Fotos</h3>
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-500 transition-colors">
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="hidden"
+                          id="editImageInput"
+                        />
+                        <label htmlFor="editImageInput" className="cursor-pointer block">
+                          <div className="text-4xl mb-2">📸</div>
+                          <p className="font-bold text-gray-700">Clique para adicionar fotos</p>
+                          <p className="text-xs text-gray-500">Quantas quiser!</p>
+                        </label>
+                      </div>
+
+                      {previews.length > 0 && (
+                        <div className="mt-4">
+                          <p className="text-sm font-bold text-gray-700 mb-3">{previews.length} foto(s)</p>
+                          <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                            {previews.map((preview, index) => (
+                              <div key={index} className="relative group">
+                                <img
+                                  src={preview}
+                                  alt={`Preview ${index + 1}`}
+                                  className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => removeImage(index)}
+                                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Mensagens */}
+                    {success && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
+                    {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
+
+                    {/* Botão Salvar Edição */}
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={loading}
+                      className="w-full bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-colors"
+                    >
+                      {loading ? "⏳ Salvando..." : "✅ SALVAR EDIÇÕES"}
+                    </button>
+                  </>
+                )}
+
+                {/* Mensagens */}
+                {success && !editMode && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
+                {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: Corrigir Preço */}
+          {activeTab === "preco" && (
+            <div className="space-y-6">
+              <h2 className="text-lg font-bold text-gray-800">💰 Corrigir Preço</h2>
+              <div className="flex gap-2 mb-4">
+                <input
+                  type="text"
+                  placeholder="Digite a REF do produto"
+                  value={deleteRef}
+                  onChange={(e) => setDeleteRef(e.target.value)}
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-yellow-500"
+                />
+                <button
+                  type="button"
+                  onClick={handleSearchProduct}
+                  disabled={loadingSearch || !deleteRef.trim()}
+                  className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-lg transition-colors"
+                >
+                  {loadingSearch ? "🔍 Buscando..." : "🔍 BUSCAR"}
+                </button>
+              </div>
+
+              {foundProduct && (
+                <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
+                  <p className="font-bold text-gray-800 mb-3">✅ Produto encontrado:</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                      <p className="text-xs font-bold text-gray-700">Nome</p>
+                      <p className="text-gray-900 font-semibold">{foundProduct.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-700">REF</p>
+                      <p className="text-gray-900 font-semibold">{foundProduct.ref}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-700">Preço Atual</p>
+                      <p className="text-lg font-black text-yellow-600">R$ {foundProduct.price?.toFixed(2).replace(".", ",")}</p>
+                    </div>
+                  </div>
+
+                  {foundProduct.images && foundProduct.images.length > 0 && (
+                    <div className="mb-4">
+                      <img src={foundProduct.images[0]} alt={foundProduct.name} className="w-32 h-32 object-cover rounded" />
+                    </div>
+                  )}
+
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Novo Preço:</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder={foundProduct.price?.toString()}
+                        value={formData.price}
+                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-yellow-500 text-lg font-bold"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newPrice = formData.price;
+                          if (newPrice && newPrice !== foundProduct.price?.toString()) {
+                            setFormData({ ...foundProduct, price: newPrice });
+                            handleSubmit({ preventDefault: () => {} } as any);
+                          }
+                        }}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-6 py-3 rounded-lg transition-colors"
+                      >
+                        💾 ATUALIZAR
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {success && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
+              {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
+            </div>
+          )}
+
+          {/* TAB: Deletar Produto */}
+          {activeTab === "deletar" && (
+            <div className="space-y-6">
+              <h2 className="text-lg font-bold text-red-600">🗑️ Deletar Produto</h2>
+              <div className="flex gap-2 mb-4">
                 <input
                   type="text"
                   placeholder="Digite a REF do produto para deletar"
@@ -539,9 +830,9 @@ export default function PalmiraUploadPage() {
               </div>
 
               {foundProduct && (
-                <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mb-4">
-                  <p className="font-bold text-gray-800 mb-2">✅ Produto encontrado:</p>
-                  <div className="space-y-2 text-sm">
+                <div className="bg-red-50 border-2 border-red-300 rounded-lg p-4">
+                  <p className="font-bold text-gray-800 mb-3">⚠️ Produto encontrado:</p>
+                  <div className="space-y-2 text-sm mb-4">
                     <p><strong>Nome:</strong> {foundProduct.name}</p>
                     <p><strong>REF:</strong> {foundProduct.ref}</p>
                     <p><strong>Preço:</strong> R$ {foundProduct.price?.toFixed(2).replace(".", ",")}</p>
@@ -563,18 +854,12 @@ export default function PalmiraUploadPage() {
                   </form>
                 </div>
               )}
-            </div>
-          </div>
 
-          {/* Botão Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#7BC9C2] hover:bg-[#5fb3ac] disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-colors"
-          >
-            {loading ? "⏳ Salvando..." : "✅ SALVAR PRODUTO"}
-          </button>
-        </form>
+              {success && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
+              {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
