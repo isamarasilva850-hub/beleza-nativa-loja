@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     const productId = `${ref}-${Date.now().toString(36)}`;
 
-    // Salvar em uploaded_products (APENAS campos básicos)
+    // Salvar em uploaded_products
     const { data, error } = await supabase
       .from('uploaded_products')
       .insert({
@@ -30,6 +30,10 @@ export async function POST(request: NextRequest) {
         ref,
         name,
         price: typeof price === 'string' ? parseFloat(price) : price,
+        color: colors?.[0]?.name || '',
+        colorHex: colors?.[0]?.hex || '#000000',
+        sizes: [],
+        quantity: 0,
       });
 
     if (error) {
