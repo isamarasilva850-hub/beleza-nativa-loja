@@ -69,10 +69,10 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
   }, [slug]);
 
   useEffect(() => {
-    if (!product) return;
+    if (!product || !product.variants || product.variants.length === 0) return;
     const map: Record<string, number> = {};
     product.variants.forEach((v: any) => {
-      v.sizes.forEach((s: any) => {
+      v.sizes?.forEach((s: any) => {
         map[`${v.color}-${s}`] = getStockQuantity(product.ref, v.color, s);
       });
     });
@@ -90,7 +90,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
     }
   }, [product]);
 
-  if (!product) {
+  if (!product || !product.variants || product.variants.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">Produto não encontrado</h1>
@@ -100,6 +100,15 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
   }
 
   const variant = product.variants[selectedVariant];
+  if (!variant) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">Variante não disponível</h1>
+        <Link href="/" className="text-primary hover:underline">Voltar para a loja</Link>
+      </div>
+    );
+  }
+
   const retailPrice = product.price * 2;
   const priceToCart = isLoggedIn ? product.price : retailPrice;
 
