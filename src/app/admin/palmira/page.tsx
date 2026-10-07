@@ -223,37 +223,6 @@ export default function PalmiraDashboard() {
             <div className="pt-4 border-t border-gray-100 text-indigo-600 font-semibold text-sm">Clique para visualizar →</div>
           </Link>
 
-          <Link href="/admin/palmira/editar-produto" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-red-500 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-xl font-bold text-gray-800">✏️ Editar Produto</h3>
-                <p className="text-sm text-gray-600 mt-1">Mudar cores e fotos</p>
-              </div>
-              <div className="text-4xl">🔧</div>
-            </div>
-            <div className="space-y-2 text-sm text-gray-600 mb-4">
-              <div className="flex items-center gap-2"><span className="text-red-500">✓</span><span>Buscar por REF</span></div>
-              <div className="flex items-center gap-2"><span className="text-red-500">✓</span><span>Editar cores/qty</span></div>
-              <div className="flex items-center gap-2"><span className="text-red-500">✓</span><span>Deletar fotos</span></div>
-            </div>
-            <div className="pt-4 border-t border-gray-100 text-red-600 font-semibold text-sm">Clique para editar →</div>
-          </Link>
-
-          <Link href="/admin/palmira/corrigir-precos" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-yellow-500 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-xl font-bold text-gray-800">💰 Corrigir Preços</h3>
-                <p className="text-sm text-gray-600 mt-1">Atualizar valores</p>
-              </div>
-              <div className="text-4xl">💵</div>
-            </div>
-            <div className="space-y-2 text-sm text-gray-600 mb-4">
-              <div className="flex items-center gap-2"><span className="text-yellow-500">✓</span><span>Buscar por REF</span></div>
-              <div className="flex items-center gap-2"><span className="text-yellow-500">✓</span><span>Editar preço</span></div>
-              <div className="flex items-center gap-2"><span className="text-yellow-500">✓</span><span>Salva na loja</span></div>
-            </div>
-            <div className="pt-4 border-t border-gray-100 text-yellow-600 font-semibold text-sm">Clique para corrigir →</div>
-          </Link>
         </div>
 
         <div className="mt-8 bg-gradient-to-r from-[#7BC9C2] to-[#5fb3ac] rounded-xl shadow-lg p-6 text-white">
