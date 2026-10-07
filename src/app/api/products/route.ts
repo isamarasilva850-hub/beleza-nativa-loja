@@ -22,15 +22,17 @@ export async function POST(request: NextRequest) {
 
     const productId = `${ref}-${Date.now().toString(36)}`;
 
-    // Salvar produto na tabela products - APENAS CAMPOS BÁSICOS
+    // Salvar produto na tabela products
     const productPayload = {
       id: productId,
       ref,
       name,
       price: typeof price === 'string' ? parseFloat(price) : price,
+      images: images || [],
     };
 
     console.log('Saving product with payload:', productPayload);
+    console.log('Payload size:', JSON.stringify(productPayload).length, 'bytes');
 
     const { data: productData, error: productError } = await supabase
       .from('products')
@@ -39,8 +41,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (productError) {
-      console.error('Erro ao salvar produto:', productError);
-      throw productError;
+      console.error('Supabase INSERT Error:', {
+        message: productError.message,
+        code: productError.code,
+        details: productError.details,
+        hint: productError.hint,
+      });
+      throw new Error(`Supabase error: ${productError.message} - ${productError.details}`);
     }
 
     // Se conseguiu salvar o produto, agora tenta salvar as cores
