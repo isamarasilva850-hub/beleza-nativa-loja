@@ -39,8 +39,6 @@ export default function PalmiraUploadPage() {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
   const [savingOrder, setSavingOrder] = useState(false);
-  const [savedImages, setSavedImages] = useState<string[]>([]);
-  const [savingImages, setSavingImages] = useState(false);
 
   const optimizeImage = (imgBase64: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -87,26 +85,6 @@ export default function PalmiraUploadPage() {
   const removeImage = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
     setPreviews(previews.filter((_, i) => i !== index));
-    setSavedImages(savedImages.filter((_, i) => i !== index));
-  };
-
-  const handleSaveImages = async () => {
-    setError("");
-    setSavingImages(true);
-
-    try {
-      if (images.length === 0) {
-        throw new Error("❌ Nenhuma imagem selecionada!");
-      }
-
-      setSavedImages([...images]);
-      setSuccess(`✅ ${images.length} imagem(ns) salva(s) e pronta(s) para enviar!`);
-      setTimeout(() => setSuccess(""), 3000);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setSavingImages(false);
-    }
   };
 
   const addColor = () => {
