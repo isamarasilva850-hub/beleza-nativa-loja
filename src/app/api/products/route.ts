@@ -108,7 +108,7 @@ export async function GET() {
     console.log('🔍 [DEBUG] About to fetch from products table...');
     const { data: newProducts, error: newError } = await supabase
       .from('products')
-      .select('id, ref, name, price, images');
+      .select('*');
 
     console.log('🔍 [DEBUG] Supabase response:', {
       hasError: !!newError,
