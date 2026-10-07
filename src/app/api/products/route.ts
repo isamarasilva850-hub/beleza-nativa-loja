@@ -22,16 +22,19 @@ export async function POST(request: NextRequest) {
 
     const productId = `${ref}-${Date.now().toString(36)}`;
 
-    // Salvar produto na tabela products (apenas o básico por enquanto)
+    // Salvar produto na tabela products - APENAS CAMPOS BÁSICOS
+    const productPayload = {
+      id: productId,
+      ref,
+      name,
+      price: typeof price === 'string' ? parseFloat(price) : price,
+    };
+
+    console.log('Saving product with payload:', productPayload);
+
     const { data: productData, error: productError } = await supabase
       .from('products')
-      .insert({
-        id: productId,
-        ref,
-        name,
-        price: typeof price === 'string' ? parseFloat(price) : price,
-        images: images || [],
-      })
+      .insert(productPayload)
       .select()
       .single();
 
