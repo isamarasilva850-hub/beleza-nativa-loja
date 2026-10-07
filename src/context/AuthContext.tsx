@@ -45,7 +45,19 @@ function getUsers(): StoredUser[] {
 function getAuth(): User | null {
   try {
     const raw = localStorage.getItem(AUTH_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+
+    const user = JSON.parse(raw);
+
+    // Auto-migrate old users without 'type' field
+    if (!user.type) {
+      // If they have company/cnpj info or just assume they're revendedoras
+      // (since the site is for resellers)
+      user.type = 'revendedor';
+      localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+    }
+
+    return user;
   } catch {
     return null;
   }
