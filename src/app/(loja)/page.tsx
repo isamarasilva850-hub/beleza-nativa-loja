@@ -299,10 +299,10 @@ export default function Home() {
             />
           </div>
           <div className="text-center py-12 md:py-8 md:w-2/4 px-8">
-            <p className="text-3xl md:text-5xl text-gray-600 font-light leading-tight">
+            <p className="text-3xl md:text-6xl text-gray-600 font-light leading-tight">
               Seja
             </p>
-            <p className="text-4xl md:text-6xl font-bold text-gray-700 leading-tight mb-6">
+            <p className="text-5xl md:text-7xl font-black text-gray-800 leading-tight mb-6">
               revendedora
             </p>
             <Image
@@ -347,7 +347,7 @@ export default function Home() {
         {/* Controls Bar */}
         <div className="flex flex-col md:flex-row gap-3 mb-6 items-start md:items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-gray-600">
+            <span className="text-base md:text-lg font-bold text-gray-800">
               {filteredProducts.length} {filteredProducts.length === 1 ? "produto" : "produtos"} encontrado{filteredProducts.length !== 1 ? "s" : ""}
             </span>
           </div>
