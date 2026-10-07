@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 interface Lead {
   id: string;
@@ -10,6 +11,7 @@ interface Lead {
 }
 
 export default function LeadCaptureModal() {
+  const { register } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "" });
@@ -29,7 +31,6 @@ export default function LeadCaptureModal() {
     e.preventDefault();
     setError("");
 
-    // Validate
     if (!form.name.trim() || !form.phone.trim()) {
       setError("Preencha nome e telefone");
       return;
@@ -38,6 +39,21 @@ export default function LeadCaptureModal() {
     setIsSubmitting(true);
 
     try {
+      // Registrar como revendedora no sistema
+      const email = `${form.phone.replace(/\D/g, "")}@belezanativa.local`;
+      const success = register({
+        email,
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        type: "revendedor",
+        password: form.phone.replace(/\D/g, ""),
+        createdAt: new Date().toISOString()
+      });
+
+      if (!success) {
+        console.log("Usuário já existe");
+      }
+
       // Create lead object
       const lead: Lead = {
         id: `lead_${Date.now()}`,
