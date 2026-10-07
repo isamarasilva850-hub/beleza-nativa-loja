@@ -31,6 +31,8 @@ export default function PalmiraUploadPage() {
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [foundProduct, setFoundProduct] = useState<any>(null);
   const [loadingSearch, setLoadingSearch] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [loadingSearchExisting, setLoadingSearchExisting] = useState(false);
 
   const optimizeImage = (imgBase64: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -128,6 +130,40 @@ export default function PalmiraUploadPage() {
       setFoundProduct(null);
     } finally {
       setLoadingSearch(false);
+    }
+  };
+
+  const handleSearchExistingProduct = async () => {
+    setError("");
+    setSuccess("");
+    setLoadingSearchExisting(true);
+
+    try {
+      if (!formData.ref.trim()) {
+        throw new Error("❌ Digite a REF do produto para editar!");
+      }
+
+      const res = await fetch("/api/products");
+      const products = await res.json();
+      const product = products.find((p: any) => p.ref === formData.ref);
+
+      if (!product) {
+        throw new Error(`❌ Produto com REF "${formData.ref}" não encontrado. Deixaremos em branco para criar novo.`);
+      }
+
+      setEditMode(true);
+      setFormData({
+        ref: product.ref,
+        name: product.name,
+        price: product.price?.toString() || "",
+        gender: product.gender || "Feminino",
+      });
+      setSuccess(`✅ Produto "${product.name}" carregado! Adicione mais fotos/cores.`);
+    } catch (err: any) {
+      setError(err.message);
+      setEditMode(false);
+    } finally {
+      setLoadingSearchExisting(false);
     }
   };
 
@@ -259,14 +295,31 @@ export default function PalmiraUploadPage() {
           {/* Dados do Produto */}
           <div>
             <h2 className="text-lg font-bold text-gray-800 mb-4">📋 Dados do Produto</h2>
+            <div className="mb-4">
+              <div className="flex gap-2 mb-4">
+                <input
+                  type="text"
+                  placeholder="Referência (ex: REF001)"
+                  value={formData.ref}
+                  onChange={(e) => setFormData({ ...formData, ref: e.target.value })}
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+                />
+                <button
+                  type="button"
+                  onClick={handleSearchExistingProduct}
+                  disabled={loadingSearchExisting || !formData.ref.trim()}
+                  className="bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-lg transition-colors"
+                >
+                  {loadingSearchExisting ? "🔍 Buscando..." : "🔍 Buscar Existente"}
+                </button>
+              </div>
+              {editMode && (
+                <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded">
+                  <p className="text-sm text-green-700 font-semibold">✅ Modo edição ativado! Adicione mais fotos/cores abaixo.</p>
+                </div>
+              )}
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <input
-                type="text"
-                placeholder="Referência (ex: REF001)"
-                value={formData.ref}
-                onChange={(e) => setFormData({ ...formData, ref: e.target.value })}
-                className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
-              />
               <input
                 type="text"
                 placeholder="Nome do produto"
