@@ -22,26 +22,41 @@ export async function POST(request: NextRequest) {
 
     const productId = `${ref}-${Date.now().toString(36)}`;
 
-    const { data, error } = await supabase
-      .from('uploaded_products')
+    // Salvar produto na tabela products
+    const { data: productData, error: productError } = await supabase
+      .from('products')
       .insert({
         id: productId,
         ref,
         name,
         price: typeof price === 'string' ? parseFloat(price) : price,
         images: images || [],
-        color: colors?.[0]?.name || '',
-        colorHex: colors?.[0]?.hex || '#000000',
-        sizes: [],
-        quantity: 0,
-        createdAt: new Date().toISOString(),
       })
       .select()
       .single();
 
-    if (error) throw error;
+    if (productError) throw productError;
 
-    return NextResponse.json(data, { status: 201 });
+    // Salvar cores na tabela product_colors
+    if (colors && colors.length > 0) {
+      const colorRecords = colors.map((color: any) => ({
+        product_id: productId,
+        color_name: color.name,
+        color_hex: color.hex,
+        qty_p: parseInt(color.qty_p) || 0,
+        qty_m: parseInt(color.qty_m) || 0,
+        qty_g: parseInt(color.qty_g) || 0,
+        qty_gg: parseInt(color.qty_gg) || 0,
+      }));
+
+      const { error: colorsError } = await supabase
+        .from('product_colors')
+        .insert(colorRecords);
+
+      if (colorsError) throw colorsError;
+    }
+
+    return NextResponse.json(productData, { status: 201 });
   } catch (error) {
     console.error('Erro ao salvar produto:', error);
     const errorMessage = error instanceof Error ? error.message : String(error);
