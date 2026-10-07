@@ -101,13 +101,28 @@ export async function POST(request: NextRequest) {
           const base64Data = imageBase64.split(',')[1] || imageBase64;
           const buffer = Buffer.from(base64Data, 'base64');
 
-          // Upload para Supabase Storage
-          const { error: uploadError } = await supabase.storage
-            .from('products')
+          // Upload para Supabase Storage (tenta diferentes buckets)
+          let uploadError: any = null;
+          let bucketName = 'products';
+
+          const { error: err1 } = await supabase.storage
+            .from(bucketName)
             .upload(filePath, buffer, {
               contentType: 'image/webp',
               upsert: true,
             });
+
+          if (err1) {
+            console.log(`❌ Bucket '${bucketName}' não encontrado, tentando 'images'...`);
+            bucketName = 'images';
+            const { error: err2 } = await supabase.storage
+              .from(bucketName)
+              .upload(filePath, buffer, {
+                contentType: 'image/webp',
+                upsert: true,
+              });
+            uploadError = err2;
+          }
 
           if (uploadError) {
             console.error(`❌ Erro ao upload imagem ${i + 1}:`, uploadError.message);
@@ -116,7 +131,7 @@ export async function POST(request: NextRequest) {
 
           // Gerar URL pública
           const { data: publicUrl } = supabase.storage
-            .from('products')
+            .from(bucketName)
             .getPublicUrl(filePath);
 
           // Salvar URL na tabela
