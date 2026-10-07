@@ -104,35 +104,23 @@ export async function GET() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // Buscar de AMBAS as tabelas (produtos novos e antigos)
+    // Buscar produtos da tabela products
     const { data: newProducts, error: newError } = await supabase
       .from('products')
       .select('id, ref, name, price, images');
 
-    const { data: oldProducts, error: oldError } = await supabase
-      .from('uploaded_products')
-      .select('id, ref, name, price, images');
+    if (newError) {
+      console.error('❌ Error fetching products:', newError.message);
+    } else {
+      console.log('✅ Fetched', newProducts?.length || 0, 'products from Supabase');
+    }
 
-    console.log('📊 Supabase fetch results:', {
-      newProductsCount: newProducts?.length || 0,
-      oldProductsCount: oldProducts?.length || 0,
-      newError: newError?.message,
-      oldError: oldError?.message,
-    });
-
-    // Combinar ambas as listas e formatar
-    const allUploadedProducts = [
-      ...(newProducts || []).map((p: any) => ({
-        ...p,
-        slug: p.ref.toLowerCase().replace(/\s+/g, '-'),
-        colors: p.colors || [],
-      })),
-      ...(oldProducts || []).map((p: any) => ({
-        ...p,
-        slug: p.ref.toLowerCase().replace(/\s+/g, '-'),
-        colors: [],
-      }))
-    ];
+    // Formatar produtos com cores
+    const allUploadedProducts = (newProducts || []).map((p: any) => ({
+      ...p,
+      slug: p.ref.toLowerCase().replace(/\s+/g, '-'),
+      colors: [],
+    }));
 
     console.log('📦 Total products from Supabase:', allUploadedProducts.length);
     if (allUploadedProducts.length > 0) {
