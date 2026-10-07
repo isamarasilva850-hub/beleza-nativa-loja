@@ -39,6 +39,8 @@ export default function PalmiraUploadPage() {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
   const [savingOrder, setSavingOrder] = useState(false);
+  const [savedImages, setSavedImages] = useState<string[]>([]);
+  const [savingImages, setSavingImages] = useState(false);
 
   const optimizeImage = (imgBase64: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -85,6 +87,26 @@ export default function PalmiraUploadPage() {
   const removeImage = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
     setPreviews(previews.filter((_, i) => i !== index));
+    setSavedImages(savedImages.filter((_, i) => i !== index));
+  };
+
+  const handleSaveImages = async () => {
+    setError("");
+    setSavingImages(true);
+
+    try {
+      if (images.length === 0) {
+        throw new Error("❌ Nenhuma imagem selecionada!");
+      }
+
+      setSavedImages([...images]);
+      setSuccess(`✅ ${images.length} imagem(ns) salva(s) e pronta(s) para enviar!`);
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setSavingImages(false);
+    }
   };
 
   const addColor = () => {
@@ -299,8 +321,8 @@ export default function PalmiraUploadPage() {
         throw new Error("❌ Adicione pelo menos uma cor!");
       }
 
-      if (images.length === 0) {
-        throw new Error("❌ Adicione pelo menos uma foto!");
+      if (savedImages.length === 0) {
+        throw new Error("❌ Salve as imagens clicando em '💾 Salvar Imagens' antes de enviar!");
       }
 
       const hasQty = colors.some(
@@ -328,7 +350,7 @@ export default function PalmiraUploadPage() {
           qty_g: c.qty_g,
           qty_gg: c.qty_gg,
         })),
-        images,
+        images: savedImages,
       };
 
       const response = await fetch("/api/products", {
@@ -352,6 +374,7 @@ export default function PalmiraUploadPage() {
       setColors([]);
       setImages([]);
       setPreviews([]);
+      setSavedImages([]);
 
       setTimeout(() => setSuccess(""), 4000);
     } catch (err: any) {
@@ -794,14 +817,37 @@ export default function PalmiraUploadPage() {
 
             {previews.length > 0 && (
               <div className="mt-4">
-                <p className="text-sm font-bold text-gray-700 mb-3">{previews.length} foto(s)</p>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm font-bold text-gray-700">
+                    {previews.length} foto(s) {savedImages.length > 0 && <span className="text-green-600">✅ salva(s)</span>}
+                  </p>
+                  {previews.length > 0 && savedImages.length === 0 && (
+                    <button
+                      type="button"
+                      onClick={handleSaveImages}
+                      disabled={savingImages}
+                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white rounded-lg text-sm font-bold transition-colors"
+                    >
+                      💾 Salvar Imagens
+                    </button>
+                  )}
+                  {savedImages.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => { setSavedImages([]); setSuccess(""); }}
+                      className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-bold transition-colors"
+                    >
+                      🔄 Alterar
+                    </button>
+                  )}
+                </div>
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
                   {previews.map((preview, index) => (
-                    <div key={index} className="relative group">
+                    <div key={index} className={`relative group ${savedImages.length > 0 ? 'opacity-75' : ''}`}>
                       <img
                         src={preview}
                         alt={`Preview ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                        className={`w-full h-24 object-cover rounded-lg border ${savedImages.length > 0 ? 'border-green-400' : 'border-gray-200'}`}
                       />
                       <button
                         type="button"
