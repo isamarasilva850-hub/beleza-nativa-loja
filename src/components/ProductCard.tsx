@@ -54,28 +54,28 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
       </div>
 
-      <div className="p-3">
+      <div className="p-4">
         {/* Category Badge */}
-        <div className="mb-2">
-          <span className="inline-block bg-primary text-white text-[10px] font-bold px-2 py-1 rounded-full">
+        <div className="mb-3">
+          <span className="inline-block bg-primary text-white text-[11px] font-bold px-3 py-1.5 rounded-full">
             {product.category}
           </span>
         </div>
 
         {/* Product Name */}
-        <p className="text-sm font-bold text-gray-900 mb-1 line-clamp-2">
+        <p className="text-base font-black text-gray-900 mb-2 line-clamp-2">
           {product.name}
         </p>
 
         {/* Description */}
-        <p className="text-xs text-gray-700 mb-2 line-clamp-2 font-medium">
+        <p className="text-sm text-gray-700 mb-3 line-clamp-2 font-semibold">
           {product.description}
         </p>
 
         {/* Prices */}
-        <div className="mb-2 bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-lg border-2 border-gray-200">
-          <p className="text-gray-600 font-semibold text-xs mb-1">Preço ao consumidor</p>
-          <p className="text-gray-800 font-bold text-base line-through">
+        <div className="mb-3 bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-lg border-2 border-gray-200">
+          <p className="text-gray-700 font-bold text-sm mb-1.5">Preço ao consumidor</p>
+          <p className="text-gray-800 font-black text-lg line-through">
             R$ {retailPrice.toFixed(2).replace(".", ",")}
           </p>
 
@@ -106,11 +106,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Sizes */}
-        <div className="mb-2">
-          <p className="text-[10px] font-semibold text-gray-600 mb-1">Tamanhos:</p>
-          <div className="flex gap-1 flex-wrap">
+        <div className="mb-3">
+          <p className="text-xs font-bold text-gray-800 mb-2">Tamanhos:</p>
+          <div className="flex gap-2 flex-wrap">
             {Array.from(new Set(product.variants.flatMap(v => v.sizes))).map((size) => (
-              <span key={size} className="text-[9px] px-2 py-0.5 bg-gray-100 text-gray-700 rounded font-semibold">
+              <span key={size} className="text-xs px-2.5 py-1 bg-gray-200 text-gray-800 rounded font-semibold">
                 {size}
               </span>
             ))}
@@ -118,13 +118,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Colors */}
-        <div className="mb-2">
-          <p className="text-[10px] font-semibold text-gray-600 mb-1">Cores:</p>
-          <div className="flex gap-1">
+        <div className="mb-3">
+          <p className="text-xs font-bold text-gray-800 mb-2">Cores:</p>
+          <div className="flex gap-2">
             {product.variants.map((v, i) => (
               <span
                 key={`${v.color}-${i}`}
-                className="w-5 h-5 rounded-full border-2 border-gray-300 hover:border-primary transition-colors cursor-help"
+                className="w-6 h-6 rounded-full border-2 border-gray-400 hover:border-primary transition-colors cursor-help"
                 style={{ backgroundColor: v.colorHex }}
                 title={`${getColorName(v.color)}`}
               />
@@ -133,12 +133,12 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Composition Hint */}
-        <p className="text-[9px] text-gray-500 italic">
+        <p className="text-xs text-gray-600 italic mb-1">
           {product.composition.split(",")[0]}
         </p>
 
         {/* REF */}
-        <p className="text-[10px] text-gray-400 mt-1 font-mono">
+        <p className="text-xs text-gray-500 mt-1 font-mono">
           REF {product.ref}
         </p>
       </div>

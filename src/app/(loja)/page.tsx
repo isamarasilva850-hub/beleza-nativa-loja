@@ -299,10 +299,10 @@ export default function Home() {
             />
           </div>
           <div className="text-center py-12 md:py-8 md:w-2/4 px-8">
-            <p className="text-3xl md:text-6xl text-gray-600 font-light leading-tight">
+            <p className="text-4xl md:text-7xl text-primary font-bold leading-tight">
               Seja
             </p>
-            <p className="text-5xl md:text-7xl font-black text-gray-800 leading-tight mb-6">
+            <p className="text-6xl md:text-8xl font-black text-gray-900 leading-tight mb-6">
               revendedora
             </p>
             <Image
