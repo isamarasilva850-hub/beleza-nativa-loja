@@ -190,21 +190,6 @@ export default function PalmiraDashboard() {
             <div className="pt-4 border-t border-gray-100 text-green-600 font-semibold text-sm">Clique para acompanhar →</div>
           </Link>
 
-          <Link href="/admin/palmira/adicionar-cor" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-pink-500 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-xl font-bold text-gray-800">🎨 Adicionar Cor</h3>
-                <p className="text-sm text-gray-600 mt-1">Novas cores aos produtos</p>
-              </div>
-              <div className="text-4xl">✨</div>
-            </div>
-            <div className="space-y-2 text-sm text-gray-600 mb-4">
-              <div className="flex items-center gap-2"><span className="text-pink-500">✓</span><span>Sem reupload de fotos</span></div>
-              <div className="flex items-center gap-2"><span className="text-pink-500">✓</span><span>Seleciona referência existente</span></div>
-              <div className="flex items-center gap-2"><span className="text-pink-500">✓</span><span>Adiciona cor nova rapidinho</span></div>
-            </div>
-            <div className="pt-4 border-t border-gray-100 text-pink-600 font-semibold text-sm">Clique para adicionar →</div>
-          </Link>
 
           <Link href="/admin/palmira/reordenar-produtos" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-orange-500 p-6">
             <div className="flex items-start justify-between mb-4">
