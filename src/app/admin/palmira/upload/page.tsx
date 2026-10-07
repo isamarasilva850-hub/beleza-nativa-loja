@@ -37,6 +37,8 @@ export default function PalmiraUploadPage() {
   const [allProducts, setAllProducts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loadingProducts, setLoadingProducts] = useState(false);
+  const [draggedItem, setDraggedItem] = useState<number | null>(null);
+  const [savingOrder, setSavingOrder] = useState(false);
 
   const optimizeImage = (imgBase64: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -147,6 +149,67 @@ export default function PalmiraUploadPage() {
       setError("❌ Erro ao carregar produtos");
     } finally {
       setLoadingProducts(false);
+    }
+  };
+
+  const moveUp = (index: number) => {
+    if (index === 0) return;
+    const newProducts = [...allProducts];
+    [newProducts[index], newProducts[index - 1]] = [newProducts[index - 1], newProducts[index]];
+    setAllProducts(newProducts);
+  };
+
+  const moveDown = (index: number) => {
+    if (index === allProducts.length - 1) return;
+    const newProducts = [...allProducts];
+    [newProducts[index], newProducts[index + 1]] = [newProducts[index + 1], newProducts[index]];
+    setAllProducts(newProducts);
+  };
+
+  const handleDragStart = (index: number) => {
+    setDraggedItem(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (index: number) => {
+    if (draggedItem === null || draggedItem === index) return;
+    const newProducts = [...allProducts];
+    const draggedProduct = newProducts[draggedItem];
+    newProducts.splice(draggedItem, 1);
+    newProducts.splice(index, 0, draggedProduct);
+    setAllProducts(newProducts);
+    setDraggedItem(null);
+  };
+
+  const handleSaveOrder = async () => {
+    try {
+      setSavingOrder(true);
+      setError("");
+      setSuccess("");
+
+      const updates = allProducts.map((product, index) => ({
+        ref: product.ref,
+        display_order: index,
+      }));
+
+      const response = await fetch("/api/admin/update-product-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ updates }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao salvar ordem");
+      }
+
+      setSuccess(`✅ Ordem de ${allProducts.length} produtos salva com sucesso!`);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setSavingOrder(false);
     }
   };
 
@@ -326,6 +389,17 @@ export default function PalmiraUploadPage() {
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab("reordenar")}
+            className={`px-6 py-3 rounded-lg font-bold transition-all ${
+              activeTab === "reordenar"
+                ? "bg-indigo-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            🔄 Reordenar
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab("criar")}
             className={`px-6 py-3 rounded-lg font-bold transition-all ${
               activeTab === "criar"
@@ -474,6 +548,87 @@ export default function PalmiraUploadPage() {
                   p.name?.toLowerCase().includes(searchQuery.toLowerCase())
                 ).length}</strong>
               </div>
+            </div>
+          )}
+
+          {/* TAB: Reordenar Produtos */}
+          {activeTab === "reordenar" && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-lg font-bold text-gray-800 mb-2">🔄 Reordenar Produtos na Loja</h2>
+                <p className="text-sm text-gray-600 mb-4">Arraste os produtos para mudar a ordem ou use os botões ⬆️ ⬇️</p>
+              </div>
+
+              {loadingProducts ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">⏳ Carregando produtos...</p>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {allProducts.map((product, index) => (
+                      <div
+                        key={product.id}
+                        draggable
+                        onDragStart={() => handleDragStart(index)}
+                        onDragOver={handleDragOver}
+                        onDrop={() => handleDrop(index)}
+                        className={`flex items-center gap-3 p-3 bg-gray-50 rounded-lg border-2 border-gray-200 hover:border-indigo-400 transition-all cursor-move ${
+                          draggedItem === index ? "opacity-50 border-indigo-500" : ""
+                        }`}
+                      >
+                        <span className="text-sm font-bold text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                          #{index + 1}
+                        </span>
+
+                        {product.images && product.images.length > 0 && (
+                          <img
+                            src={product.images[0]}
+                            alt={product.name}
+                            className="w-10 h-10 object-cover rounded"
+                          />
+                        )}
+
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-gray-900 truncate">{product.name}</p>
+                          <p className="text-xs text-gray-600">REF: {product.ref}</p>
+                        </div>
+
+                        <div className="flex gap-1">
+                          <button
+                            type="button"
+                            onClick={() => moveUp(index)}
+                            disabled={index === 0}
+                            className="text-xs px-2 py-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white rounded font-bold"
+                          >
+                            ⬆️
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveDown(index)}
+                            disabled={index === allProducts.length - 1}
+                            className="text-xs px-2 py-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white rounded font-bold"
+                          >
+                            ⬇️
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {success && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
+                  {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
+
+                  <button
+                    type="button"
+                    onClick={handleSaveOrder}
+                    disabled={savingOrder}
+                    className="w-full bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-colors"
+                  >
+                    {savingOrder ? "⏳ Salvando..." : "💾 SALVAR NOVA ORDEM"}
+                  </button>
+                </>
+              )}
             </div>
           )}
 
