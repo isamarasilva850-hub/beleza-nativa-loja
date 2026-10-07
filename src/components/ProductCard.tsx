@@ -77,7 +77,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Prices */}
         <div className="mb-3 bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-lg border-2 border-gray-200">
           <p className="text-gray-700 font-bold text-sm mb-1.5">Preço ao consumidor</p>
-          <p className="text-gray-800 font-black text-lg line-through">
+          <p className="text-gray-800 font-black text-lg">
             R$ {retailPrice.toFixed(2).replace(".", ",")}
           </p>
 
