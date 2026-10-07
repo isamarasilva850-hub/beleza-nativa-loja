@@ -100,6 +100,16 @@ export default function PalmiraUploadPage() {
     setPreviews(previews.filter((_, i) => i !== index));
   };
 
+  const handleSaveImages = () => {
+    if (images.length === 0) {
+      setError("❌ Nenhuma imagem selecionada!");
+      return;
+    }
+    setSavedImages(images);
+    setSuccess(`✅ ${images.length} imagem(ns) salva(s)!`);
+    setTimeout(() => setSuccess(""), 2000);
+  };
+
   const addColor = () => {
     setColors([
       ...colors,
@@ -324,6 +334,10 @@ export default function PalmiraUploadPage() {
         throw new Error("❌ Adicione quantidade para pelo menos um tamanho!");
       }
 
+      if (savedImages.length === 0) {
+        throw new Error("❌ Clique em 'Salvar Imagens' antes de enviar o produto!");
+      }
+
       const productData = {
         ref: formData.ref,
         name: formData.name,
@@ -337,7 +351,7 @@ export default function PalmiraUploadPage() {
           qty_g: c.qty_g,
           qty_gg: c.qty_gg,
         })),
-        images,
+        images: savedImages,
       };
 
       console.log('📤 Enviando:', {
@@ -812,7 +826,7 @@ export default function PalmiraUploadPage() {
               <div className="mt-4">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-sm font-bold text-gray-700">
-                    {previews.length} foto(s) adicionada(s)
+                    {previews.length} foto(s) adicionada(s) {savedImages.length > 0 && `✅ ${savedImages.length} salva(s)`}
                   </p>
                 </div>
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
@@ -821,7 +835,7 @@ export default function PalmiraUploadPage() {
                       <img
                         src={preview}
                         alt={`Preview ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                        className={`w-full h-24 object-cover rounded-lg border-2 ${savedImages.length > 0 ? 'border-green-500' : 'border-gray-200'}`}
                       />
                       <button
                         type="button"
@@ -833,6 +847,13 @@ export default function PalmiraUploadPage() {
                     </div>
                   ))}
                 </div>
+                <button
+                  type="button"
+                  onClick={handleSaveImages}
+                  className="mt-4 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+                >
+                  💾 Salvar Imagens
+                </button>
               </div>
             )}
           </div>
