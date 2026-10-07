@@ -30,19 +30,9 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
       try {
         const response = await fetch('/api/products');
         const supabaseProducts = await response.json();
-        const formatted = supabaseProducts.map((item: any, index: number) => ({
-          id: index + 1,
-          ref: item.ref,
-          slug: item.ref.toLowerCase().replace(/\s+/g, '-'),
-          name: item.name,
-          price: parseFloat(item.price),
-          description: `Produto ${item.name}`,
-          composition: "Veja a descrição completa na loja",
-          care: "Lavar com sabão neutro",
-          collection: "Lingerie",
-          category: item.category || "Lingerie",
-          gender: item.gender || "Feminino",
-          variants: item.colors?.map((color: any) => ({
+        const formatted = supabaseProducts.map((item: any, index: number) => {
+          // Se tem colors (do Supabase), formata; senão usa variants (do JSON estático)
+          const variantsData = item.colors?.map((color: any) => ({
             color: color.color_name,
             colorHex: color.color_hex || "#000000",
             sizes: [
@@ -51,9 +41,24 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
               ...(parseInt(color.qty_g) > 0 ? ['G'] : []),
               ...(parseInt(color.qty_gg) > 0 ? ['GG'] : []),
             ],
-          })) || [],
-          images: item.images?.map((img: any) => img.image_base64 || img.image_url) || [],
-        }));
+          })) || item.variants || [];
+
+          return {
+            id: index + 1,
+            ref: item.ref,
+            slug: item.slug || item.ref.toLowerCase().replace(/\s+/g, '-'),
+            name: item.name,
+            price: parseFloat(item.price),
+            description: item.description || `Produto ${item.name}`,
+            composition: item.composition || "Veja a descrição completa na loja",
+            care: item.care || "Lavar com sabão neutro",
+            collection: item.collection || "Lingerie",
+            category: item.category || "Lingerie",
+            gender: item.gender || "Feminino",
+            variants: variantsData,
+            images: item.images?.map((img: any) => img.image_base64 || img.image_url) || item.images || [],
+          };
+        });
         const allProducts = [...formatted, ...products];
         const found = allProducts.find((p) => p.slug === slug);
         setProduct(found || null);

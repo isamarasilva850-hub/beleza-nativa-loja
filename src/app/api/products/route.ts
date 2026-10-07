@@ -60,6 +60,7 @@ export async function GET() {
     const staticProducts = JSON.parse(productsData).map((p: any) => ({
       id: p.id,
       ref: p.ref,
+      slug: p.ref.toLowerCase().replace(/\s+/g, '-'),
       name: p.name,
       price: p.price,
       images: p.images || [],
@@ -75,14 +76,36 @@ export async function GET() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    const { data: uploadedProducts } = await supabase
-      .from('uploaded_products')
+    const { data: uploadedProducts, error: supabaseError } = await supabase
+      .from('products')
       .select('id, ref, name, price');
+
+    if (supabaseError) {
+      console.error('Supabase error:', supabaseError);
+    } else {
+      console.log('Uploaded products from Supabase:', uploadedProducts?.length);
+    }
+
+    // Buscar cores para cada produto uploadado
+    const productsWithColors = await Promise.all(
+      (uploadedProducts || []).map(async (product: any) => {
+        const { data: colors } = await supabase
+          .from('product_colors')
+          .select('color_name, color_hex, qty_p, qty_m, qty_g, qty_gg')
+          .eq('product_id', product.id);
+
+        return {
+          ...product,
+          slug: product.ref.toLowerCase().replace(/\s+/g, '-'),
+          colors: colors || [],
+        };
+      })
+    );
 
     // Combina ambos
     const allProducts = [
       ...staticProducts,
-      ...(uploadedProducts || [])
+      ...productsWithColors
     ];
 
     return NextResponse.json(allProducts);
