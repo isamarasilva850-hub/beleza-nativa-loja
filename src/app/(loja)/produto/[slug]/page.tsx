@@ -99,7 +99,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
     );
   }
 
-  const variant = product.variants[selectedVariant];
+  const variant = product.variants?.[selectedVariant];
   if (!variant) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center">
@@ -113,17 +113,17 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
   const priceToCart = isLoggedIn ? product.price : retailPrice;
 
   const getStock = (color: string, size: string) => stockMap[`${color}-${size}`] ?? -1;
-  const selectedStock = selectedSize ? getStock(variant.color, selectedSize) : -1;
+  const selectedStock = selectedSize ? getStock(variant?.color || '', selectedSize) : -1;
 
   const handleAdd = () => {
-    if (!selectedSize) return;
+    if (!selectedSize || !variant) return;
     addItem({
       productId: product.id,
       ref: product.ref,
       name: product.name,
       price: priceToCart,
-      color: variant.color,
-      colorHex: variant.colorHex,
+      color: variant.color || '',
+      colorHex: variant.colorHex || '#000000',
       size: selectedSize,
       image: product.images[0] || "",
     }, quantity);
@@ -265,10 +265,10 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
 
           <div className="mb-6">
             <p className="text-sm font-semibold text-gray-700 mb-2">
-              Cor: <span className="font-normal text-gray-500">{variant.color}</span>
+              Cor: <span className="font-normal text-gray-500">{variant?.color || 'N/A'}</span>
             </p>
             <div className="flex gap-2">
-              {product.variants.map((v: any, i: number) => (
+              {product.variants?.map((v: any, i: number) => (
                 <button
                   key={i}
                   onClick={() => { setSelectedVariant(i); setSelectedSize(""); }}
@@ -297,8 +297,8 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
           <div className="mb-6">
             <p className="text-sm font-semibold text-gray-700 mb-2">Tamanho:</p>
             <div className="flex flex-wrap gap-2">
-              {variant.sizes.map((size: any) => {
-                const stock = getStock(variant.color, size);
+              {variant?.sizes?.map((size: any) => {
+                const stock = getStock(variant?.color || '', size);
                 const notConfigured = stock === -1;
                 const outOfStock = !notConfigured && stock <= 0;
                 const isSelected = selectedSize === size;
