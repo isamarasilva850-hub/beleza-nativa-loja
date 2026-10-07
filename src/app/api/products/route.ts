@@ -205,10 +205,18 @@ export async function GET() {
           .eq('product_id', product.id);
 
         // Buscar imagens 🖼️
-        const { data: images } = await supabase
+        const { data: images, error: imgError } = await supabase
           .from('product_images')
           .select('id, url, image_base64')
           .eq('product_id', product.id);
+
+        if (product.ref === 'TESTE-FINAL-03') {
+          console.log(`🔍 [DEBUG] Imagens para ${product.ref}:`, {
+            count: images?.length || 0,
+            error: imgError?.message,
+            sample: images?.[0],
+          });
+        }
 
         // Tentar image_base64 primeiro, se não houver tenta url
         let imageList = images?.map((img: any) => img.image_base64 || img.url).filter(Boolean) || product.images || [];
