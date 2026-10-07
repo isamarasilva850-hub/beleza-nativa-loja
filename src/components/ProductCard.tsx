@@ -80,14 +80,14 @@ export default function ProductCard({ product }: ProductCardProps) {
           </p>
 
           {isReseller ? (
-            <div className="mt-3 pt-3 border-t-2 border-green-200">
-              <div className="inline-block bg-gradient-to-r from-green-400 to-green-500 text-white px-2.5 py-1 rounded-full text-xs font-black mb-2">
+            <div className="mt-3 pt-3 border-t-2 border-[#2d8a7d]/30">
+              <div className="inline-block bg-gradient-to-r from-[#1b7a6f] to-[#2d8a7d] text-white px-2.5 py-1 rounded-full text-xs font-black mb-2">
                 💰 PREÇO REVENDA
               </div>
-              <p className="text-green-600 font-black text-2xl">
+              <p className="text-[#1b7a6f] font-black text-2xl">
                 R$ {product.price.toFixed(2).replace(".", ",")}
               </p>
-              <p className="text-xs text-green-600 font-semibold">
+              <p className="text-xs text-[#2d8a7d] font-semibold">
                 ✓ Você economiza R$ {(retailPrice - product.price).toFixed(2).replace(".", ",")}
               </p>
             </div>
