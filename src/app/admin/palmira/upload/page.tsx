@@ -24,6 +24,7 @@ export default function PalmiraUploadPage() {
   const [colors, setColors] = useState<ColorInput[]>([]);
   const [images, setImages] = useState<string[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [savedImages, setSavedImages] = useState<string[]>([]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
