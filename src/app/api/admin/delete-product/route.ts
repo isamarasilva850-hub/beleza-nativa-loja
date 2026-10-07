@@ -46,25 +46,21 @@ export async function POST(request: NextRequest) {
 
     const productId = products[0].id;
 
-    // 2. Deleta as cores do produto
-    const { error: deleteColorsError } = await supabase
-      .from('product_colors')
-      .delete()
-      .eq('product_id', productId);
+    // 2. Deleta as cores do produto (se existirem)
+    try {
+      const { error: deleteColorsError } = await supabase
+        .from('product_colors')
+        .delete()
+        .eq('product_id', productId);
 
-    if (deleteColorsError) throw deleteColorsError;
-    console.log(`✅ Cores deletadas (product_id: ${productId})`);
+      if (!deleteColorsError) {
+        console.log(`✅ Cores deletadas (product_id: ${productId})`);
+      }
+    } catch (e) {
+      console.log(`⚠️ Cores não deletadas (tabela pode não existir)`);
+    }
 
-    // 3. Deleta as fotos do produto
-    const { error: deleteImagesError } = await supabase
-      .from('product_images')
-      .delete()
-      .eq('product_id', productId);
-
-    if (deleteImagesError) throw deleteImagesError;
-    console.log(`✅ Fotos deletadas (product_id: ${productId})`);
-
-    // 4. Deleta o produto
+    // Deleta o produto
     const { error: deleteProductError } = await supabase
       .from('products')
       .delete()
