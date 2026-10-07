@@ -138,7 +138,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </p>
 
         {/* REF */}
-        <p className="text-xs text-gray-500 mt-1 font-mono">
+        <p className="text-xs text-gray-600 mt-1 font-mono font-bold">
           REF {product.ref}
         </p>
       </div>
