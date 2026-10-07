@@ -107,7 +107,7 @@ export async function GET() {
     // Buscar de AMBAS as tabelas (produtos novos e antigos)
     const { data: newProducts, error: newError } = await supabase
       .from('products')
-      .select('id, ref, name, price, images, colors');
+      .select('id, ref, name, price, images');
 
     const { data: oldProducts, error: oldError } = await supabase
       .from('uploaded_products')
