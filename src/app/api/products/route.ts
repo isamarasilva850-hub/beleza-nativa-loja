@@ -22,7 +22,17 @@ export async function POST(request: NextRequest) {
 
     const productId = `${ref}-${Date.now().toString(36)}`;
 
-    // Salvar produto na tabela products
+    // Preparar cores para salvar junto com o produto
+    const colorRecords = (colors || []).map((color: any) => ({
+      color_name: color.name,
+      color_hex: color.hex,
+      qty_p: parseInt(color.qty_p) || 0,
+      qty_m: parseInt(color.qty_m) || 0,
+      qty_g: parseInt(color.qty_g) || 0,
+      qty_gg: parseInt(color.qty_gg) || 0,
+    }));
+
+    // Salvar produto na tabela products (com cores embutidas)
     const { data: productData, error: productError } = await supabase
       .from('products')
       .insert({
@@ -31,32 +41,14 @@ export async function POST(request: NextRequest) {
         name,
         price: typeof price === 'string' ? parseFloat(price) : price,
         images: images || [],
+        colors: colorRecords,
       })
       .select()
       .single();
 
-    if (productError) throw productError;
-
-    // Salvar cores na tabela product_colors
-    if (colors && colors.length > 0) {
-      const colorRecords = colors.map((color: any) => ({
-        product_id: productId,
-        color_name: color.name,
-        color_hex: color.hex,
-        qty_p: parseInt(color.qty_p) || 0,
-        qty_m: parseInt(color.qty_m) || 0,
-        qty_g: parseInt(color.qty_g) || 0,
-        qty_gg: parseInt(color.qty_gg) || 0,
-      }));
-
-      const { error: colorsError } = await supabase
-        .from('product_colors')
-        .insert(colorRecords);
-
-      if (colorsError) {
-        console.error('Erro ao salvar cores:', colorsError);
-        throw new Error(`Erro ao salvar cores: ${colorsError.message}`);
-      }
+    if (productError) {
+      console.error('Erro ao salvar produto:', productError);
+      throw productError;
     }
 
     return NextResponse.json(productData, { status: 201 });
@@ -97,7 +89,7 @@ export async function GET() {
     // Buscar de AMBAS as tabelas (produtos novos e antigos)
     const { data: newProducts, error: newError } = await supabase
       .from('products')
-      .select('id, ref, name, price, images');
+      .select('id, ref, name, price, images, colors');
 
     const { data: oldProducts, error: oldError } = await supabase
       .from('uploaded_products')
@@ -110,25 +102,23 @@ export async function GET() {
       console.error('Supabase error (uploaded_products):', oldError);
     }
 
-    // Combinar ambas as listas
-    const uploadedProducts = [...(newProducts || []), ...(oldProducts || [])];
-    console.log('Total products from Supabase:', uploadedProducts.length);
+    // Combinar ambas as listas e formatar
+    const allUploadedProducts = [
+      ...(newProducts || []).map((p: any) => ({
+        ...p,
+        slug: p.ref.toLowerCase().replace(/\s+/g, '-'),
+        colors: p.colors || [],
+      })),
+      ...(oldProducts || []).map((p: any) => ({
+        ...p,
+        slug: p.ref.toLowerCase().replace(/\s+/g, '-'),
+        colors: [],
+      }))
+    ];
 
-    // Buscar cores para cada produto uploadado
-    const productsWithColors = await Promise.all(
-      (uploadedProducts || []).map(async (product: any) => {
-        const { data: colors } = await supabase
-          .from('product_colors')
-          .select('color_name, color_hex, qty_p, qty_m, qty_g, qty_gg')
-          .eq('product_id', product.id);
+    console.log('Total products from Supabase:', allUploadedProducts.length);
 
-        return {
-          ...product,
-          slug: product.ref.toLowerCase().replace(/\s+/g, '-'),
-          colors: colors || [],
-        };
-      })
-    );
+    const productsWithColors = allUploadedProducts;
 
     // Combina ambos
     const allProducts = [
