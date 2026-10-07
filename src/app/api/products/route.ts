@@ -207,7 +207,7 @@ export async function GET() {
         // Buscar imagens 🖼️
         const { data: images, error: imgError } = await supabase
           .from('product_images')
-          .select('id, url, image_base64')
+          .select('id, image_base64')
           .eq('product_id', product.id);
 
         if (product.ref === 'TESTE-FINAL-03') {
@@ -218,8 +218,8 @@ export async function GET() {
           });
         }
 
-        // Tentar image_base64 primeiro, se não houver tenta url
-        let imageList = images?.map((img: any) => img.image_base64 || img.url).filter(Boolean) || product.images || [];
+        // Usar image_base64
+        let imageList = images?.map((img: any) => img.image_base64).filter(Boolean) || product.images || [];
         return {
           ...product,
           images: imageList,
