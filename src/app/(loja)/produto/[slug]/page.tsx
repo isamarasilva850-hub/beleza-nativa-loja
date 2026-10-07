@@ -43,6 +43,23 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
             ],
           })) || item.variants || [];
 
+          // Parse images se for string JSON
+          let parsedImages: string[] = [];
+          if (item.images) {
+            try {
+              if (typeof item.images === 'string') {
+                parsedImages = JSON.parse(item.images);
+              } else if (Array.isArray(item.images)) {
+                parsedImages = item.images.map((img: any) => {
+                  if (typeof img === 'string') return img;
+                  return img.image_base64 || img.image_url || '';
+                }).filter((url: string) => url);
+              }
+            } catch (e) {
+              parsedImages = [];
+            }
+          }
+
           return {
             id: index + 1,
             ref: item.ref,
@@ -56,7 +73,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
             category: item.category || "Lingerie",
             gender: item.gender || "Feminino",
             variants: variantsData,
-            images: item.images?.map((img: any) => img.image_base64 || img.image_url) || item.images || [],
+            images: parsedImages,
           };
         });
         const allProducts = [...formatted, ...products];
