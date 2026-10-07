@@ -65,17 +65,29 @@ export default function PalmiraUploadPage() {
         const file = files[i];
         const reader = new FileReader();
         reader.onload = async (event) => {
-          const result = event.target?.result as string;
-          const optimized = await optimizeImage(result);
-          newImages.push(optimized);
-          newPreviews.push(optimized);
+          try {
+            const result = event.target?.result as string;
+            console.log(`🖼️ Otimizando imagem ${i + 1}/${files.length}...`);
+            const optimized = await optimizeImage(result);
+            newImages.push(optimized);
+            newPreviews.push(optimized);
+            console.log(`✅ Imagem ${i + 1} otimizada: ${Math.round(optimized.length / 1024)}KB`);
 
-          if (newImages.length === files.length) {
-            setImages([...images, ...newImages]);
-            setPreviews([...previews, ...newPreviews]);
-            setSuccess(`✅ ${newImages.length} foto(s) adicionada(s)!`);
-            setTimeout(() => setSuccess(""), 2000);
+            if (newImages.length === files.length) {
+              console.log(`🎉 Todas ${newImages.length} imagens prontas!`);
+              setImages([...images, ...newImages]);
+              setPreviews([...previews, ...newPreviews]);
+              setSuccess(`✅ ${newImages.length} foto(s) adicionada(s)!`);
+              setTimeout(() => setSuccess(""), 2000);
+            }
+          } catch (err) {
+            console.error(`❌ Erro ao processar imagem ${i + 1}:`, err);
+            setError(`❌ Erro ao processar imagem: ${err instanceof Error ? err.message : String(err)}`);
           }
+        };
+        reader.onerror = () => {
+          console.error(`❌ Erro ao ler arquivo ${i + 1}`);
+          setError(`❌ Erro ao ler arquivo da imagem`);
         };
         reader.readAsDataURL(file);
       }
