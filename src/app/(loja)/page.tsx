@@ -270,6 +270,7 @@ export default function Home() {
                 className="object-cover hover:scale-105 transition-transform duration-300"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#1b7a6f]/60 to-[#2d8a7d]/40 hover:from-[#1b7a6f]/50 hover:to-[#2d8a7d]/30 transition-all duration-300" />
             </div>
           </Link>
           <Link href="/" className="block">
@@ -281,6 +282,7 @@ export default function Home() {
                 className="object-cover hover:scale-105 transition-transform duration-300"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#2d8a7d]/60 to-[#1b7a6f]/40 hover:from-[#2d8a7d]/50 hover:to-[#1b7a6f]/30 transition-all duration-300" />
             </div>
           </Link>
         </div>
