@@ -328,8 +328,14 @@ export default function PalmiraUploadPage() {
           qty_g: c.qty_g,
           qty_gg: c.qty_gg,
         })),
-        images: savedImages,
+        images,
       };
+
+      console.log('📤 Enviando:', {
+        ref: formData.ref,
+        images_count: images.length,
+        first_image_sample: images[0]?.substring(0, 100)
+      });
 
       const response = await fetch("/api/products", {
         method: "POST",
