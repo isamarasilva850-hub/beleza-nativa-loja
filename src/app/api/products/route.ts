@@ -97,8 +97,9 @@ export async function POST(request: NextRequest) {
       let lastError: any = null;
 
       for (const colName of colNames) {
-        const imageInserts = images.map((image: string) => {
+        const imageInserts = images.map((image: string, index: number) => {
           const insert: any = {
+            id: `${productId}-img-${index}`,
             product_id: productId,
           };
           insert[colName] = image;
@@ -206,11 +207,11 @@ export async function GET() {
         // Buscar imagens 🖼️
         const { data: images } = await supabase
           .from('product_images')
-          .select('url, image_base64')
+          .select('id, url, image_base64')
           .eq('product_id', product.id);
 
-        // Tentar url primeiro, se não houver tenta image_base64
-        let imageList = images?.map((img: any) => img.url || img.image_base64).filter(Boolean) || product.images || [];
+        // Tentar image_base64 primeiro, se não houver tenta url
+        let imageList = images?.map((img: any) => img.image_base64 || img.url).filter(Boolean) || product.images || [];
         return {
           ...product,
           images: imageList,
