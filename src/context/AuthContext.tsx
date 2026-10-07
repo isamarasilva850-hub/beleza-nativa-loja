@@ -9,6 +9,7 @@ export interface User {
   email: string;
   name: string;
   phone: string;
+  type?: 'revendedor' | 'consumidor'; // Tipo de usuário
   company?: string;
   cnpj?: string;
   city?: string;

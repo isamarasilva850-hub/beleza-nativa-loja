@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import { products } from '@/data/products';
 
 const LUCRO_PERCENT = 100; // 100% de lucro para revendedoras!
@@ -14,6 +15,7 @@ const PRODUCTS = products.slice(0, 10).map(p => ({
 }));
 
 export default function QueroComecear() {
+  const { register } = useAuth();
   const [selectedProduct, setSelectedProduct] = useState<number>(1);
   const [quantidade, setQuantidade] = useState(10);
   const [formData, setFormData] = useState({
@@ -36,7 +38,23 @@ export default function QueroComecear() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/crm/leads', {
+      // Registrar como revendedora no sistema
+      const email = `${formData.phone.replace(/\D/g, '')}@belezanativa.local`;
+      const success = register({
+        email,
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        type: formData.type === 'Revendedora' ? 'revendedor' : 'consumidor',
+        password: formData.phone.replace(/\D/g, ''), // Usar telefone como senha temporária
+        createdAt: new Date().toISOString()
+      });
+
+      if (!success) {
+        console.log('Usuário já existe, apenas salvando como lead');
+      }
+
+      // Também salvar como lead no CRM
+      await fetch('/api/crm/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -46,13 +64,11 @@ export default function QueroComecear() {
           status: 'novo',
           notas: `Tipo: ${formData.type} | Status: ${formData.status}`
         })
-      });
+      }).catch(err => console.log('Lead CRM (opcional):', err));
 
-      if (response.ok) {
-        setSubmitted(true);
-        setFormData({ name: '', phone: '', type: 'Revendedora', status: 'Quer começar' });
-        setTimeout(() => setSubmitted(false), 5000);
-      }
+      setSubmitted(true);
+      setFormData({ name: '', phone: '', type: 'Revendedora', status: 'Quer começar' });
+      setTimeout(() => setSubmitted(false), 5000);
     } catch (error) {
       console.error('Erro ao enviar:', error);
     } finally {

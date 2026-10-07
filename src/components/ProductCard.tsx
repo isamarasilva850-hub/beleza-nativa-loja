@@ -13,7 +13,8 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const hasImage = product.images.length > 0 && !product.images[0].includes("basica-1");
   const retailPrice = product.price * 2;
-  const { isLoggedIn } = useAuth();
+  const { user } = useAuth();
+  const isReseller = user?.type === 'revendedor';
   const [colorOverrides, setColorOverrides] = useState<any[]>([]);
 
   useEffect(() => {
@@ -78,7 +79,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </p>
           <p className="text-xs text-gray-600 font-semibold -mt-0.5">para uso próprio</p>
 
-          {isLoggedIn ? (
+          {isReseller ? (
             <p className="text-sm font-bold text-primary mt-1">
               R$ {product.price.toFixed(2).replace(".", ",")} <span className="text-xs font-semibold text-gray-700">revenda</span>
             </p>
@@ -87,11 +88,11 @@ export default function ProductCard({ product }: ProductCardProps) {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                window.location.href = "/minha-conta";
+                window.location.href = "/quero-comecar";
               }}
               className="text-xs text-primary font-semibold hover:text-primary-dark mt-1 block bg-none border-none p-0 cursor-pointer underline"
             >
-              Logue-se para preço de revenda
+              Comece como revendedora para preço especial
             </button>
           )}
         </div>
