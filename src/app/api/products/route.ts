@@ -36,9 +36,7 @@ export async function POST(request: NextRequest) {
 
     const { data: productData, error: productError } = await supabase
       .from('products')
-      .insert(productPayload)
-      .select()
-      .single();
+      .insert([productPayload]);
 
     if (productError) {
       console.error('Supabase INSERT Error:', {
@@ -72,7 +70,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(productData, { status: 201 });
+    return NextResponse.json(
+      { message: 'Produto salvo com sucesso!', id: productId },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Erro ao salvar produto:', error);
     const errorMessage = error instanceof Error ? error.message : String(error);
