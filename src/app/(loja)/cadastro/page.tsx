@@ -108,7 +108,6 @@ export default function Cadastro() {
       }).catch(err => console.warn('Erro ao salvar cliente:', err));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao salvar cadastro');
-      setLoading(false);
       return;
     }
 

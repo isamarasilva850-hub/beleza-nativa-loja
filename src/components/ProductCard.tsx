@@ -11,7 +11,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const hasImage = product.images.length > 0 && !product.images[0].includes("basica-1");
+  const hasImage = product.images && product.images.length > 0 && !product.images[0].includes("basica-1");
   const retailPrice = product.price * 2;
   const { user } = useAuth();
   const isReseller = user?.type === 'revendedor';
@@ -109,7 +109,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mb-3">
           <p className="text-xs font-bold text-gray-800 mb-2">Tamanhos:</p>
           <div className="flex gap-2 flex-wrap">
-            {Array.from(new Set(product.variants.flatMap(v => v.sizes))).map((size) => (
+            {product.variants && Array.from(new Set(product.variants.flatMap(v => v.sizes))).map((size) => (
               <span key={size} className="text-xs px-2.5 py-1 bg-gray-200 text-gray-800 rounded font-semibold">
                 {size}
               </span>
@@ -121,7 +121,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mb-3">
           <p className="text-xs font-bold text-gray-800 mb-2">Cores:</p>
           <div className="flex gap-2">
-            {product.variants.map((v, i) => (
+            {product.variants?.map((v, i) => (
               <span
                 key={`${v.color}-${i}`}
                 className="w-6 h-6 rounded-full border-2 border-gray-400 hover:border-primary transition-colors cursor-help"
@@ -133,9 +133,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Composition Hint */}
-        <p className="text-xs text-gray-600 italic mb-1">
-          {product.composition.split(",")[0]}
-        </p>
+        {product.composition && (
+          <p className="text-xs text-gray-600 italic mb-1">
+            {product.composition.split(",")[0]}
+          </p>
+        )}
 
         {/* REF */}
         <p className="text-xs text-gray-600 mt-1 font-mono font-bold">
