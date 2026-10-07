@@ -53,7 +53,10 @@ export async function POST(request: NextRequest) {
         .from('product_colors')
         .insert(colorRecords);
 
-      if (colorsError) throw colorsError;
+      if (colorsError) {
+        console.error('Erro ao salvar cores:', colorsError);
+        throw new Error(`Erro ao salvar cores: ${colorsError.message}`);
+      }
     }
 
     return NextResponse.json(productData, { status: 201 });
