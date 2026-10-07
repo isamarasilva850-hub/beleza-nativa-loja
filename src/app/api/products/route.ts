@@ -113,12 +113,12 @@ export async function GET() {
       .from('uploaded_products')
       .select('id, ref, name, price, images');
 
-    if (newError) {
-      console.error('Supabase error (products):', newError);
-    }
-    if (oldError) {
-      console.error('Supabase error (uploaded_products):', oldError);
-    }
+    console.log('📊 Supabase fetch results:', {
+      newProductsCount: newProducts?.length || 0,
+      oldProductsCount: oldProducts?.length || 0,
+      newError: newError?.message,
+      oldError: oldError?.message,
+    });
 
     // Combinar ambas as listas e formatar
     const allUploadedProducts = [
@@ -134,7 +134,10 @@ export async function GET() {
       }))
     ];
 
-    console.log('Total products from Supabase:', allUploadedProducts.length);
+    console.log('📦 Total products from Supabase:', allUploadedProducts.length);
+    if (allUploadedProducts.length > 0) {
+      console.log('🆕 First new products:', allUploadedProducts.slice(0, 3).map(p => p.ref));
+    }
 
     // Buscar cores de product_colors para produtos que não têm no JSON
     const productsWithColors = await Promise.all(
