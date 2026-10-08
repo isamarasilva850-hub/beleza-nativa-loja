@@ -29,23 +29,23 @@ export async function POST(request: NextRequest) {
     }
 
     // 0. Verificar se produto com essa ref já existe e deletar se existir
-    const { data: existingProduct, error: searchError } = await supabase
-      .from('products')
-      .select('id')
-      .eq('ref', ref)
-      .single();
+    try {
+      const { data: existingProducts } = await supabase
+        .from('products')
+        .select('id')
+        .eq('ref', ref);
 
-    if (existingProduct) {
-      console.log(`⚠️ Produto com ref '${ref}' já existe (id: ${existingProduct.id}), deletando antes de criar novo...`);
-
-      // Deletar imagens do produto antigo
-      await supabase.from('product_images').delete().eq('product_id', existingProduct.id);
-      // Deletar cores do produto antigo
-      await supabase.from('product_colors').delete().eq('product_id', existingProduct.id);
-      // Deletar produto antigo
-      await supabase.from('products').delete().eq('id', existingProduct.id);
-
-      console.log(`✅ Produto antigo deletado com sucesso`);
+      if (existingProducts && existingProducts.length > 0) {
+        console.log(`⚠️ Produto com ref '${ref}' já existe, deletando...`);
+        for (const existing of existingProducts) {
+          await supabase.from('product_images').delete().eq('product_id', existing.id);
+          await supabase.from('product_colors').delete().eq('product_id', existing.id);
+          await supabase.from('products').delete().eq('id', existing.id);
+        }
+        console.log(`✅ Produto antigo deletado`);
+      }
+    } catch (e) {
+      console.warn('⚠️ Erro ao deletar antigo (continuando):', e);
     }
 
     const productId = `${ref}-${Date.now().toString(36)}`;
