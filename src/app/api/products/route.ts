@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
     console.log('✅ Produto criado/atualizado com sucesso:', { id: productData.id, ref: productData.ref });
 
     // 2. Insert cores em product_colors se houver
+    let colorErrors: string[] = [];
     if (colors && colors.length > 0) {
       try {
         const colorInserts = colors.map((color: any) => ({
@@ -93,12 +94,16 @@ export async function POST(request: NextRequest) {
           .insert(colorInserts);
 
         if (colorError) {
-          console.warn('⚠️ Erro ao salvar cores (ignorando):', colorError.message);
+          const errMsg = `[${colorError.code}] ${colorError.message}`;
+          console.warn('⚠️ Erro ao salvar cores:', errMsg);
+          colorErrors.push(errMsg);
         } else {
           console.log('✅ Cores salvas!');
         }
       } catch (e) {
-        console.warn('⚠️ Exceção ao salvar cores (ignorando):', e);
+        const errMsg = `Exceção: ${e instanceof Error ? e.message : String(e)}`;
+        console.warn('⚠️ Exceção ao salvar cores:', errMsg);
+        colorErrors.push(errMsg);
       }
     }
 
@@ -148,7 +153,11 @@ export async function POST(request: NextRequest) {
       debugLogs.push(warnMsg);
     }
 
-    return NextResponse.json({ ...productData, debug_image_logs: debugLogs }, { status: 201 });
+    return NextResponse.json({
+      ...productData,
+      debug_image_logs: debugLogs,
+      debug_color_errors: colorErrors.length > 0 ? colorErrors : undefined
+    }, { status: 201 });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : '';
