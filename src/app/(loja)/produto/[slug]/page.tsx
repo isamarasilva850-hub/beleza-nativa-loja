@@ -61,7 +61,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
           }
 
           return {
-            id: index + 1,
+            id: item.id,
             ref: item.ref,
             slug: item.slug || item.ref.toLowerCase().replace(/\s+/g, '-'),
             name: item.name,
@@ -77,11 +77,11 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
           };
         });
         const allProducts = [...formatted, ...products];
-        const found = allProducts.find((p) => p.slug === slug || p.ref === slug || p.id === parseInt(slug));
+        const found = allProducts.find((p) => p.slug === slug || p.ref === slug);
         setProduct(found || null);
       } catch (error) {
         console.error('Erro ao carregar produto:', error);
-        const staticProduct = products.find((p) => p.slug === slug || p.ref === slug || p.id === parseInt(slug));
+        const staticProduct = products.find((p) => p.slug === slug || p.ref === slug);
         setProduct(staticProduct || null);
       } finally {
         setLoading(false);
