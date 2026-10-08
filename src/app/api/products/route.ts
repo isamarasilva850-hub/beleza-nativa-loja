@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     const productId = `${ref}-${Date.now().toString(36)}`;
 
-    // 1. Insert ou UPDATE produto em products (UPSERT simples)
+    // 1. Insert ou UPDATE produto em products (UPSERT pelo ref)
     const { data: productData, error: productError } = await supabase
       .from('products')
       .upsert({
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
         name,
         price: typeof price === 'string' ? parseFloat(price) : price,
         gender: gender || 'Feminino',
-      }, { onConflict: 'id' })
+      }, { onConflict: 'ref' })
       .select()
       .single();
 
