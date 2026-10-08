@@ -30,6 +30,24 @@ export async function POST(request: NextRequest) {
 
     const productId = `${ref}-${Date.now().toString(36)}`;
 
+    // 0.5. Se houver produto com essa ref, limpar cores e imagens ANTES de UPSERT
+    try {
+      const { data: existing } = await supabase
+        .from('products')
+        .select('id')
+        .eq('ref', ref)
+        .maybeSingle();
+
+      if (existing) {
+        console.log(`🧹 Limpando dados antigos do produto ${ref}...`);
+        await supabase.from('product_colors').delete().eq('product_id', existing.id);
+        await supabase.from('product_images').delete().eq('product_id', existing.id);
+        console.log(`✅ Dados antigos removidos`);
+      }
+    } catch (e) {
+      console.warn('⚠️ Erro ao limpar antigos (continuando):', e);
+    }
+
     // 1. Insert ou UPDATE produto em products (UPSERT pelo ref)
     const { data: productData, error: productError } = await supabase
       .from('products')
