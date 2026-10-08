@@ -77,7 +77,8 @@ export async function POST(request: NextRequest) {
     let colorErrors: string[] = [];
     if (colors && colors.length > 0) {
       try {
-        const colorInserts = colors.map((color: any) => ({
+        const colorInserts = colors.map((color: any, idx: number) => ({
+          id: `${productData.id}-cor-${idx}-${Date.now()}`,
           id_do_produto: productData.id,
           nome_da_cor: (color.name || 'Sem cor').toString().substring(0, 50),
           texto_hex_color: (color.hex || '#000000').toString().substring(0, 7),
