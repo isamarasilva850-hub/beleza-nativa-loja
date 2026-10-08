@@ -76,8 +76,12 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
             images: parsedImages,
           };
         });
-        const allProducts = [...formatted, ...products];
-        const found = allProducts.find((p) => p.slug === slug || p.ref === slug);
+        console.log('📦 Produtos carregados:', formatted.length);
+        console.log('🔍 Procurando por slug:', slug);
+        console.log('🔍 Primeiro produto:', formatted[0] ? { slug: formatted[0].slug, ref: formatted[0].ref } : 'nenhum');
+
+        const found = formatted.find((p) => p.slug === slug || p.ref === slug);
+        console.log('✅ Produto encontrado?', found ? { ref: found.ref, slug: found.slug } : 'NÃO');
         setProduct(found || null);
       } catch (error) {
         console.error('Erro ao carregar produto:', error);
