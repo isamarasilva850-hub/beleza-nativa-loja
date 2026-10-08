@@ -88,22 +88,25 @@ export async function POST(request: NextRequest) {
           qtd_gg: Math.max(0, parseInt(color.qty_gg) || 0),
         }));
 
-        console.log('🎨 Cores a inserir:', colorInserts);
+        console.log('🎨 Cores a inserir:', JSON.stringify(colorInserts, null, 2));
 
-        const { error: colorError } = await supabase
+        const { data: insertedColors, error: colorError } = await supabase
           .from('cores_do_produto')
-          .insert(colorInserts);
+          .insert(colorInserts)
+          .select();
+
+        console.log('🎨 Resposta do INSERT:', { data: insertedColors, error: colorError });
 
         if (colorError) {
-          const errMsg = `[${colorError.code}] ${colorError.message}`;
-          console.warn('⚠️ Erro ao salvar cores:', errMsg);
+          const errMsg = `[${colorError.code}] ${colorError.message} | ${colorError.details}`;
+          console.error('❌ ERRO AO SALVAR CORES:', errMsg);
           colorErrors.push(errMsg);
         } else {
-          console.log('✅ Cores salvas!');
+          console.log(`✅ Cores salvas! ${insertedColors?.length || 0} cores inseridas`);
         }
       } catch (e) {
         const errMsg = `Exceção: ${e instanceof Error ? e.message : String(e)}`;
-        console.warn('⚠️ Exceção ao salvar cores:', errMsg);
+        console.error('❌ EXCEÇÃO AO SALVAR CORES:', errMsg);
         colorErrors.push(errMsg);
       }
     }
