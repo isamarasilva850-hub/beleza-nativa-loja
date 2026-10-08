@@ -47,26 +47,50 @@ export async function POST(request: NextRequest) {
     const productId = products[0].id;
 
     // 2. Deleta as cores do produto (se existirem)
+    console.log(`🎨 Tentando deletar cores para id_do_produto: ${productId}`);
     try {
-      const { error: deleteColorsError } = await supabase
+      const { error: deleteColorsError, count } = await supabase
         .from('cores_do_produto')
         .delete()
         .eq('id_do_produto', productId);
 
-      if (!deleteColorsError) {
-        console.log(`✅ Cores deletadas (product_id: ${productId})`);
+      if (deleteColorsError) {
+        console.error(`❌ Erro ao deletar cores:`, deleteColorsError);
+      } else {
+        console.log(`✅ Cores deletadas! (${count || 0} registros removidos)`);
       }
-    } catch (e) {
-      console.log(`⚠️ Cores não deletadas (tabela pode não existir)`);
+    } catch (e: any) {
+      console.error(`❌ Exceção ao deletar cores:`, e.message);
     }
 
-    // Deleta o produto
+    // 3. Deletar imagens
+    console.log(`🖼️ Tentando deletar imagens para product_id: ${productId}`);
+    try {
+      const { error: deleteImagesError } = await supabase
+        .from('product_images')
+        .delete()
+        .eq('product_id', productId);
+
+      if (deleteImagesError) {
+        console.error(`❌ Erro ao deletar imagens:`, deleteImagesError);
+      } else {
+        console.log(`✅ Imagens deletadas!`);
+      }
+    } catch (e: any) {
+      console.error(`❌ Exceção ao deletar imagens:`, e.message);
+    }
+
+    // 4. Deleta o produto
+    console.log(`🗑️ Tentando deletar produto: ${productId}`);
     const { error: deleteProductError } = await supabase
       .from('products')
       .delete()
       .eq('id', productId);
 
-    if (deleteProductError) throw deleteProductError;
+    if (deleteProductError) {
+      console.error(`❌ Erro ao deletar produto:`, deleteProductError);
+      throw deleteProductError;
+    }
     console.log(`✅ Produto deletado (REF: ${ref}, ID: ${productId})`);
 
     return NextResponse.json({
