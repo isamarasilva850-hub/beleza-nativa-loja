@@ -88,10 +88,10 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
         console.log('📦 Produtos formatados:', formatted.length);
         console.log('🔍 Procurando por slug:', slug);
         if (formatted.length > 0) {
-          console.log('🔍 Primeiros 3 produtos:', formatted.slice(0, 3).map(p => ({ ref: p.ref, slug: p.slug })));
+          console.log('🔍 Primeiros 3 produtos:', formatted.slice(0, 3).map((p: any) => ({ ref: p.ref, slug: p.slug })));
         }
 
-        const found = formatted.find((p) => (p.slug === slug || p.ref === slug) && p.slug && p.ref);
+        const found = formatted.find((p: any) => (p.slug === slug || p.ref === slug) && p.slug && p.ref);
         console.log('✅ Produto encontrado?', found ? { ref: found.ref, slug: found.slug, id: found.id } : 'NÃO');
 
         if (found) {
