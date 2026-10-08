@@ -28,38 +28,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 0. Verificar se produto com essa ref já existe e deletar se existir
-    try {
-      const { data: existingProducts } = await supabase
-        .from('products')
-        .select('id')
-        .eq('ref', ref);
-
-      if (existingProducts && existingProducts.length > 0) {
-        console.log(`⚠️ Produto com ref '${ref}' já existe, deletando...`);
-        for (const existing of existingProducts) {
-          await supabase.from('product_images').delete().eq('product_id', existing.id);
-          await supabase.from('product_colors').delete().eq('product_id', existing.id);
-          await supabase.from('products').delete().eq('id', existing.id);
-        }
-        console.log(`✅ Produto antigo deletado`);
-      }
-    } catch (e) {
-      console.warn('⚠️ Erro ao deletar antigo (continuando):', e);
-    }
-
     const productId = `${ref}-${Date.now().toString(36)}`;
 
-    // 1. Insert produto em products
+    // 1. Insert ou UPDATE produto em products (UPSERT simples)
     const { data: productData, error: productError } = await supabase
       .from('products')
-      .insert({
+      .upsert({
         id: productId,
         ref,
         name,
         price: typeof price === 'string' ? parseFloat(price) : price,
         gender: gender || 'Feminino',
-      })
+      }, { onConflict: 'id' })
       .select()
       .single();
 
