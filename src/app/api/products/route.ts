@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
       try {
         const colorInserts = colors.map((color: any) => ({
           product_id: productData.id,
-          nome_da_cor: (color.name || 'Sem cor').toString().substring(0, 50),
-          texto_hex_color: (color.hex || '#000000').toString().substring(0, 7),
+          color_name: (color.name || 'Sem cor').toString().substring(0, 50),
+          color_hex: (color.hex || '#000000').toString().substring(0, 7),
           qty_p: Math.max(0, parseInt(color.qty_p) || 0),
           qty_m: Math.max(0, parseInt(color.qty_m) || 0),
           qty_g: Math.max(0, parseInt(color.qty_g) || 0),
