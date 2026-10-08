@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     // 2. Deleta as cores do produto (se existirem)
     try {
       const { error: deleteColorsError } = await supabase
-        .from('product_colors')
+        .from('cores_do_produto')
         .delete()
         .eq('product_id', productId);
 
