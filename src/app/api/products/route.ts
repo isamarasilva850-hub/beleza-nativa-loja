@@ -39,7 +39,6 @@ export async function POST(request: NextRequest) {
         name,
         price: typeof price === 'string' ? parseFloat(price) : price,
         gender: gender || 'Feminino',
-        display_order: Date.now(), // Novos produtos vão pro final
       })
       .select()
       .single();
