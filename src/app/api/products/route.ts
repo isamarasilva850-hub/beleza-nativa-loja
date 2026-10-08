@@ -64,17 +64,22 @@ export async function POST(request: NextRequest) {
         qty_gg: parseInt(color.qty_gg) || 0,
       }));
 
+      console.log('🎨 Tentando salvar cores:', colorInserts);
+
       const { error: colorError } = await supabase
         .from('product_colors')
         .insert(colorInserts);
 
       if (colorError) {
-        console.error('Supabase insert error (product_colors):', {
+        console.error('❌ ERRO ao salvar cores:', {
           message: colorError.message,
           code: colorError.code,
           details: colorError.details,
+          hint: colorError.hint,
         });
-        // Não falha se cores falharem, apenas loga
+        throw new Error(`Erro ao salvar cores: [${colorError.code}] ${colorError.message}`);
+      } else {
+        console.log('✅ Cores salvas com sucesso!');
       }
     }
 
