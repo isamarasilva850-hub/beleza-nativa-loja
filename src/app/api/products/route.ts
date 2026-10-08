@@ -73,14 +73,14 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Produto criado/atualizado com sucesso:', { id: productData.id, ref: productData.ref });
 
-    // 2. Insert cores em product_colors se houver
+    // 2. Insert cores em cores_do_produto se houver
     let colorErrors: string[] = [];
     if (colors && colors.length > 0) {
       try {
         const colorInserts = colors.map((color: any) => ({
           product_id: productData.id,
-          color_name: (color.name || 'Sem cor').toString().substring(0, 50),
-          color_hex: (color.hex || '#000000').toString().substring(0, 7),
+          nome_da_cor: (color.name || 'Sem cor').toString().substring(0, 50),
+          texto_hex_color: (color.hex || '#000000').toString().substring(0, 7),
           qty_p: Math.max(0, parseInt(color.qty_p) || 0),
           qty_m: Math.max(0, parseInt(color.qty_m) || 0),
           qty_g: Math.max(0, parseInt(color.qty_g) || 0),
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
         console.log('🎨 Cores a inserir:', colorInserts);
 
         const { error: colorError } = await supabase
-          .from('product_colors')
+          .from('cores_do_produto')
           .insert(colorInserts);
 
         if (colorError) {
@@ -233,8 +233,8 @@ export async function GET() {
       allUploadedProducts.map(async (product: any) => {
         // Buscar cores
         const { data: colors } = await supabase
-          .from('product_colors')
-          .select('color_name, color_hex, qty_p, qty_m, qty_g, qty_gg')
+          .from('cores_do_produto')
+          .select('nome_da_cor, texto_hex_color, qty_p, qty_m, qty_g, qty_gg')
           .eq('product_id', product.id);
 
         // Buscar imagens 🖼️
@@ -257,8 +257,8 @@ export async function GET() {
           ...product,
           images: imageList,
           colors: colors?.map((c: any) => ({
-            color_name: c.color_name,
-            color_hex: c.color_hex,
+            color_name: c.nome_da_cor,
+            color_hex: c.texto_hex_color,
             qty_p: c.qty_p,
             qty_m: c.qty_m,
             qty_g: c.qty_g,
