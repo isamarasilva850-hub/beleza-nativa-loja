@@ -149,7 +149,7 @@ export async function GET() {
     // Produtos estáticos do arquivo JSON
     const productsPath = path.join(process.cwd(), 'src', 'data', 'products.json');
     const productsData = fs.readFileSync(productsPath, 'utf-8');
-    const staticProducts = JSON.parse(productsData).map((p: any) => ({
+    const staticProducts = JSON.parse(productsData).map((p: any, index: number) => ({
       id: p.id,
       ref: p.ref,
       slug: p.ref.toLowerCase().replace(/\s+/g, '-'),
@@ -160,6 +160,7 @@ export async function GET() {
       category: p.category,
       collection: p.collection,
       variants: p.variants || [],
+      display_order: index, // Produtos antigos recebem ordem padrão
     }));
 
     // Produtos uploadados do Supabase
@@ -241,11 +242,11 @@ export async function GET() {
       })
     );
 
-    // Combina ambos
+    // Combina ambos e ordena por display_order
     const allProducts = [
       ...staticProducts,
       ...productsWithDetails
-    ];
+    ].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
 
     return NextResponse.json(allProducts);
   } catch (error) {
