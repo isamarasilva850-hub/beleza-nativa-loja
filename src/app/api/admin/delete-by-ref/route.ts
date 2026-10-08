@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     // Deletar cores
     await supabase
-      .from('product_colors')
+      .from('cores_do_produto')
       .delete()
       .eq('product_id', product.id);
 

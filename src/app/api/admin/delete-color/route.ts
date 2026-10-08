@@ -21,7 +21,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { error } = await supabase
-      .from('product_colors')
+      .from('cores_do_produto')
       .delete()
       .eq('id', colorId);
 

@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     // Deletar cores (ignorar erros)
     try {
       const { error: colError } = await supabase
-        .from('product_colors')
+        .from('cores_do_produto')
         .delete()
         .eq('product_id', productId);
 

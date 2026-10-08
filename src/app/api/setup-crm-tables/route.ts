@@ -50,10 +50,10 @@ export async function POST() {
       });
     } catch (e) { }
 
-    // Criar tabela product_colors (cores e estoque por tamanho)
+    // Criar tabela cores_do_produto (cores e estoque por tamanho)
     try {
       await supabase.rpc('exec_sql', {
-        sql: `CREATE TABLE IF NOT EXISTS product_colors (id TEXT PRIMARY KEY, product_id TEXT NOT NULL, color_name TEXT NOT NULL, color_hex TEXT, qty_p INTEGER DEFAULT 0, qty_m INTEGER DEFAULT 0, qty_g INTEGER DEFAULT 0, qty_gg INTEGER DEFAULT 0, created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW(), FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE);`
+        sql: `CREATE TABLE IF NOT EXISTS cores_do_produto (id TEXT PRIMARY KEY, product_id TEXT NOT NULL, nome_da_cor TEXT NOT NULL, texto_hex_color TEXT, qty_p INTEGER DEFAULT 0, qty_m INTEGER DEFAULT 0, qty_g INTEGER DEFAULT 0, qty_gg INTEGER DEFAULT 0, created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW(), FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE);`
       });
     } catch (e) { }
 
