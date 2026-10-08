@@ -174,8 +174,7 @@ export async function GET() {
     console.log('🔍 [DEBUG] About to fetch from products table...');
     const { data: newProducts, error: newError } = await supabase
       .from('products')
-      .select('*')
-      .order('display_order', { ascending: true });
+      .select('*');
 
     console.log('🔍 [DEBUG] Supabase response:', {
       hasError: !!newError,
