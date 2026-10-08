@@ -261,6 +261,19 @@ export default function PalmiraUploadPage() {
         price: product.price?.toString() || "",
         gender: product.gender || "Feminino",
       });
+      if (product.variants && product.variants.length > 0) {
+        setColors(
+          product.variants.map((v: any) => ({
+            id: `color_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            name: v.color_name || v.name || '',
+            hex: v.color_hex || v.hex || '#000000',
+            qty_p: v.qty_p?.toString() || '0',
+            qty_m: v.qty_m?.toString() || '0',
+            qty_g: v.qty_g?.toString() || '0',
+            qty_gg: v.qty_gg?.toString() || '0',
+          }))
+        );
+      }
       setSuccess(`✅ Produto "${product.name}" carregado! Adicione mais fotos/cores.`);
     } catch (err: any) {
       setError(err.message);
@@ -334,22 +347,18 @@ export default function PalmiraUploadPage() {
         throw new Error("❌ Adicione quantidade para pelo menos um tamanho!");
       }
 
-      if (savedImages.length === 0) {
-        throw new Error("❌ Clique em 'Salvar Imagens' antes de enviar o produto!");
-      }
-
       const productData = {
         ref: formData.ref,
         name: formData.name,
-        price: formData.price,
+        price: parseFloat(formData.price) || 0,
         gender: formData.gender,
         colors: colors.map((c) => ({
-          name: c.name,
+          name: c.name || 'Sem cor',
           hex: c.hex,
-          qty_p: c.qty_p,
-          qty_m: c.qty_m,
-          qty_g: c.qty_g,
-          qty_gg: c.qty_gg,
+          qty_p: parseInt(c.qty_p) || 0,
+          qty_m: parseInt(c.qty_m) || 0,
+          qty_g: parseInt(c.qty_g) || 0,
+          qty_gg: parseInt(c.qty_gg) || 0,
         })),
         images: savedImages,
       };
@@ -1139,7 +1148,6 @@ export default function PalmiraUploadPage() {
                         onClick={() => {
                           const newPrice = formData.price;
                           if (newPrice && newPrice !== foundProduct.price?.toString()) {
-                            setFormData({ ...foundProduct, price: newPrice });
                             handleSubmit({ preventDefault: () => {} } as any);
                           }
                         }}
