@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
       if (existing) {
         console.log(`🧹 Limpando dados antigos do produto ${ref}...`);
-        await supabase.from('product_colors').delete().eq('product_id', existing.id);
+        await supabase.from('cores_do_produto').delete().eq('product_id', existing.id);
         await supabase.from('product_images').delete().eq('product_id', existing.id);
         console.log(`✅ Dados antigos removidos`);
       }
