@@ -61,20 +61,23 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (productError) {
-      console.error('Supabase insert error (products):', {
-        message: productError.message,
-        code: productError.code,
-        details: productError.details,
+    if (productError || !productData) {
+      console.error('❌ Erro ao salvar produto:', {
+        message: productError?.message,
+        code: productError?.code,
+        details: productError?.details,
+        productData,
       });
-      throw new Error(`[${productError.code}] ${productError.message}${productError.details ? ': ' + productError.details : ''}`);
+      throw new Error(`Erro ao criar produto: ${productError?.message || 'Sem dados retornados'}`);
     }
+
+    console.log('✅ Produto criado/atualizado com sucesso:', { id: productData.id, ref: productData.ref });
 
     // 2. Insert cores em product_colors se houver
     if (colors && colors.length > 0) {
       try {
         const colorInserts = colors.map((color: any) => ({
-          product_id: productId,
+          product_id: productData.id,
           color_name: (color.name || 'Sem cor').toString().substring(0, 50),
           color_hex: (color.hex || '#000000').toString().substring(0, 7),
           qty_p: Math.max(0, parseInt(color.qty_p) || 0),
@@ -109,8 +112,8 @@ export async function POST(request: NextRequest) {
       for (let i = 0; i < images.length; i++) {
         try {
           const imageData = {
-            id: `${productId}-img-${i}`,
-            product_id: productId,
+            id: `${productData.id}-img-${i}`,
+            product_id: productData.id,
             image_base64: images[i],
           };
 
