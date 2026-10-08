@@ -10,15 +10,6 @@ export async function POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    // Debug: descobrir colunas da tabela
-    const { data: schemaInfo } = await supabase
-      .from('information_schema.columns')
-      .select('column_name')
-      .eq('table_name', 'product_images')
-      .limit(10);
-
-    console.log('🔍 [DEBUG] Colunas de product_images:', schemaInfo?.map(c => (c as any).column_name).join(', ') || 'não conseguiu');
-
     const body = await request.json();
     const { ref, name, price, gender, colors, images } = body;
 
