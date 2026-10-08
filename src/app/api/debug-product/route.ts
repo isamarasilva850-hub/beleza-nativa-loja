@@ -34,16 +34,26 @@ export async function GET(request: NextRequest) {
       .select('*')
       .eq('id_do_produto', product.id);
 
+    // 3. Ver TUDO na tabela cores_do_produto (sem filtro)
+    const { data: allColors, error: allColorsError } = await supabase
+      .from('cores_do_produto')
+      .select('*');
+
     return NextResponse.json({
       product: {
         id: product.id,
         ref: product.ref,
         name: product.name,
       },
-      colors: {
+      colors_for_this_product: {
         count: colors?.length || 0,
         data: colors || [],
         error: colorsError?.message,
+      },
+      all_colors_in_database: {
+        count: allColors?.length || 0,
+        data: allColors || [],
+        error: allColorsError?.message,
       },
     });
   } catch (error) {
