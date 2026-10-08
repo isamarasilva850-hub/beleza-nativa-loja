@@ -26,12 +26,21 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
 
   useEffect(() => {
     const loadProduct = async () => {
+      console.log('🚀 [DEBUG] loadProduct iniciado, slug:', slug);
       setLoading(true);
       try {
+        console.log('🔄 Fetching /api/products...');
         const response = await fetch('/api/products');
+        console.log('📥 Response recebida, status:', response.status);
+
+        if (!response.ok) {
+          throw new Error(`Erro ${response.status} ao buscar produtos`);
+        }
+
         const supabaseProducts = await response.json();
+        console.log('✅ JSON parseado, total de produtos:', supabaseProducts.length);
+
         const formatted = supabaseProducts.map((item: any, index: number) => {
-          // Se tem colors (do Supabase), formata; senão usa variants (do JSON estático)
           const variantsData = item.colors?.map((color: any) => ({
             color: color.color_name,
             colorHex: color.color_hex || "#000000",
@@ -43,7 +52,6 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
             ],
           })) || item.variants || [];
 
-          // Parse images se for string JSON
           let parsedImages: string[] = [];
           if (item.images) {
             try {
@@ -63,7 +71,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
           return {
             id: item.id,
             ref: item.ref,
-            slug: item.slug || item.ref.toLowerCase().replace(/\s+/g, '-'),
+            slug: item.slug || (item.ref ? item.ref.toLowerCase().replace(/\s+/g, '-') : ''),
             name: item.name,
             price: parseFloat(item.price),
             description: item.description || `Produto ${item.name}`,
@@ -76,15 +84,25 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
             images: parsedImages,
           };
         });
-        console.log('📦 Produtos carregados:', formatted.length);
-        console.log('🔍 Procurando por slug:', slug);
-        console.log('🔍 Primeiro produto:', formatted[0] ? { slug: formatted[0].slug, ref: formatted[0].ref } : 'nenhum');
 
-        const found = formatted.find((p) => p.slug === slug || p.ref === slug);
-        console.log('✅ Produto encontrado?', found ? { ref: found.ref, slug: found.slug } : 'NÃO');
-        setProduct(found || null);
+        console.log('📦 Produtos formatados:', formatted.length);
+        console.log('🔍 Procurando por slug:', slug);
+        if (formatted.length > 0) {
+          console.log('🔍 Primeiros 3 produtos:', formatted.slice(0, 3).map(p => ({ ref: p.ref, slug: p.slug })));
+        }
+
+        const found = formatted.find((p) => (p.slug === slug || p.ref === slug) && p.slug && p.ref);
+        console.log('✅ Produto encontrado?', found ? { ref: found.ref, slug: found.slug, id: found.id } : 'NÃO');
+
+        if (found) {
+          setProduct(found);
+        } else {
+          console.log('⚠️ Não encontrado em formatados, tentando JSON estático...');
+          const staticProduct = products.find((p) => p.slug === slug || p.ref === slug);
+          setProduct(staticProduct || null);
+        }
       } catch (error) {
-        console.error('Erro ao carregar produto:', error);
+        console.error('❌ Erro ao carregar produto:', error);
         const staticProduct = products.find((p) => p.slug === slug || p.ref === slug);
         setProduct(staticProduct || null);
       } finally {
