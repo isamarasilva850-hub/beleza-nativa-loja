@@ -248,6 +248,24 @@ export async function GET() {
       ...productsWithDetails
     ].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
 
+    // Debug: verificar se produto 444 está lá
+    const produto444 = allProducts.find(p => p.ref === '444');
+    if (produto444) {
+      console.log('✅ Produto 444 encontrado:', {
+        ref: produto444.ref,
+        slug: produto444.slug,
+        id: produto444.id,
+        colors: produto444.colors?.length || 0,
+        images: produto444.images?.length || 0,
+        display_order: produto444.display_order
+      });
+    } else {
+      console.log('❌ Produto 444 NÃO encontrado no array final!');
+      console.log('📊 Total de produtos:', allProducts.length);
+      console.log('📊 Produtos do Supabase:', productsWithDetails.length);
+      console.log('📊 Produtos estáticos:', staticProducts.length);
+    }
+
     return NextResponse.json(allProducts);
   } catch (error) {
     console.error('Erro ao buscar produtos:', error);
