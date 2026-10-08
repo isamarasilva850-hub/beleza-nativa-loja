@@ -22,6 +22,7 @@ export default function PalmiraUploadPage() {
   });
 
   const [colors, setColors] = useState<ColorInput[]>([]);
+  const [savedColors, setSavedColors] = useState<ColorInput[]>([]);
   const [images, setImages] = useState<string[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [savedImages, setSavedImages] = useState<string[]>([]);
@@ -107,6 +108,21 @@ export default function PalmiraUploadPage() {
     }
     setSavedImages(images);
     setSuccess(`✅ ${images.length} imagem(ns) salva(s)!`);
+    setTimeout(() => setSuccess(""), 2000);
+  };
+
+  const handleSaveColors = () => {
+    if (colors.length === 0) {
+      setError("❌ Nenhuma cor adicionada!");
+      return;
+    }
+    const validColors = colors.filter((c) => c.name && (parseInt(c.qty_p) > 0 || parseInt(c.qty_m) > 0 || parseInt(c.qty_g) > 0 || parseInt(c.qty_gg) > 0));
+    if (validColors.length === 0) {
+      setError("❌ Adicione nome e quantidade para pelo menos uma cor!");
+      return;
+    }
+    setSavedColors(colors);
+    setSuccess(`✅ ${colors.length} cor(es) salva(s)!`);
     setTimeout(() => setSuccess(""), 2000);
   };
 
@@ -331,8 +347,8 @@ export default function PalmiraUploadPage() {
         throw new Error("❌ Preencha REF, Nome e Preço!");
       }
 
-      if (colors.length === 0) {
-        throw new Error("❌ Adicione pelo menos uma cor!");
+      if (savedColors.length === 0) {
+        throw new Error("❌ Clique em 'Salvar Cores' antes de enviar o produto!");
       }
 
       const hasQty = colors.some(
@@ -352,7 +368,7 @@ export default function PalmiraUploadPage() {
         name: formData.name,
         price: parseFloat(formData.price) || 0,
         gender: formData.gender,
-        colors: colors.map((c) => ({
+        colors: savedColors.map((c) => ({
           name: c.name || 'Sem cor',
           hex: c.hex,
           qty_p: parseInt(c.qty_p) || 0,
@@ -753,7 +769,22 @@ export default function PalmiraUploadPage() {
               >
                 + Adicionar Cor
               </button>
+              {colors.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleSaveColors}
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold text-sm transition-colors"
+                >
+                  💾 Salvar Cores
+                </button>
+              )}
             </div>
+
+            {savedColors.length > 0 && (
+              <div className="bg-green-100 border border-green-300 rounded-lg p-3 mb-4">
+                <p className="text-green-700 text-sm">✅ {savedColors.length} cor(es) salva(s)!</p>
+              </div>
+            )}
 
             {colors.length === 0 ? (
               <p className="text-gray-500 text-sm">Clique em "Adicionar Cor" para começar</p>
