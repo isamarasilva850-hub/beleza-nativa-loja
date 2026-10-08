@@ -28,6 +28,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 0. Verificar se produto com essa ref já existe e deletar se existir
+    const { data: existingProduct, error: searchError } = await supabase
+      .from('products')
+      .select('id')
+      .eq('ref', ref)
+      .single();
+
+    if (existingProduct) {
+      console.log(`⚠️ Produto com ref '${ref}' já existe (id: ${existingProduct.id}), deletando antes de criar novo...`);
+
+      // Deletar imagens do produto antigo
+      await supabase.from('product_images').delete().eq('product_id', existingProduct.id);
+      // Deletar cores do produto antigo
+      await supabase.from('product_colors').delete().eq('product_id', existingProduct.id);
+      // Deletar produto antigo
+      await supabase.from('products').delete().eq('id', existingProduct.id);
+
+      console.log(`✅ Produto antigo deletado com sucesso`);
+    }
+
     const productId = `${ref}-${Date.now().toString(36)}`;
 
     // 1. Insert produto em products
