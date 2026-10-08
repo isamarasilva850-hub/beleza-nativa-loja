@@ -128,9 +128,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ...productData, debug_image_logs: debugLogs }, { status: 201 });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('POST /api/products error:', errorMessage);
+    const errorStack = error instanceof Error ? error.stack : '';
+    console.error('❌ POST /api/products ERROR:');
+    console.error('Message:', errorMessage);
+    console.error('Stack:', errorStack);
     return NextResponse.json(
-      { error: 'Erro ao salvar produto', details: errorMessage },
+      { error: 'Erro ao salvar produto', details: errorMessage, stack: errorStack },
       { status: 500 }
     );
   }
