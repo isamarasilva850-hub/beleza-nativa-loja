@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
       if (existing) {
         console.log(`🧹 Limpando dados antigos do produto ${ref}...`);
-        await supabase.from('cores_do_produto').delete().eq('product_id', existing.id);
+        await supabase.from('cores_do_produto').delete().eq('id_do_produto', existing.id);
         await supabase.from('product_images').delete().eq('product_id', existing.id);
         console.log(`✅ Dados antigos removidos`);
       }
@@ -78,13 +78,13 @@ export async function POST(request: NextRequest) {
     if (colors && colors.length > 0) {
       try {
         const colorInserts = colors.map((color: any) => ({
-          product_id: productData.id,
+          id_do_produto: productData.id,
           nome_da_cor: (color.name || 'Sem cor').toString().substring(0, 50),
           texto_hex_color: (color.hex || '#000000').toString().substring(0, 7),
-          qty_p: Math.max(0, parseInt(color.qty_p) || 0),
-          qty_m: Math.max(0, parseInt(color.qty_m) || 0),
-          qty_g: Math.max(0, parseInt(color.qty_g) || 0),
-          qty_gg: Math.max(0, parseInt(color.qty_gg) || 0),
+          qtd_p: Math.max(0, parseInt(color.qty_p) || 0),
+          qtd_m: Math.max(0, parseInt(color.qty_m) || 0),
+          qtd_g: Math.max(0, parseInt(color.qty_g) || 0),
+          qtd_gg: Math.max(0, parseInt(color.qty_gg) || 0),
         }));
 
         console.log('🎨 Cores a inserir:', colorInserts);
@@ -234,8 +234,8 @@ export async function GET() {
         // Buscar cores
         const { data: colors } = await supabase
           .from('cores_do_produto')
-          .select('nome_da_cor, texto_hex_color, qty_p, qty_m, qty_g, qty_gg')
-          .eq('product_id', product.id);
+          .select('nome_da_cor, texto_hex_color, qtd_p, qtd_m, qtd_g, qtd_gg')
+          .eq('id_do_produto', product.id);
 
         // Buscar imagens 🖼️
         const { data: images, error: imgError } = await supabase
@@ -259,10 +259,10 @@ export async function GET() {
           colors: colors?.map((c: any) => ({
             color_name: c.nome_da_cor,
             color_hex: c.texto_hex_color,
-            qty_p: c.qty_p,
-            qty_m: c.qty_m,
-            qty_g: c.qty_g,
-            qty_gg: c.qty_gg,
+            qty_p: c.qtd_p,
+            qty_m: c.qtd_m,
+            qty_g: c.qtd_g,
+            qty_gg: c.qtd_gg,
           })) || [],
         };
       })

@@ -53,7 +53,7 @@ export async function POST() {
     // Criar tabela cores_do_produto (cores e estoque por tamanho)
     try {
       await supabase.rpc('exec_sql', {
-        sql: `CREATE TABLE IF NOT EXISTS cores_do_produto (id TEXT PRIMARY KEY, product_id TEXT NOT NULL, nome_da_cor TEXT NOT NULL, texto_hex_color TEXT, qty_p INTEGER DEFAULT 0, qty_m INTEGER DEFAULT 0, qty_g INTEGER DEFAULT 0, qty_gg INTEGER DEFAULT 0, created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW(), FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE);`
+        sql: `CREATE TABLE IF NOT EXISTS cores_do_produto (id TEXT PRIMARY KEY, id_do_produto TEXT NOT NULL, nome_da_cor TEXT NOT NULL, texto_hex_color TEXT, qtd_p INTEGER DEFAULT 0, qtd_m INTEGER DEFAULT 0, qtd_g INTEGER DEFAULT 0, qtd_gg INTEGER DEFAULT 0, criado_em TIMESTAMP DEFAULT NOW(), atualizado_em TIMESTAMP DEFAULT NOW(), FOREIGN KEY(id_do_produto) REFERENCES produtos(id) ON DELETE CASCADE);`
       });
     } catch (e) { }
 

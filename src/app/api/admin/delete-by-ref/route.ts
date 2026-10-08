@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     await supabase
       .from('cores_do_produto')
       .delete()
-      .eq('product_id', product.id);
+      .eq('id_do_produto', product.id);
 
     // Deletar produto
     const { error: deleteError } = await supabase

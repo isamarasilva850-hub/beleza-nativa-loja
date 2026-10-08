@@ -15,10 +15,10 @@ export async function PUT(request: NextRequest) {
 
     const updates: any = {};
     if (color_name) updates.nome_da_cor = color_name;
-    if (qty_p !== undefined) updates.qty_p = parseInt(qty_p);
-    if (qty_m !== undefined) updates.qty_m = parseInt(qty_m);
-    if (qty_g !== undefined) updates.qty_g = parseInt(qty_g);
-    if (qty_gg !== undefined) updates.qty_gg = parseInt(qty_gg);
+    if (qty_p !== undefined) updates.qtd_p = parseInt(qty_p);
+    if (qty_m !== undefined) updates.qtd_m = parseInt(qty_m);
+    if (qty_g !== undefined) updates.qtd_g = parseInt(qty_g);
+    if (qty_gg !== undefined) updates.qtd_gg = parseInt(qty_gg);
 
     const { error } = await supabase
       .from('cores_do_produto')

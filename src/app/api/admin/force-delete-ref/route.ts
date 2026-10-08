@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
       const { error: colError } = await supabase
         .from('cores_do_produto')
         .delete()
-        .eq('product_id', productId);
+        .eq('id_do_produto', productId);
 
       if (colError) {
         log.push(`⚠️ Erro ao deletar cores: ${colError.message}`);
