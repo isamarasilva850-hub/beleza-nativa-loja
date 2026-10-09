@@ -22,14 +22,16 @@ export default function PedidosRevendedoras() {
     const catalogLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/vitrine/${order.id}/editar`;
 
     // Criar mensagem com legendas de cada peça
+    const caixa = '```';
     const artesMsg = refs
       .map((ref: string) => {
         const arteLegenda = artesLegendasMap[ref as keyof typeof artesLegendasMap];
         const legenda = arteLegenda?.legendaCurta || arteLegenda?.legendaCompleta || `REF ${ref}`;
+        const nomePeca = (order.items || []).find((item: any) => item.ref === ref)?.name || '';
 
-        return `📸 REF ${ref}\n${legenda}`;
+        return `📸 *REF ${ref}* - ${nomePeca}\n${caixa}\n${legenda}\n${caixa}`;
       })
-      .join('\n\n');
+      .join('\n\n\n━━━━━━━━━━━━\n\n\n');
 
     const linkLoja = `${typeof window !== 'undefined' ? window.location.origin : ''}/vitrine/${order.id}`;
 
