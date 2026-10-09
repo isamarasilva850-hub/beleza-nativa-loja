@@ -18,9 +18,9 @@ export default function LeadCaptureModal() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Check if already captured in this session
     const capturedLead = localStorage.getItem("belezanativa_lead_captured");
-    if (!capturedLead) {
+    const dismissed = localStorage.getItem("belezanativa_lead_dismissed");
+    if (!capturedLead && !dismissed) {
       // Show after 5 seconds of landing
       const timer = setTimeout(() => setIsOpen(true), 5000);
       return () => clearTimeout(timer);
@@ -92,10 +92,15 @@ export default function LeadCaptureModal() {
     }
   };
 
+  const dismiss = () => {
+    localStorage.setItem("belezanativa_lead_dismissed", "true");
+    setIsOpen(false);
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fadeIn">
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
       <style>{`
         @keyframes slideUp {
           from {
@@ -119,14 +124,14 @@ export default function LeadCaptureModal() {
         }
       `}</style>
 
-      <div className="bg-gradient-to-b from-white to-gray-50 rounded-3xl shadow-2xl w-full max-w-md p-8 space-y-5 animate-slideUp border-2 border-[#7BC9C2]/20 relative overflow-hidden">
+      <div className="bg-gradient-to-b from-white to-gray-50 rounded-3xl shadow-2xl w-full max-w-md p-5 space-y-3 animate-slideUp border-2 border-[#7BC9C2]/20 relative max-h-[90vh] overflow-y-auto">
         {/* Decorative background elements */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-[#7BC9C2]/5 rounded-full -mr-16 -mt-16" />
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-yellow-200/10 rounded-full -ml-12 -mb-12" />
 
         {/* Close button */}
         <button
-          onClick={() => setIsOpen(false)}
+          onClick={dismiss}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
         >
           ✕
@@ -135,8 +140,8 @@ export default function LeadCaptureModal() {
         {/* Header - Premium style */}
         <div className="text-center mb-2 relative z-10">
           <div className="inline-block mb-4">
-            <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-full p-4 animate-pulse">
-              <span className="text-4xl">💎</span>
+            <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] rounded-full p-3 animate-pulse">
+              <span className="text-3xl">💎</span>
             </div>
           </div>
 
@@ -144,7 +149,7 @@ export default function LeadCaptureModal() {
             🎁 OFERTA EXCLUSIVA
           </div>
 
-          <h2 className="text-3xl font-black text-gray-900 leading-tight mt-2">
+          <h2 className="text-2xl font-black text-gray-900 leading-tight mt-1">
             Pegue seu Cupom Surpresa!
           </h2>
 
@@ -221,7 +226,7 @@ export default function LeadCaptureModal() {
 
           <button
             type="button"
-            onClick={() => setIsOpen(false)}
+            onClick={dismiss}
             className="w-full text-gray-600 hover:text-gray-800 font-semibold py-2 rounded-lg transition-colors"
           >
             Não, obrigado
