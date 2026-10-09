@@ -312,6 +312,7 @@ export default function MontarPedidoPage() {
                       ?.sizes.map((size: string) => {
                         const variante = selectedProduct.variants.find((v: any) => v.color === selectedColor);
                         const estoque = variante?.stock ? variante.stock[size] : getStockQuantity(selectedProduct.ref, selectedColor, size);
+                        if (estoque === 0) return null;
                         return (
                           <button
                             key={size}
