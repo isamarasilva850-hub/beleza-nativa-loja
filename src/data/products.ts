@@ -11,6 +11,7 @@ export interface Product {
   id: number;
   ref: string;
   slug?: string;
+  display_order?: number;
   name: string;
   price: number;
   description?: string;

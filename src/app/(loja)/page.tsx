@@ -28,7 +28,7 @@ export default function Home() {
     category: null as string | null,
     size: null as string | null,
     priceRange: null as [number, number] | null,
-    sortBy: "newest" as string,
+    sortBy: "ordem" as string,
     searchQuery: null as string | null,
   });
   const [showFilters, setShowFilters] = useState(false);
@@ -91,6 +91,8 @@ export default function Home() {
     })
     .sort((a, b) => {
       switch (filters.sortBy) {
+        case "ordem":
+          return (a.display_order || 0) - (b.display_order || 0);
         case "price-asc":
           return (a.price || 0) - (b.price || 0);
         case "price-desc":
@@ -366,10 +368,11 @@ export default function Home() {
             </button>
 
             <select
-              value={filters.sortBy || "newest"}
+              value={filters.sortBy || "ordem"}
               onChange={(e) => setFilters({ ...filters, sortBy: e.target.value } as any)}
               className="flex-1 md:flex-none px-3 py-2 bg-white border-2 border-gray-200 rounded-lg text-sm font-semibold focus:border-primary outline-none transition-colors"
             >
+              <option value="ordem">⭐ Destaques</option>
               <option value="newest">✨ Mais novos</option>
               <option value="price-asc">💰 Menor preço</option>
               <option value="price-desc">💎 Maior preço</option>
