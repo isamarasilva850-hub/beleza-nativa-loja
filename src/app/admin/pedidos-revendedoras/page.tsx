@@ -19,7 +19,7 @@ export default function PedidosRevendedoras() {
     const refs = [...new Set((order.items || []).map((item: any): string => item.ref))] as string[];
 
     // Gerar link do catálogo
-    const catalogLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/artes-pedido/${order.id}`;
+    const catalogLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/vitrine/${order.id}/editar`;
 
     // Criar mensagem com legendas de cada peça
     const artesMsg = refs
@@ -31,7 +31,7 @@ export default function PedidosRevendedoras() {
       })
       .join('\n\n');
 
-    const fullMsg = `🎨 PEÇAS DO SEU PEDIDO\n\n${artesMsg}\n\n---\n\n📱 Suas artes e fotos:\n${catalogLink}\n\n🔗 Clique para baixar as FOTOS de cada peça e copiar a legenda!\n\nTodas as peças estão prontas para você usar nas suas redes sociais e WhatsApp! ✨`;
+    const fullMsg = `Oi! Sua vitrine já está pronta. Abra o link, personalize com a sua logo, defina o seu preço de revenda e baixe as fotos:\n${catalogLink}\n\n---\n\nLegendas prontas para copiar e postar junto com as fotos:\n\n${artesMsg}`;
 
     // Abrir WhatsApp
     window.open(
@@ -163,27 +163,6 @@ export default function PedidosRevendedoras() {
                       className="px-4 py-2 bg-gray-400 text-white rounded-lg text-sm font-bold hover:bg-gray-500"
                     >
                       🔄 Reenviar Artes
-                    </button>
-                  )}
-
-                  {(order.status === 'pago' || order.status === 'artes_enviadas') && (
-                    <button
-                      onClick={() => {
-                        const link = `${window.location.origin}/vitrine/${order.id}/editar`;
-                        const refs = [...new Set((order.items || []).map((item: any): string => item.ref))] as string[];
-                        const legendas = refs
-                          .map((ref: string) => {
-                            const entrada = artesLegendasMap[ref as keyof typeof artesLegendasMap];
-                            const legenda = entrada?.legendaCurta || entrada?.legendaCompleta || `REF ${ref}`;
-                            return `📸 REF ${ref}\n${legenda}`;
-                          })
-                          .join('\n\n');
-                        const texto = `Oi! Sua vitrine já está pronta. Abra o link, personalize com a sua logo, defina o seu preço de revenda e baixe as fotos:\n${link}\n\n---\n\nLegendas prontas para copiar e postar junto com as fotos:\n\n${legendas}`;
-                        window.open(`https://wa.me/${telefoneWhatsApp(order.partnerPhone)}?text=${encodeURIComponent(texto)}`, '_blank');
-                      }}
-                      className="px-4 py-2 bg-[#7BC9C2] text-white rounded-lg text-sm font-bold hover:bg-[#5fb3ac]"
-                    >
-                      🛍️ Enviar Vitrine
                     </button>
                   )}
 
