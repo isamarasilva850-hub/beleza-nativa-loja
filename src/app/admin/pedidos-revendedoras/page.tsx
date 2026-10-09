@@ -165,6 +165,27 @@ export default function PedidosRevendedoras() {
                     </button>
                   )}
 
+                  {(order.status === 'pago' || order.status === 'artes_enviadas') && (
+                    <button
+                      onClick={() => {
+                        const link = `${window.location.origin}/vitrine/${order.id}/editar`;
+                        const refs = [...new Set((order.items || []).map((item: any): string => item.ref))] as string[];
+                        const legendas = refs
+                          .map((ref: string) => {
+                            const entrada = artesLegendasMap[ref as keyof typeof artesLegendasMap];
+                            const legenda = entrada?.legendaCurta || entrada?.legendaCompleta || `REF ${ref}`;
+                            return `📸 REF ${ref}\n${legenda}`;
+                          })
+                          .join('\n\n');
+                        const texto = `Oi! Sua vitrine já está pronta. Abra o link, personalize com a sua logo, defina o seu preço de revenda e baixe as fotos:\n${link}\n\n---\n\nLegendas prontas para copiar e postar junto com as fotos:\n\n${legendas}`;
+                        window.open(`https://wa.me/${order.partnerPhone}?text=${encodeURIComponent(texto)}`, '_blank');
+                      }}
+                      className="px-4 py-2 bg-[#7BC9C2] text-white rounded-lg text-sm font-bold hover:bg-[#5fb3ac]"
+                    >
+                      🛍️ Enviar Vitrine
+                    </button>
+                  )}
+
                   <button
                     onClick={() =>
                       navigator.clipboard.writeText(`📦 PEDIDO DE ${order.partnerName}\n\n${order.items.map((i) => `REF ${i.ref} - ${i.name}\nQtd: ${i.quantity}`).join("\n\n")}\n\nTOTAL: R$ ${order.total.toFixed(2).replace(".", ",")}`)
