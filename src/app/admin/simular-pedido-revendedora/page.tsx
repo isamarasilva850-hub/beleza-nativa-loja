@@ -34,10 +34,51 @@ export default function SimularPedidoRevendedora() {
   const [purchases, setPurchases] = useState<PurchasedProduct[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [creatingOrder, setCreatingOrder] = useState(false);
+  const [partnerBusca, setPartnerBusca] = useState('');
+  const [buscaProduto, setBuscaProduto] = useState('');
+  const [todosProdutos, setTodosProdutos] = useState<any[]>([]);
 
   useEffect(() => {
     loadPartners();
+    fetch('/api/products')
+      .then((r) => r.json())
+      .then((lista) => {
+        if (Array.isArray(lista)) setTodosProdutos(lista);
+      })
+      .catch((err) => console.error('Erro ao carregar produtos', err));
   }, [loadPartners]);
+
+  const rotuloRevendedora = (p: any) => `${p.company || p.name} - ${p.city}/${p.state}`;
+
+  const combinacoesDoProduto = (p: any): { color: string; size: string }[] => {
+    const variantes = p.variants?.length
+      ? p.variants
+      : (p.colors || []).map((c: any) => ({
+          color: c.color_name,
+          sizes: ['P', 'M', 'G', 'GG'].filter((t) => Number(c[`qty_${t.toLowerCase()}`]) > 0),
+        }));
+    return variantes.flatMap((v: any) => (v.sizes || []).map((s: string) => ({ color: v.color, size: s })));
+  };
+
+  const resultadosBusca = buscaProduto.trim()
+    ? todosProdutos
+        .filter((p) => {
+          const termo = buscaProduto.trim().toLowerCase();
+          return p.ref?.toLowerCase().includes(termo) || p.name?.toLowerCase().includes(termo);
+        })
+        .slice(0, 8)
+    : [];
+
+  const adicionarDaBusca = (p: any, color: string, size: string) => {
+    addToCart({
+      productId: p.id,
+      ref: p.ref,
+      name: p.name,
+      price: Number(p.price) || 0,
+      color,
+      size,
+    } as any);
+  };
 
   useEffect(() => {
     if (selectedPartnerId) {
@@ -159,18 +200,22 @@ export default function SimularPedidoRevendedora() {
             {/* Seleção de Revendedora */}
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
               <h2 className="font-bold text-gray-800 mb-4">👥 Selecione a Revendedora</h2>
-              <select
-                value={selectedPartnerId}
-                onChange={(e) => setSelectedPartnerId(e.target.value)}
+              <input
+                list="lista-revendedoras"
+                value={partnerBusca}
+                placeholder="Digite o nome da revendedora..."
+                onChange={(e) => {
+                  setPartnerBusca(e.target.value);
+                  const encontrada = partners.find((p) => rotuloRevendedora(p) === e.target.value);
+                  setSelectedPartnerId(encontrada?.id || '');
+                }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
-              >
-                <option value="">Escolha uma revendedora...</option>
+              />
+              <datalist id="lista-revendedoras">
                 {partners.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.company || p.name} - {p.city}/{p.state}
-                  </option>
+                  <option key={p.id} value={rotuloRevendedora(p)} />
                 ))}
-              </select>
+              </datalist>
             </div>
 
             {/* Produtos da Revendedora */}
@@ -219,6 +264,42 @@ export default function SimularPedidoRevendedora() {
                     Esta revendedora não tem produtos cadastrados ainda
                   </p>
                 )}
+              </div>
+            )}
+
+            {selectedPartner && (
+              <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
+                <h2 className="font-bold text-gray-800 mb-4">🔎 Buscar produto pela REF ou nome</h2>
+                <input
+                  type="text"
+                  value={buscaProduto}
+                  placeholder="Ex: 562 ou conjunto renda"
+                  onChange={(e) => setBuscaProduto(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
+                />
+                <div className="mt-4 space-y-3">
+                  {resultadosBusca.map((p) => (
+                    <div key={p.id} className="p-4 rounded-lg border-2 border-gray-200 bg-gray-50">
+                      <p className="text-xs text-gray-500 font-mono">REF {p.ref}</p>
+                      <p className="font-semibold text-gray-800">{p.name}</p>
+                      <p className="text-sm text-[#7BC9C2] font-bold mb-2">R$ {(Number(p.price) || 0).toFixed(2).replace('.', ',')}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {combinacoesDoProduto(p).map((c) => (
+                          <button
+                            key={`${c.color}-${c.size}`}
+                            onClick={() => adicionarDaBusca(p, c.color, c.size)}
+                            className="px-3 py-1 rounded-lg text-xs font-bold bg-[#7BC9C2] text-white hover:bg-[#6ab8b1]"
+                          >
+                            + {c.color} / {c.size}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  {buscaProduto.trim() && resultadosBusca.length === 0 && (
+                    <p className="text-gray-500 text-center py-4">Nenhum produto encontrado</p>
+                  )}
+                </div>
               </div>
             )}
           </div>
