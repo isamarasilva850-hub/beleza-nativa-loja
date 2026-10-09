@@ -183,6 +183,11 @@ export default function EditarVitrine() {
           <h2 className="text-lg font-semibold text-gray-900">Peças e preço de revenda</h2>
           {pecas.map((peca) => (
             <div key={peca.ref} className="flex items-center gap-3 border-t border-gray-100 pt-3">
+              {fotos[peca.ref] ? (
+                <img src={fotos[peca.ref]} alt={peca.name} className="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-gray-100" />
+              ) : (
+                <div className="w-14 h-14 rounded-lg bg-gray-100 flex-shrink-0" />
+              )}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">{peca.name}</p>
                 <p className="text-xs text-gray-500">REF {peca.ref}</p>
