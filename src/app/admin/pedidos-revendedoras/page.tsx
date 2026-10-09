@@ -31,7 +31,7 @@ export default function PedidosRevendedoras() {
       })
       .join('\n\n');
 
-    const fullMsg = `Oi! Sua vitrine já está pronta. Abra o link, personalize com a sua logo, defina o seu preço de revenda e baixe as fotos:\n${catalogLink}\n\n---\n\nLegendas prontas para copiar e postar junto com as fotos:\n\n${artesMsg}`;
+    const fullMsg = `Oi! Sua vitrine já está pronta. Abra o link, personalize com a sua logo e defina o seu preço de revenda:\n${catalogLink}\n\n📲 Como enviar para a sua cliente:\n1. Na vitrine, toque em "Baixar foto" em cada peça\n2. Abra o WhatsApp e escolha a sua cliente\n3. Toque no clipe 📎, escolha "Galeria" e selecione as fotos\n4. Toque em "Copiar legenda" da peça, cole na mensagem e envie junto\n\n---\n\nLegendas prontas para copiar:\n\n${artesMsg}`;
 
     // Abrir WhatsApp
     window.open(
