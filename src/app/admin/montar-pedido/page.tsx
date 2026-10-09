@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { products } from "@/data/products";
 import { useReactiveStorage } from "@/hooks/useReactiveStorage";
 
 interface ItemPedido {
@@ -24,7 +23,8 @@ interface Cliente {
 export default function MontarPedidoPage() {
   const [items, setItems] = useState<ItemPedido[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState<typeof products[0] | null>(null);
+  const [products, setProducts] = useState<any[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -34,6 +34,16 @@ export default function MontarPedidoPage() {
 
   // Observa mudanças nos produtos da Palmira em tempo real
   useReactiveStorage("belezanativa_product_uploads");
+
+  useEffect(() => {
+    fetch("/api/products")
+      .then((r) => r.json())
+      .then((lista) => {
+        if (!Array.isArray(lista)) return;
+        setProducts(lista.map((p: any) => ({ ...p, price: Number(p.price) || 0 })));
+      })
+      .catch((err) => console.error("Erro ao carregar produtos", err));
+  }, []);
 
   // Carrega clientes do CRM
   useEffect(() => {
@@ -253,7 +263,7 @@ export default function MontarPedidoPage() {
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">🎨 Cor</label>
                   <div className="flex flex-wrap gap-2">
-                    {selectedProduct.variants?.map((variant) => (
+                    {selectedProduct.variants?.map((variant: any) => (
                       <button
                         key={variant.color}
                         onClick={() => {
@@ -280,8 +290,8 @@ export default function MontarPedidoPage() {
                   <label className="block text-sm font-bold text-gray-700 mb-2">📐 Tamanho</label>
                   <div className="flex flex-wrap gap-2">
                     {selectedProduct.variants
-                      ?.find((v) => v.color === selectedColor)
-                      ?.sizes.map((size) => (
+                      ?.find((v: any) => v.color === selectedColor)
+                      ?.sizes.map((size: string) => (
                         <button
                           key={size}
                           onClick={() => setSelectedSize(size)}
