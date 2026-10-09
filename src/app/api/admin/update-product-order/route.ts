@@ -14,18 +14,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Updates array is required' }, { status: 400 });
     }
 
-    for (const update of updates) {
-      const { ref, display_order } = update;
-      if (!ref) continue;
+    const rows = updates
+      .filter((u: any) => u.ref)
+      .map((u: any) => ({ ref: u.ref, display_order: u.display_order }));
 
-      const { error } = await supabase
-        .from('products')
-        .update({ display_order })
-        .eq('ref', ref);
+    const { error } = await supabase
+      .from('ordem_produtos')
+      .upsert(rows, { onConflict: 'ref' });
 
-      if (error) {
-        console.error(`Erro ao atualizar ordem do produto ${ref}:`, error);
-      }
+    if (error) {
+      console.error('Erro ao salvar ordem dos produtos:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

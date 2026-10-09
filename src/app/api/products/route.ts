@@ -272,11 +272,18 @@ export async function GET() {
       })
     );
 
+    const { data: ordemRows } = await supabase
+      .from('ordem_produtos')
+      .select('ref, display_order');
+    const ordemMap = new Map((ordemRows || []).map((o: any) => [o.ref, o.display_order]));
+
     // Combina ambos e ordena por display_order
     const allProducts = [
       ...staticProducts,
       ...productsWithDetails
-    ].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+    ]
+      .map((p: any) => (ordemMap.has(p.ref) ? { ...p, display_order: ordemMap.get(p.ref) } : p))
+      .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
 
     // Debug: verificar se produto 444 está lá
     const produto444 = allProducts.find(p => p.ref === '444');
