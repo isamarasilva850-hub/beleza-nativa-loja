@@ -19,7 +19,7 @@ export default function PedidosRevendedoras() {
     const refs = [...new Set((order.items || []).map((item: any): string => item.ref))] as string[];
 
     // Gerar link do catálogo
-    const catalogLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/catalogo-revendedora/${order.partnerId}`;
+    const catalogLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/artes-pedido/${order.id}`;
 
     // Criar mensagem com legendas de cada peça
     const artesMsg = refs
@@ -31,7 +31,7 @@ export default function PedidosRevendedoras() {
       })
       .join('\n\n');
 
-    const fullMsg = `🎨 PEÇAS DO SEU PEDIDO\n\n${artesMsg}\n\n---\n\n📱 Seu Catálogo Exclusivo:\n${catalogLink}\n\n🔗 Clique para ver FOTOS de cada peça, cores, tamanhos e simular novos pedidos!\n\nTodas as peças estão prontas para você usar nas suas redes sociais e WhatsApp! ✨`;
+    const fullMsg = `🎨 PEÇAS DO SEU PEDIDO\n\n${artesMsg}\n\n---\n\n📱 Suas artes e fotos:\n${catalogLink}\n\n🔗 Clique para baixar as FOTOS de cada peça e copiar a legenda!\n\nTodas as peças estão prontas para você usar nas suas redes sociais e WhatsApp! ✨`;
 
     // Abrir WhatsApp
     window.open(
