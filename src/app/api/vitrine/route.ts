@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const db = supabase();
     const { data: pedido, error: pedidoError } = await db
       .from('orders')
-      .select('id, partnerName, items')
+      .select('id, partnername, items')
       .eq('id', pedidoId)
       .maybeSingle();
 
@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
     if (!pedido) {
       return NextResponse.json({ error: 'Pedido não encontrado' }, { status: 404 });
     }
+    const pedidoFormatado = { id: pedido.id, partnerName: pedido.partnername, items: pedido.items };
 
     const { data: vitrine } = await db
       .from('vitrines')
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
       .eq('pedido_id', pedidoId)
       .maybeSingle();
 
-    return NextResponse.json({ pedido, vitrine });
+    return NextResponse.json({ pedido: pedidoFormatado, vitrine });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Erro desconhecido' },
