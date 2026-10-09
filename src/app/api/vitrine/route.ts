@@ -26,7 +26,17 @@ export async function GET(request: NextRequest) {
     if (!pedido) {
       return NextResponse.json({ error: 'Pedido não encontrado' }, { status: 404 });
     }
-    const pedidoFormatado = { id: pedido.id, partnerName: pedido.partnername, items: pedido.items };
+    const pedidoFormatado = {
+      id: pedido.id,
+      partnerName: pedido.partnername,
+      items: (pedido.items || []).map((i: any) => ({
+        ref: i.ref,
+        name: i.name,
+        color: i.color,
+        size: i.size,
+        quantity: i.quantity,
+      })),
+    };
 
     const { data: vitrine } = await db
       .from('vitrines')
