@@ -627,6 +627,18 @@ export default function PalmiraUploadPage() {
                 </a>
               </div>
 
+              <button
+                type="button"
+                onClick={handleSaveOrder}
+                disabled={savingOrder || loadingProducts || allProducts.length === 0}
+                className="w-full bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-colors"
+              >
+                {savingOrder ? "⏳ Salvando..." : "💾 SALVAR NOVA ORDEM"}
+              </button>
+
+              {success && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
+              {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
+
               {loadingProducts ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500">⏳ Carregando produtos...</p>
@@ -684,17 +696,6 @@ export default function PalmiraUploadPage() {
                     ))}
                   </div>
 
-                  {success && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
-                  {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
-
-                  <button
-                    type="button"
-                    onClick={handleSaveOrder}
-                    disabled={savingOrder}
-                    className="w-full bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 text-white font-bold py-3 rounded-lg transition-colors"
-                  >
-                    {savingOrder ? "⏳ Salvando..." : "💾 SALVAR NOVA ORDEM"}
-                  </button>
                 </>
               )}
             </div>
