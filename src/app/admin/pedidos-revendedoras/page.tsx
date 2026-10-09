@@ -31,7 +31,7 @@ export default function PedidosRevendedoras() {
       })
       .join('\n\n');
 
-    const fullMsg = `Oi! Sua vitrine já está pronta. Abra o link, personalize com a sua logo e defina o seu preço de revenda:\n${catalogLink}\n\n📲 Como enviar para a sua cliente:\n1. Na vitrine, toque em "Baixar foto" em cada peça\n2. Abra o WhatsApp e escolha a sua cliente\n3. Toque no clipe 📎, escolha "Galeria" e selecione as fotos\n4. Toque em "Copiar legenda" da peça, cole na mensagem e envie junto\n\n---\n\nLegendas prontas para copiar:\n\n${artesMsg}`;
+    const fullMsg = `Oi! Sua vitrine já está pronta. Abra o link, personalize com a sua logo e defina o seu preço de revenda:\n${catalogLink}\n\n📲 Passo a passo para enviar as fotos para a sua cliente:\n1. Toque no link da vitrine acima. Ela vai abrir no seu celular.\n2. Role a tela até a peça. Embaixo do nome dela, toque no botão "Baixar foto". A foto é salva no seu celular. Faça isso para cada peça.\n3. Se o celular pedir permissão para salvar, toque em "Permitir".\n4. Volte para o WhatsApp e abra a conversa da sua cliente.\n5. Toque no ícone de clipe 📎, que fica ao lado da caixa de mensagem.\n6. Toque em "Galeria" e escolha as fotos. Toque em cada uma que quer enviar e depois toque em "Enviar".\n7. Volte para esta conversa e toque em "Copiar legenda" da peça.\n8. Abra a conversa com a sua cliente, toque na caixa de mensagem, segure o dedo nela e toque em "Colar". Depois toque na setinha verde para enviar.\n\n---\n\nLegendas prontas para copiar:\n\n${artesMsg}`;
 
     // Abrir WhatsApp
     window.open(
