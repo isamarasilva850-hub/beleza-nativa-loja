@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useReactiveStorage } from "@/hooks/useReactiveStorage";
+import { getStockQuantity } from "@/lib/stock";
 
 interface ItemPedido {
   ref: string;
@@ -40,7 +41,24 @@ export default function MontarPedidoPage() {
       .then((r) => r.json())
       .then((lista) => {
         if (!Array.isArray(lista)) return;
-        setProducts(lista.map((p: any) => ({ ...p, price: Number(p.price) || 0 })));
+        setProducts(
+          lista.map((p: any) => {
+            const variants = p.variants?.length
+              ? p.variants
+              : (p.colors || []).map((c: any) => ({
+                  color: c.color_name,
+                  colorHex: c.color_hex || "#000000",
+                  sizes: ["P", "M", "G", "GG"].filter((t) => Number(c[`qty_${t.toLowerCase()}`]) > 0),
+                  stock: {
+                    P: Number(c.qty_p) || 0,
+                    M: Number(c.qty_m) || 0,
+                    G: Number(c.qty_g) || 0,
+                    GG: Number(c.qty_gg) || 0,
+                  },
+                }));
+            return { ...p, price: Number(p.price) || 0, variants };
+          })
+        );
       })
       .catch((err) => console.error("Erro ao carregar produtos", err));
   }, []);
@@ -291,19 +309,24 @@ export default function MontarPedidoPage() {
                   <div className="flex flex-wrap gap-2">
                     {selectedProduct.variants
                       ?.find((v: any) => v.color === selectedColor)
-                      ?.sizes.map((size: string) => (
-                        <button
-                          key={size}
-                          onClick={() => setSelectedSize(size)}
-                          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                            selectedSize === size
-                              ? "bg-[#7BC9C2] text-white"
-                              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                          }`}
-                        >
-                          {size}
-                        </button>
-                      ))}
+                      ?.sizes.map((size: string) => {
+                        const variante = selectedProduct.variants.find((v: any) => v.color === selectedColor);
+                        const estoque = variante?.stock ? variante.stock[size] : getStockQuantity(selectedProduct.ref, selectedColor, size);
+                        return (
+                          <button
+                            key={size}
+                            onClick={() => setSelectedSize(size)}
+                            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                              selectedSize === size
+                                ? "bg-[#7BC9C2] text-white"
+                                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                            }`}
+                          >
+                            {size}
+                            {estoque !== undefined && <span className="ml-1 text-xs opacity-80">({estoque} em estoque)</span>}
+                          </button>
+                        );
+                      })}
                   </div>
                 </div>
               )}
