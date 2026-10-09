@@ -179,46 +179,48 @@ export default function EditarVitrine() {
           </div>
         </section>
 
-        <section className="bg-white rounded-2xl p-5 space-y-3 border border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900">Peças e preço de revenda</h2>
-          {pecas.map((peca) => (
-            <div key={peca.ref} className="flex items-center gap-3 border-t border-gray-100 pt-3">
-              {fotos[peca.ref] ? (
-                <img src={fotos[peca.ref]} alt={peca.name} className="w-24 h-24 rounded-lg object-cover flex-shrink-0 bg-gray-100" />
-              ) : (
-                <div className="w-24 h-24 rounded-lg bg-gray-100 flex-shrink-0" />
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{peca.name}</p>
-                <p className="text-xs text-gray-500">REF {peca.ref}</p>
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold text-gray-900">Suas peças</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {pecas.map((peca) => (
+              <div key={peca.ref} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col">
+                <div className="aspect-square bg-gray-100">
+                  {fotos[peca.ref] && (
+                    <img src={fotos[peca.ref]} alt={peca.name} className="w-full h-full object-cover" />
+                  )}
+                </div>
+                <div className="p-3 flex flex-col gap-2 flex-1">
+                  <p className="text-sm font-medium text-gray-900">{peca.name}</p>
+                  <p className="text-xs text-gray-500">REF {peca.ref}</p>
+                  <input
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#7BC9C2]"
+                    placeholder="Seu preço de revenda"
+                    inputMode="decimal"
+                    value={precos[peca.ref] || ""}
+                    onChange={(e) => setPrecos({ ...precos, [peca.ref]: e.target.value })}
+                  />
+                  <div className="flex flex-col gap-1 mt-auto">
+                    {fotos[peca.ref] && (
+                      <button
+                        type="button"
+                        onClick={() => baixarFoto(peca.ref)}
+                        className="text-xs px-3 py-2 border border-[#7BC9C2] text-[#3d8c85] rounded-lg hover:bg-[#7BC9C2]/10"
+                      >
+                        Baixar foto
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => copiarLegenda(peca.ref)}
+                      className="text-xs px-3 py-2 border border-[#7BC9C2] text-[#3d8c85] rounded-lg hover:bg-[#7BC9C2]/10"
+                    >
+                      {legendaCopiada === peca.ref ? "Legenda copiada!" : "Copiar legenda"}
+                    </button>
+                  </div>
+                </div>
               </div>
-              <input
-                className="w-32 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#7BC9C2]"
-                placeholder="Seu preço"
-                inputMode="decimal"
-                value={precos[peca.ref] || ""}
-                onChange={(e) => setPrecos({ ...precos, [peca.ref]: e.target.value })}
-              />
-              <div className="flex flex-col gap-1">
-                {fotos[peca.ref] && (
-                  <button
-                    type="button"
-                    onClick={() => baixarFoto(peca.ref)}
-                    className="text-xs px-3 py-1.5 border border-[#7BC9C2] text-[#3d8c85] rounded-lg hover:bg-[#7BC9C2]/10"
-                  >
-                    Baixar foto
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => copiarLegenda(peca.ref)}
-                  className="text-xs px-3 py-1.5 border border-[#7BC9C2] text-[#3d8c85] rounded-lg hover:bg-[#7BC9C2]/10"
-                >
-                  {legendaCopiada === peca.ref ? "Legenda copiada!" : "Copiar legenda"}
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </section>
 
         {mensagemStatus && (
