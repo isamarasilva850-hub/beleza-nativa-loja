@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useOrders } from '@/hooks/useOrders';
 import { artesLegendasMap } from '@/data/artes-legendas';
+import { telefoneWhatsApp } from '@/lib/vitrine';
 
 export default function PedidosRevendedoras() {
   const { orders, loading, error, loadOrders, updateOrderStatus } = useOrders();
@@ -34,7 +35,7 @@ export default function PedidosRevendedoras() {
 
     // Abrir WhatsApp
     window.open(
-      `https://wa.me/${order.partnerPhone}?text=${encodeURIComponent(fullMsg)}`,
+      `https://wa.me/${telefoneWhatsApp(order.partnerPhone)}?text=${encodeURIComponent(fullMsg)}`,
       '_blank'
     );
 
@@ -178,7 +179,7 @@ export default function PedidosRevendedoras() {
                           })
                           .join('\n\n');
                         const texto = `Oi! Sua vitrine já está pronta. Abra o link, personalize com a sua logo, defina o seu preço de revenda e baixe as fotos:\n${link}\n\n---\n\nLegendas prontas para copiar e postar junto com as fotos:\n\n${legendas}`;
-                        window.open(`https://wa.me/${order.partnerPhone}?text=${encodeURIComponent(texto)}`, '_blank');
+                        window.open(`https://wa.me/${telefoneWhatsApp(order.partnerPhone)}?text=${encodeURIComponent(texto)}`, '_blank');
                       }}
                       className="px-4 py-2 bg-[#7BC9C2] text-white rounded-lg text-sm font-bold hover:bg-[#5fb3ac]"
                     >

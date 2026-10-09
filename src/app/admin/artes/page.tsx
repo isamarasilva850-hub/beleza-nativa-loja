@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useOrders } from '@/hooks/useOrders';
 import { artesLegendasMap } from '@/data/artes-legendas';
+import { telefoneWhatsApp } from '@/lib/vitrine';
 
 export default function ArtesPage() {
   const { orders, loadOrders } = useOrders();
@@ -24,7 +25,7 @@ export default function ArtesPage() {
     const fullMsg = `🎨 SUAS ARTES ESTÃO PRONTAS!\n\n📸 Clique aqui para ver todas as fotos com as legendas:\n${artesLink}\n\n---\n\n💡 COMO USAR:\n1️⃣ Baixe as imagens\n2️⃣ Poste no Instagram, Facebook, WhatsApp e Stories\n3️⃣ Venda com as fotos prontas!\n\n---\n\n📱 Seu Catálogo Completo:\n${catalogLink}\n\nAqui tem TODAS as cores, tamanhos e você pode simular novos pedidos quando quiser!\n\nTodas as peças estão prontas para você usar e ganhar! 💰✨`;
 
     window.open(
-      `https://wa.me/${order.partnerPhone}?text=${encodeURIComponent(fullMsg)}`,
+      `https://wa.me/${telefoneWhatsApp(order.partnerPhone)}?text=${encodeURIComponent(fullMsg)}`,
       '_blank'
     );
   };

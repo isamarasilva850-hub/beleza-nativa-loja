@@ -28,6 +28,11 @@ export function agruparPecas(items: ItemPedido[]): PecaVitrine[] {
   return [...mapa.values()];
 }
 
+export function telefoneWhatsApp(telefone: string | undefined | null): string {
+  const digitos = String(telefone || "").replace(/\D/g, "");
+  return digitos.length <= 11 ? `55${digitos}` : digitos;
+}
+
 export function formatarPreco(valor: string | number | undefined | null): string {
   const numero = typeof valor === "string" ? parseFloat(valor.replace(",", ".")) : valor;
   if (!numero || isNaN(numero)) return "";

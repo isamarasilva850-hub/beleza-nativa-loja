@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { telefoneWhatsApp } from '@/lib/vitrine';
 import Link from 'next/link';
 import { usePartners } from '@/hooks/usePartners';
 import { useOrders } from '@/hooks/useOrders';
@@ -377,7 +378,7 @@ export default function SimularPedidoRevendedora() {
 
                     <button
                       onClick={() => {
-                        window.open(`https://wa.me/${selectedPartner?.phone}?text=${encodeURIComponent(generateResume())}`, '_blank');
+                        window.open(`https://wa.me/${telefoneWhatsApp(selectedPartner?.phone)}?text=${encodeURIComponent(generateResume())}`, '_blank');
                       }}
                       className="w-full py-2 bg-teal-500 text-white rounded-lg text-sm font-bold hover:bg-teal-600"
                     >
