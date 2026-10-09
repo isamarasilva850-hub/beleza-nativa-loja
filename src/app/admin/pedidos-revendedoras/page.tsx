@@ -24,12 +24,12 @@ export default function PedidosRevendedoras() {
     // Criar mensagem com legendas de cada peça
     const caixa = '```';
     const artesMsg = refs
-      .map((ref: string) => {
+      .map((ref: string, idx: number) => {
         const arteLegenda = artesLegendasMap[ref as keyof typeof artesLegendasMap];
         const legenda = arteLegenda?.legendaCurta || arteLegenda?.legendaCompleta || `REF ${ref}`;
         const nomePeca = (order.items || []).find((item: any) => item.ref === ref)?.name || '';
 
-        return `📸 *REF ${ref}* - ${nomePeca}\n${caixa}\n${legenda}\n${caixa}`;
+        return `📸 *Peça ${idx + 1} de ${refs.length} - REF ${ref}*\n${nomePeca}\n${caixa}\n${legenda}\n${caixa}`;
       })
       .join('\n\n\n━━━━━━━━━━━━\n\n\n');
 
