@@ -14,6 +14,7 @@ export default function VitrinePublica() {
   const [pecas, setPecas] = useState<PecaVitrine[]>([]);
   const [fotos, setFotos] = useState<Record<string, string>>({});
   const [nomePedido, setNomePedido] = useState("");
+  const [telefonePedido, setTelefonePedido] = useState("");
 
   useEffect(() => {
     if (!orderId) return;
@@ -25,6 +26,7 @@ export default function VitrinePublica() {
         if (dados.error) throw new Error(dados.error);
         setVitrine(dados.vitrine);
         setNomePedido(dados.pedido.partnerName);
+        setTelefonePedido(dados.pedido.partnerPhone || "");
         setPecas(agruparPecas(dados.pedido.items));
         const mapaFotos: Record<string, string> = {};
         for (const p of Array.isArray(produtos) ? produtos : []) {
@@ -46,7 +48,8 @@ export default function VitrinePublica() {
 
   const nome = vitrine?.nome || nomePedido;
   const mensagem = vitrine?.mensagem || MENSAGEM_PADRAO;
-  const whatsapp = vitrine?.whatsapp ? telefoneWhatsApp(vitrine.whatsapp) : "";
+  const telefoneContato = vitrine?.whatsapp || telefonePedido;
+  const whatsapp = telefoneContato ? telefoneWhatsApp(telefoneContato) : "";
 
   const linkWhatsApp = (texto: string) =>
     `https://wa.me/${whatsapp}?text=${encodeURIComponent(texto)}`;

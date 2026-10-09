@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const db = supabase();
     const { data: pedido, error: pedidoError } = await db
       .from('orders')
-      .select('id, partnername, items')
+      .select('id, partnername, partnerphone, items')
       .eq('id', pedidoId)
       .maybeSingle();
 
@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
     const pedidoFormatado = {
       id: pedido.id,
       partnerName: pedido.partnername,
+      partnerPhone: pedido.partnerphone,
       items: (pedido.items || []).map((i: any) => ({
         ref: i.ref,
         name: i.name,

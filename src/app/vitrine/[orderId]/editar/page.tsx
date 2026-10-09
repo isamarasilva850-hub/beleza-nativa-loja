@@ -61,7 +61,7 @@ export default function EditarVitrine() {
           nome: v.nome || dados.pedido.partnerName || "",
           logo: v.logo || "",
           mensagem: v.mensagem || MENSAGEM_PADRAO,
-          whatsapp: v.whatsapp || "",
+          whatsapp: v.whatsapp || dados.pedido.partnerPhone || "",
         });
         setPrecos(v.precos || {});
         setPecas(agruparPecas(dados.pedido.items));
