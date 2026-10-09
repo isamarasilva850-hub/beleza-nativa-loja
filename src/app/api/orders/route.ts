@@ -13,7 +13,13 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return NextResponse.json(data || []);
+    const pedidos = (data || []).map((o: any) => ({
+      ...o,
+      partnerId: o.partnerid,
+      partnerName: o.partnername,
+      partnerPhone: o.partnerphone,
+    }));
+    return NextResponse.json(pedidos);
   } catch (error) {
     console.error('Erro ao carregar pedidos:', error);
     return NextResponse.json({ error: 'Erro ao carregar pedidos' }, { status: 500 });
@@ -39,9 +45,9 @@ export async function POST(request: NextRequest) {
       .from('orders')
       .insert({
         id: orderId,
-        partnerId,
-        partnerName,
-        partnerPhone,
+        partnerid: partnerId,
+        partnername: partnerName,
+        partnerphone: partnerPhone,
         items: items,
         total: typeof total === 'string' ? parseFloat(total) : total,
         date: date || new Date().toISOString().split('T')[0],
@@ -51,7 +57,10 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) throw error;
-    return NextResponse.json(data, { status: 201 });
+    return NextResponse.json(
+      { ...data, partnerId: data.partnerid, partnerName: data.partnername, partnerPhone: data.partnerphone },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Erro ao criar pedido:', error);
     return NextResponse.json({ error: 'Erro ao criar pedido' }, { status: 500 });
