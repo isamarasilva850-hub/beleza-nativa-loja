@@ -57,6 +57,30 @@ export default function CRMMetodoBN() {
   const [leadsHoje, setLeadsHoje] = useState<Lead[]>([]);
   const [notificacaoEnviada, setNotificacaoEnviada] = useState(false);
   const [registrosFollowup, setRegistrosFollowup] = useState<Record<string, { data: string; texto: string }[]>>({});
+  const [editandoDados, setEditandoDados] = useState(false);
+  const [dadosEdicao, setDadosEdicao] = useState({ nome: "", telefone: "" });
+
+  const salvarDadosLead = async () => {
+    if (!selecionado || !dadosEdicao.nome.trim() || !dadosEdicao.telefone.trim()) return;
+    const atualizado = { ...selecionado, nome: dadosEdicao.nome.trim(), telefone: dadosEdicao.telefone.trim() };
+    setSelecionado(atualizado);
+    setLeads(leads.map((l) => (l.id === selecionado.id ? atualizado : l)));
+    setEditandoDados(false);
+    try {
+      const resposta = await fetch("/api/crm-dados?chave=planos");
+      const dados = await resposta.json();
+      const planos = dados.valor && typeof dados.valor === "object" && !Array.isArray(dados.valor) ? dados.valor : {};
+      const idPlano = `lead-${selecionado.id}`;
+      if (planos[idPlano]) planos[idPlano] = { ...planos[idPlano], nome: atualizado.nome, telefone: atualizado.telefone };
+      await fetch("/api/crm-dados", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chave: "planos", valor: planos }),
+      });
+    } catch (err) {
+      console.error("Erro ao atualizar o plano do lead", err);
+    }
+  };
 
   useEffect(() => {
     fetch("/api/crm-dados?chave=followup")
@@ -551,8 +575,47 @@ export default function CRMMetodoBN() {
         {selecionado ? (
           <>
             <div className={`${etapaAtual?.cor} border-b-2 p-4`}>
-              <h2 className="font-bold text-xl text-gray-800">{selecionado.nome}</h2>
-              <p className="text-sm text-gray-600 mt-1">📱 {selecionado.telefone}</p>
+              {editandoDados ? (
+                <div className="space-y-2">
+                  <input
+                    value={dadosEdicao.nome}
+                    onChange={(e) => setDadosEdicao({ ...dadosEdicao, nome: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                    placeholder="Nome"
+                  />
+                  <input
+                    value={dadosEdicao.telefone}
+                    onChange={(e) => setDadosEdicao({ ...dadosEdicao, telefone: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                    placeholder="Telefone com DDD"
+                  />
+                  <div className="flex gap-2">
+                    <button type="button" onClick={salvarDadosLead} className="px-4 py-2 rounded-lg text-sm font-bold bg-[#7BC9C2] text-white">
+                      Salvar
+                    </button>
+                    <button type="button" onClick={() => setEditandoDados(false)} className="px-4 py-2 rounded-lg text-sm font-bold bg-gray-200 text-gray-700">
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-between items-start gap-2">
+                    <h2 className="font-bold text-xl text-gray-800">{selecionado.nome}</h2>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDadosEdicao({ nome: selecionado.nome, telefone: selecionado.telefone });
+                        setEditandoDados(true);
+                      }}
+                      className="text-sm font-bold text-gray-600 underline whitespace-nowrap"
+                    >
+                      ✏️ Editar
+                    </button>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1">📱 {selecionado.telefone}</p>
+                </>
+              )}
               <p className="text-sm text-gray-600 mt-2">Etapa: {etapaAtual?.nome}</p>
             </div>
 
