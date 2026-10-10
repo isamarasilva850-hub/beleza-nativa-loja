@@ -21,6 +21,9 @@ const SEQUENCIA_RECUPERACAO = [
   },
 ];
 
+type Registro = { data: string; texto: string };
+type Registros = Record<string, Registro[]>;
+
 const hojeISO = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
 
 const linkWhats = (telefone: string, texto: string) =>
@@ -31,27 +34,87 @@ const diasEntre = (dataISO: string) => {
   return Math.floor((Date.now() - inicio) / (1000 * 60 * 60 * 24));
 };
 
+const formatarDataHora = (iso: string) =>
+  new Date(iso).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" });
+
+function RegistroContato({
+  historico,
+  onRegistrar,
+}: {
+  historico: Registro[];
+  onRegistrar: (texto: string) => void;
+}) {
+  const [texto, setTexto] = useState("");
+  const ultimos = [...historico].reverse().slice(0, 3);
+
+  return (
+    <div className="border-t border-gray-100 pt-3 space-y-2">
+      {ultimos.length > 0 && (
+        <div className="space-y-1">
+          <p className="text-xs font-bold text-gray-600">Últimos registros:</p>
+          {ultimos.map((r, i) => (
+            <p key={i} className="text-xs text-gray-700 bg-gray-50 rounded-lg p-2">
+              <span className="text-gray-400">{formatarDataHora(r.data)}</span> — {r.texto}
+            </p>
+          ))}
+        </div>
+      )}
+      <textarea
+        value={texto}
+        onChange={(e) => setTexto(e.target.value)}
+        placeholder="O que vocês conversaram?"
+        className="w-full p-2 border border-gray-200 rounded-lg text-sm h-16 resize-none focus:outline-none focus:border-[#7BC9C2]"
+      />
+      <button
+        type="button"
+        disabled={!texto.trim()}
+        onClick={() => {
+          onRegistrar(texto.trim());
+          setTexto("");
+        }}
+        className="w-full py-2 rounded-lg text-sm font-bold bg-[#7BC9C2] hover:bg-[#5fb3ac] disabled:opacity-40 text-white"
+      >
+        Registrar contato
+      </button>
+    </div>
+  );
+}
+
 export default function FollowupPage() {
   const [carregando, setCarregando] = useState(true);
   const [leads, setLeads] = useState<any[]>([]);
   const [pedidos, setPedidos] = useState<any[]>([]);
   const [revendedoras, setRevendedoras] = useState<any[]>([]);
   const [passoPorLead, setPassoPorLead] = useState<Record<string, number>>({});
+  const [registros, setRegistros] = useState<Registros>({});
 
   useEffect(() => {
     Promise.all([
       fetch("/api/crm-dados?chave=leads").then((r) => r.json()),
       fetch("/api/orders").then((r) => r.json()),
       fetch("/api/partners").then((r) => r.json()),
+      fetch("/api/crm-dados?chave=followup").then((r) => r.json()),
     ])
-      .then(([crm, pedidosDados, parceiros]) => {
+      .then(([crm, pedidosDados, parceiros, reg]) => {
         setLeads(Array.isArray(crm.valor) ? crm.valor : []);
         setPedidos(Array.isArray(pedidosDados) ? pedidosDados : []);
         setRevendedoras(Array.isArray(parceiros) ? parceiros : []);
+        setRegistros(reg.valor && typeof reg.valor === "object" && !Array.isArray(reg.valor) ? reg.valor : {});
       })
       .catch((err) => console.error("Erro ao carregar follow-up", err))
       .finally(() => setCarregando(false));
   }, []);
+
+  const registrarContato = (id: string, texto: string) => {
+    const novo: Registro = { data: new Date().toISOString(), texto };
+    const atualizado: Registros = { ...registros, [id]: [...(registros[id] || []), novo] };
+    setRegistros(atualizado);
+    fetch("/api/crm-dados", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chave: "followup", valor: atualizado }),
+    }).catch((err) => console.error("Erro ao salvar registro", err));
+  };
 
   const hoje = hojeISO();
 
@@ -115,6 +178,10 @@ export default function FollowupPage() {
                   <a href={linkWhats(l.telefone, textoAtual)} target="_blank" rel="noopener noreferrer" className={botao}>
                     Chamar no WhatsApp
                   </a>
+                  <RegistroContato
+                    historico={registros[`lead-${l.id}`] || []}
+                    onRegistrar={(texto) => registrarContato(`lead-${l.id}`, texto)}
+                  />
                 </div>
               );
             })}
@@ -137,6 +204,10 @@ export default function FollowupPage() {
                 >
                   Perguntar como foi
                 </a>
+                <RegistroContato
+                  historico={registros[`pedido-${p.id}`] || []}
+                  onRegistrar={(texto) => registrarContato(`pedido-${p.id}`, texto)}
+                />
               </div>
             ))}
           </div>
@@ -160,6 +231,10 @@ export default function FollowupPage() {
                 >
                   Chamar de volta
                 </a>
+                <RegistroContato
+                  historico={registros[`revenda-${r.id}`] || []}
+                  onRegistrar={(texto) => registrarContato(`revenda-${r.id}`, texto)}
+                />
               </div>
             ))}
           </div>
