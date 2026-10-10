@@ -24,6 +24,15 @@ const SEQUENCIA_RECUPERACAO = [
 type Registro = { data: string; texto: string };
 type Registros = Record<string, Registro[]>;
 
+const ABAS = [
+  { id: "hoje", rotulo: "📞 Hoje" },
+  { id: "leads", rotulo: "📋 Todos os leads" },
+  { id: "pos", rotulo: "🎁 Pós-venda" },
+  { id: "reativar", rotulo: "🔁 Reativação" },
+] as const;
+
+type Aba = (typeof ABAS)[number]["id"];
+
 const hojeISO = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
 
 const linkWhats = (telefone: string, texto: string) =>
@@ -36,6 +45,8 @@ const diasEntre = (dataISO: string) => {
 
 const formatarDataHora = (iso: string) =>
   new Date(iso).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" });
+
+const formatarData = (iso: string) => (iso ? iso.split("-").reverse().join("/") : "—");
 
 function RegistroContato({
   historico,
@@ -82,6 +93,7 @@ function RegistroContato({
 
 export default function FollowupPage() {
   const [carregando, setCarregando] = useState(true);
+  const [aba, setAba] = useState<Aba>("hoje");
   const [leads, setLeads] = useState<any[]>([]);
   const [pedidos, setPedidos] = useState<any[]>([]);
   const [revendedoras, setRevendedoras] = useState<any[]>([]);
@@ -122,6 +134,10 @@ export default function FollowupPage() {
     .filter((l) => l.proximaData && l.proximaData <= hoje && l.telefone)
     .sort((a, b) => (a.proximaData < b.proximaData ? -1 : 1));
 
+  const todosLeads = leads
+    .filter((l) => l.telefone)
+    .sort((a, b) => (a.proximaData || "9999") < (b.proximaData || "9999") ? -1 : 1);
+
   const posVenda = pedidos
     .filter((p) => (p.status === "pago" || p.status === "artes_enviadas") && p.partnerPhone)
     .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
@@ -141,104 +157,151 @@ export default function FollowupPage() {
   const cartao = "bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col gap-2";
   const botao = "text-center bg-[#25D366] hover:bg-[#1ebe5b] text-white font-bold py-2.5 rounded-xl transition-colors";
 
+  const contadores: Record<Aba, number> = {
+    hoje: contatosPendentes.length,
+    leads: todosLeads.length,
+    pos: posVenda.length,
+    reativar: paraReativar.length,
+  };
+
   if (carregando) {
     return <div className="p-8 text-gray-500">Carregando...</div>;
   }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <div className="max-w-5xl mx-auto space-y-10">
+      <div className="max-w-5xl mx-auto space-y-6">
         <div>
           <Link href="/admin/crm" className="text-sm text-gray-500 hover:text-gray-700 mb-4 block">← Voltar ao CRM</Link>
           <h1 className="text-2xl font-bold text-gray-800">Follow-up e pós-venda</h1>
-          <p className="text-gray-600 mt-1">Quem precisa de contato hoje, quem comprou e quem está sem comprar.</p>
+          <p className="text-gray-600 mt-1">Tudo em um lugar: quem chamar hoje, histórico de cada pessoa e pós-venda.</p>
         </div>
 
-        <section className="space-y-3">
-          <h2 className="text-lg font-bold text-gray-800">📞 Contatos de hoje e atrasados ({contatosPendentes.length})</h2>
-          {contatosPendentes.length === 0 && <p className="text-gray-500">Nenhum contato pendente.</p>}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {contatosPendentes.map((l) => {
-              const passo = passoPorLead[l.id] ?? 0;
-              const textoAtual = SEQUENCIA_RECUPERACAO[passo].texto.replace("[NOME]", l.nome);
-              return (
+        <div className="flex gap-2 flex-wrap">
+          {ABAS.map((a) => (
+            <button
+              key={a.id}
+              type="button"
+              onClick={() => setAba(a.id)}
+              className={`px-5 py-3 rounded-lg font-bold transition-all ${
+                aba === a.id ? "bg-[#7BC9C2] text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              {a.rotulo} ({contadores[a.id]})
+            </button>
+          ))}
+        </div>
+
+        {aba === "hoje" && (
+          <section className="space-y-3">
+            {contatosPendentes.length === 0 && <p className="text-gray-500">Nenhum contato pendente hoje.</p>}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {contatosPendentes.map((l) => {
+                const passo = passoPorLead[l.id] ?? 0;
+                const textoAtual = SEQUENCIA_RECUPERACAO[passo].texto.replace("[NOME]", l.nome);
+                return (
+                  <div key={l.id} className={cartao}>
+                    <p className="font-semibold text-gray-900">{l.nome}</p>
+                    <p className="text-xs text-gray-500">Etapa: {l.etapa || "—"} · Próximo contato: {formatarData(l.proximaData)}</p>
+                    {l.notas && <p className="text-xs text-gray-600 bg-yellow-50 rounded-lg p-2 whitespace-pre-line">📝 {l.notas}</p>}
+                    <select
+                      value={passo}
+                      onChange={(e) => setPassoPorLead({ ...passoPorLead, [l.id]: Number(e.target.value) })}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    >
+                      {SEQUENCIA_RECUPERACAO.map((s, i) => (
+                        <option key={i} value={i}>{s.rotulo}</option>
+                      ))}
+                    </select>
+                    <p className="text-sm text-gray-700 whitespace-pre-line">{textoAtual}</p>
+                    <a href={linkWhats(l.telefone, textoAtual)} target="_blank" rel="noopener noreferrer" className={botao}>
+                      Chamar no WhatsApp
+                    </a>
+                    <RegistroContato
+                      historico={registros[`lead-${l.id}`] || []}
+                      onRegistrar={(texto) => registrarContato(`lead-${l.id}`, texto)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {aba === "leads" && (
+          <section className="space-y-3">
+            {todosLeads.length === 0 && <p className="text-gray-500">Nenhum lead com telefone cadastrado.</p>}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {todosLeads.map((l) => (
                 <div key={l.id} className={cartao}>
                   <p className="font-semibold text-gray-900">{l.nome}</p>
-                  <p className="text-xs text-gray-500">Etapa: {l.etapa || "—"} · Próximo contato: {l.proximaData.split("-").reverse().join("/")}</p>
-                  <select
-                    value={passo}
-                    onChange={(e) => setPassoPorLead({ ...passoPorLead, [l.id]: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                  >
-                    {SEQUENCIA_RECUPERACAO.map((s, i) => (
-                      <option key={i} value={i}>{s.rotulo}</option>
-                    ))}
-                  </select>
-                  <p className="text-sm text-gray-700 whitespace-pre-line">{textoAtual}</p>
-                  <a href={linkWhats(l.telefone, textoAtual)} target="_blank" rel="noopener noreferrer" className={botao}>
-                    Chamar no WhatsApp
-                  </a>
+                  <p className="text-xs text-gray-500">
+                    Etapa: {l.etapa || "—"} · Próximo contato: {formatarData(l.proximaData)} · {l.telefone}
+                  </p>
+                  {l.notas && <p className="text-xs text-gray-600 bg-yellow-50 rounded-lg p-2 whitespace-pre-line">📝 {l.notas}</p>}
                   <RegistroContato
                     historico={registros[`lead-${l.id}`] || []}
                     onRegistrar={(texto) => registrarContato(`lead-${l.id}`, texto)}
                   />
                 </div>
-              );
-            })}
-          </div>
-        </section>
+              ))}
+            </div>
+          </section>
+        )}
 
-        <section className="space-y-3">
-          <h2 className="text-lg font-bold text-gray-800">🎁 Pós-venda: perguntar se gostou ({posVenda.length})</h2>
-          {posVenda.length === 0 && <p className="text-gray-500">Nenhum pedido pago para acompanhar.</p>}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {posVenda.map((p) => (
-              <div key={p.id} className={cartao}>
-                <p className="font-semibold text-gray-900">{p.partnerName}</p>
-                <p className="text-xs text-gray-500">Pedido de {p.date || p.created_at?.slice(0, 10)}</p>
-                <a
-                  href={linkWhats(p.partnerPhone, `Oi, ${p.partnerName}! Tudo bem? Passando para saber se as peças chegaram certinho e se você gostou. Qualquer dúvida, estou à disposição 💛`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={botao}
-                >
-                  Perguntar como foi
-                </a>
-                <RegistroContato
-                  historico={registros[`pedido-${p.id}`] || []}
-                  onRegistrar={(texto) => registrarContato(`pedido-${p.id}`, texto)}
-                />
-              </div>
-            ))}
-          </div>
-        </section>
+        {aba === "pos" && (
+          <section className="space-y-3">
+            {posVenda.length === 0 && <p className="text-gray-500">Nenhum pedido pago para acompanhar.</p>}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {posVenda.map((p) => (
+                <div key={p.id} className={cartao}>
+                  <p className="font-semibold text-gray-900">{p.partnerName}</p>
+                  <p className="text-xs text-gray-500">Pedido de {p.date || p.created_at?.slice(0, 10)}</p>
+                  <a
+                    href={linkWhats(p.partnerPhone, `Oi, ${p.partnerName}! Tudo bem? Passando para saber se as peças chegaram certinho e se você gostou. Qualquer dúvida, estou à disposição 💛`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={botao}
+                  >
+                    Perguntar como foi
+                  </a>
+                  <RegistroContato
+                    historico={registros[`pedido-${p.id}`] || []}
+                    onRegistrar={(texto) => registrarContato(`pedido-${p.id}`, texto)}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
-        <section className="space-y-3">
-          <h2 className="text-lg font-bold text-gray-800">🔁 Sem comprar há {DIAS_REATIVACAO}+ dias ({paraReativar.length})</h2>
-          {paraReativar.length === 0 && <p className="text-gray-500">Nenhuma revendedora nessa situação.</p>}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {paraReativar.map((r) => (
-              <div key={r.id} className={cartao}>
-                <p className="font-semibold text-gray-900">{r.company || r.name}</p>
-                <p className="text-xs text-gray-500">
-                  Última compra há {diasEntre(ultimoPedidoPorRevendedora.get(r.id) || "")} dias
-                </p>
-                <a
-                  href={linkWhats(r.phone, `Oi, ${r.name}! Saudades 💛 Chegaram peças novas na Beleza Nativa. Quer que eu te mande as novidades?`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={botao}
-                >
-                  Chamar de volta
-                </a>
-                <RegistroContato
-                  historico={registros[`revenda-${r.id}`] || []}
-                  onRegistrar={(texto) => registrarContato(`revenda-${r.id}`, texto)}
-                />
-              </div>
-            ))}
-          </div>
-        </section>
+        {aba === "reativar" && (
+          <section className="space-y-3">
+            {paraReativar.length === 0 && <p className="text-gray-500">Nenhuma revendedora sem comprar há {DIAS_REATIVACAO}+ dias.</p>}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {paraReativar.map((r) => (
+                <div key={r.id} className={cartao}>
+                  <p className="font-semibold text-gray-900">{r.company || r.name}</p>
+                  <p className="text-xs text-gray-500">
+                    Última compra há {diasEntre(ultimoPedidoPorRevendedora.get(r.id) || "")} dias
+                  </p>
+                  <a
+                    href={linkWhats(r.phone, `Oi, ${r.name}! Saudades 💛 Chegaram peças novas na Beleza Nativa. Quer que eu te mande as novidades?`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={botao}
+                  >
+                    Chamar de volta
+                  </a>
+                  <RegistroContato
+                    historico={registros[`revenda-${r.id}`] || []}
+                    onRegistrar={(texto) => registrarContato(`revenda-${r.id}`, texto)}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );
