@@ -279,6 +279,7 @@ export default function FollowupPage() {
             );
           })}
         </div>
+        <RegistroContato historico={registros[id] || []} onRegistrar={(t) => registrarContato(id, t)} />
       </div>
     );
   };
@@ -333,6 +334,10 @@ export default function FollowupPage() {
                         ✓ Feito
                       </button>
                     </div>
+                    <RegistroContato
+                      historico={registros[x.id] || []}
+                      onRegistrar={(t) => registrarContato(x.id, t)}
+                    />
                   </div>
                 );
               })}
@@ -357,6 +362,10 @@ export default function FollowupPage() {
                           ✓ Feito
                         </button>
                       </div>
+                      <RegistroContato
+                        historico={registros[x.id] || []}
+                        onRegistrar={(t) => registrarContato(x.id, t)}
+                      />
                     </div>
                   );
                 })}
