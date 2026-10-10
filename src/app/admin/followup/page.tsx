@@ -3,6 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { telefoneWhatsApp } from "@/lib/vitrine";
+import {
+  criarPlano,
+  dataDoPasso,
+  Planos,
+  preencherNome,
+  Plano,
+} from "@/lib/followup";
 
 const DIAS_REATIVACAO = 60;
 
@@ -26,6 +33,7 @@ type Registros = Record<string, Registro[]>;
 
 const ABAS = [
   { id: "hoje", rotulo: "📞 Hoje" },
+  { id: "planos", rotulo: "📅 Planos" },
   { id: "leads", rotulo: "📋 Todos os leads" },
   { id: "pos", rotulo: "🎁 Pós-venda" },
   { id: "reativar", rotulo: "🔁 Reativação" },
@@ -47,6 +55,12 @@ const formatarDataHora = (iso: string) =>
   new Date(iso).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" });
 
 const formatarData = (iso: string) => (iso ? iso.split("-").reverse().join("/") : "—");
+
+const dataDoLead = (lead: any) => {
+  const ms = Number(lead.id);
+  if (!ms || isNaN(ms)) return hojeISO();
+  return new Date(ms).toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
+};
 
 function RegistroContato({
   historico,
@@ -99,6 +113,15 @@ export default function FollowupPage() {
   const [revendedoras, setRevendedoras] = useState<any[]>([]);
   const [passoPorLead, setPassoPorLead] = useState<Record<string, number>>({});
   const [registros, setRegistros] = useState<Registros>({});
+  const [planos, setPlanos] = useState<Planos>({});
+  const [recebimentoEdicao, setRecebimentoEdicao] = useState<Record<string, string>>({});
+
+  const gravar = (chave: string, valor: unknown) =>
+    fetch("/api/crm-dados", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chave, valor }),
+    }).catch((err) => console.error(`Erro ao salvar ${chave}`, err));
 
   useEffect(() => {
     Promise.all([
@@ -106,12 +129,27 @@ export default function FollowupPage() {
       fetch("/api/orders").then((r) => r.json()),
       fetch("/api/partners").then((r) => r.json()),
       fetch("/api/crm-dados?chave=followup").then((r) => r.json()),
+      fetch("/api/crm-dados?chave=planos").then((r) => r.json()),
     ])
-      .then(([crm, pedidosDados, parceiros, reg]) => {
-        setLeads(Array.isArray(crm.valor) ? crm.valor : []);
+      .then(([crm, pedidosDados, parceiros, reg, pl]) => {
+        const listaLeads: any[] = Array.isArray(crm.valor) ? crm.valor : [];
+        setLeads(listaLeads);
         setPedidos(Array.isArray(pedidosDados) ? pedidosDados : []);
         setRevendedoras(Array.isArray(parceiros) ? parceiros : []);
         setRegistros(reg.valor && typeof reg.valor === "object" && !Array.isArray(reg.valor) ? reg.valor : {});
+
+        const atuais: Planos = pl.valor && typeof pl.valor === "object" && !Array.isArray(pl.valor) ? pl.valor : {};
+        const novos: Planos = { ...atuais };
+        let mudou = false;
+        for (const l of listaLeads) {
+          const id = `lead-${l.id}`;
+          if (!novos[id] && l.telefone) {
+            novos[id] = criarPlano("lead", l.nome, l.telefone, dataDoLead(l));
+            mudou = true;
+          }
+        }
+        setPlanos(novos);
+        if (mudou) gravar("planos", novos);
       })
       .catch((err) => console.error("Erro ao carregar follow-up", err))
       .finally(() => setCarregando(false));
@@ -121,11 +159,26 @@ export default function FollowupPage() {
     const novo: Registro = { data: new Date().toISOString(), texto };
     const atualizado: Registros = { ...registros, [id]: [...(registros[id] || []), novo] };
     setRegistros(atualizado);
-    fetch("/api/crm-dados", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chave: "followup", valor: atualizado }),
-    }).catch((err) => console.error("Erro ao salvar registro", err));
+    gravar("followup", atualizado);
+  };
+
+  const alterarPlanos = (novo: Planos) => {
+    setPlanos(novo);
+    gravar("planos", novo);
+  };
+
+  const marcarPasso = (planoId: string, indice: number) => {
+    const plano = planos[planoId];
+    const passos = plano.passos.map((p, i) =>
+      i === indice ? { ...p, feito: !p.feito, feitoEm: !p.feito ? new Date().toISOString() : undefined } : p
+    );
+    alterarPlanos({ ...planos, [planoId]: { ...plano, passos } });
+  };
+
+  const definirRecebimento = (revenda: any, data: string) => {
+    if (!data || !revenda.phone) return;
+    const id = `revenda-${revenda.id}`;
+    alterarPlanos({ ...planos, [id]: criarPlano("revenda", revenda.company || revenda.name, revenda.phone, data) });
   };
 
   const hoje = hojeISO();
@@ -136,7 +189,7 @@ export default function FollowupPage() {
 
   const todosLeads = leads
     .filter((l) => l.telefone)
-    .sort((a, b) => (a.proximaData || "9999") < (b.proximaData || "9999") ? -1 : 1);
+    .sort((a, b) => ((a.proximaData || "9999") < (b.proximaData || "9999") ? -1 : 1));
 
   const posVenda = pedidos
     .filter((p) => (p.status === "pago" || p.status === "artes_enviadas") && p.partnerPhone)
@@ -154,14 +207,69 @@ export default function FollowupPage() {
     return diasEntre(ultimo) >= DIAS_REATIVACAO;
   });
 
+  const listaPlanos = Object.entries(planos)
+    .map(([id, plano]) => ({ id, plano, proximo: plano.passos.find((p) => !p.feito) }))
+    .sort((a, b) => {
+      const da = a.proximo ? dataDoPasso(a.plano, a.proximo) : "9999";
+      const db = b.proximo ? dataDoPasso(b.plano, b.proximo) : "9999";
+      return da < db ? -1 : 1;
+    });
+
+  const planosLeads = listaPlanos.filter((x) => x.plano.tipo === "lead");
+  const planosRevenda = listaPlanos.filter((x) => x.plano.tipo === "revenda");
+
   const cartao = "bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col gap-2";
   const botao = "text-center bg-[#25D366] hover:bg-[#1ebe5b] text-white font-bold py-2.5 rounded-xl transition-colors";
 
   const contadores: Record<Aba, number> = {
     hoje: contatosPendentes.length,
+    planos: listaPlanos.length,
     leads: todosLeads.length,
     pos: posVenda.length,
     reativar: paraReativar.length,
+  };
+
+  const renderPlano = (id: string, plano: Plano) => {
+    const pendentes = plano.passos
+      .map((p, i) => ({ p, i }))
+      .filter((x) => !x.p.feito)
+      .slice(0, 6);
+
+    return (
+      <div key={id} className={cartao}>
+        <div className="flex justify-between items-start gap-2">
+          <p className="font-semibold text-gray-900">{plano.nome}</p>
+          <span className="text-xs bg-gray-100 text-gray-600 rounded-full px-2 py-1">
+            {plano.tipo === "lead" ? "Lead" : "Revendedora"} · início {formatarData(plano.inicio)}
+          </span>
+        </div>
+        {pendentes.length === 0 && <p className="text-sm text-gray-500">Todos os passos feitos.</p>}
+        <div className="space-y-2">
+          {pendentes.map(({ p, i }) => {
+            const data = dataDoPasso(plano, p);
+            const texto = preencherNome(p.mensagem, plano.nome);
+            const vencido = data < hoje;
+            return (
+              <div key={i} className={`rounded-xl border p-3 space-y-2 ${vencido ? "border-red-200 bg-red-50" : "border-gray-100 bg-gray-50"}`}>
+                <div className="flex justify-between text-xs text-gray-600">
+                  <span className="font-bold">{p.titulo}</span>
+                  <span>{formatarData(data)}{vencido ? " · atrasado" : ""}</span>
+                </div>
+                <p className="text-sm text-gray-700 whitespace-pre-line">{texto}</p>
+                <div className="flex gap-2">
+                  <a href={linkWhats(plano.telefone, texto)} target="_blank" rel="noopener noreferrer" className="flex-1 text-center bg-[#25D366] hover:bg-[#1ebe5b] text-white text-sm font-bold py-2 rounded-lg">
+                    Chamar
+                  </a>
+                  <button type="button" onClick={() => marcarPasso(id, i)} className="flex-1 text-sm font-bold py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800">
+                    ✓ Feito
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   if (carregando) {
@@ -174,7 +282,7 @@ export default function FollowupPage() {
         <div>
           <Link href="/admin/crm" className="text-sm text-gray-500 hover:text-gray-700 mb-4 block">← Voltar ao CRM</Link>
           <h1 className="text-2xl font-bold text-gray-800">Follow-up e pós-venda</h1>
-          <p className="text-gray-600 mt-1">Tudo em um lugar: quem chamar hoje, histórico de cada pessoa e pós-venda.</p>
+          <p className="text-gray-600 mt-1">Tudo em um lugar: planos de contato, histórico de cada pessoa e pós-venda.</p>
         </div>
 
         <div className="flex gap-2 flex-wrap">
@@ -224,6 +332,55 @@ export default function FollowupPage() {
                   </div>
                 );
               })}
+            </div>
+          </section>
+        )}
+
+        {aba === "planos" && (
+          <section className="space-y-8">
+            <div className="space-y-3">
+              <h2 className="text-lg font-bold text-gray-800">📋 Planos de leads ({planosLeads.length})</h2>
+              <p className="text-sm text-gray-500">Começam sozinhos quando o lead entra no CRM.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {planosLeads.map((x) => renderPlano(x.id, x.plano))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="text-lg font-bold text-gray-800">🛍️ Planos de revendedoras</h2>
+              <p className="text-sm text-gray-500">Informe a data em que ela recebeu a mercadoria. Os contatos são contados a partir dessa data.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {revendedoras.map((r) => {
+                  const id = `revenda-${r.id}`;
+                  const temPlano = !!planos[id];
+                  return (
+                    <div key={r.id} className={cartao}>
+                      <p className="font-semibold text-gray-900">{r.company || r.name}</p>
+                      <div className="flex gap-2 items-center">
+                        <input
+                          type="date"
+                          value={recebimentoEdicao[r.id] ?? (temPlano ? planos[id].inicio : "")}
+                          onChange={(e) => setRecebimentoEdicao({ ...recebimentoEdicao, [r.id]: e.target.value })}
+                          className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => definirRecebimento(r, recebimentoEdicao[r.id] || "")}
+                          className="px-4 py-2 rounded-lg text-sm font-bold bg-[#7BC9C2] hover:bg-[#5fb3ac] text-white"
+                        >
+                          Salvar
+                        </button>
+                      </div>
+                      {temPlano && <p className="text-xs text-gray-500">Plano ativo desde {formatarData(planos[id].inicio)}</p>}
+                    </div>
+                  );
+                })}
+              </div>
+              {planosRevenda.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {planosRevenda.map((x) => renderPlano(x.id, x.plano))}
+                </div>
+              )}
             </div>
           </section>
         )}

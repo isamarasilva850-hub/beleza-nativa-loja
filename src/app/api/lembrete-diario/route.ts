@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { passosDeHoje, Planos } from '@/lib/followup';
 
 const hojeISO = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
 
@@ -17,27 +18,24 @@ export async function GET(request: NextRequest) {
     }
 
     const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-    const { data, error } = await db.from('crm_dados').select('valor').eq('chave', 'leads').maybeSingle();
+    const { data, error } = await db.from('crm_dados').select('valor').eq('chave', 'planos').maybeSingle();
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const leads: any[] = Array.isArray(data?.valor) ? data.valor : [];
-    const hoje = hojeISO();
-    const pendentes = leads
-      .filter((l) => l.proximaData && l.proximaData <= hoje && l.telefone)
-      .sort((a, b) => (a.proximaData < b.proximaData ? -1 : 1));
+    const planos: Planos = data?.valor && typeof data.valor === 'object' && !Array.isArray(data.valor) ? data.valor : {};
+    const pendentes = passosDeHoje(planos, hojeISO());
 
     if (pendentes.length === 0) {
       return NextResponse.json({ enviado: false, motivo: 'Nenhum contato para hoje' });
     }
 
-    const linhas = pendentes.map((l, i) => {
-      const data = l.proximaData.split('-').reverse().join('/');
-      return `${i + 1}. ${l.nome} (${l.telefone}) - etapa: ${l.etapa || '—'} - previsto: ${data}`;
+    const linhas = pendentes.map((item, i) => {
+      const tipo = item.plano.tipo === 'lead' ? 'Lead' : 'Revendedora';
+      return `${i + 1}. ${item.plano.nome} (${item.plano.telefone}) - ${tipo} - ${item.passo.titulo}`;
     });
 
-    const texto = `🔔 Falar hoje com:\n\n${linhas.join('\n')}\n\nAbra o Follow-up no admin para ver as mensagens prontas.`;
+    const texto = `🔔 Falar hoje com:\n\n${linhas.join('\n')}\n\nAbra o Follow-up no admin para ver as mensagens prontas e marcar como feito.`;
 
     const resposta = await fetch('https://wasenderapi.com/api/send-message', {
       method: 'POST',
