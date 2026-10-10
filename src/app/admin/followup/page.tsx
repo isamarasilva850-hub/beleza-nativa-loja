@@ -114,6 +114,7 @@ export default function FollowupPage() {
   const [revendedoras, setRevendedoras] = useState<any[]>([]);
   const [passoPorLead, setPassoPorLead] = useState<Record<string, number>>({});
   const [registros, setRegistros] = useState<Registros>({});
+  const [metas, setMetas] = useState<Record<string, { prospectados: number; meta: number }>>({});
   const [planos, setPlanos] = useState<Planos>({});
   const [recebimentoEdicao, setRecebimentoEdicao] = useState<Record<string, string>>({});
 
@@ -131,8 +132,10 @@ export default function FollowupPage() {
       fetch("/api/partners").then((r) => r.json()),
       fetch("/api/crm-dados?chave=followup").then((r) => r.json()),
       fetch("/api/crm-dados?chave=planos").then((r) => r.json()),
+      fetch("/api/crm-dados?chave=metas").then((r) => r.json()),
     ])
-      .then(([crm, pedidosDados, parceiros, reg, pl]) => {
+      .then(([crm, pedidosDados, parceiros, reg, pl, mt]) => {
+        if (mt.valor && typeof mt.valor === "object" && !Array.isArray(mt.valor)) setMetas(mt.valor);
         const listaLeads: any[] = Array.isArray(crm.valor) ? crm.valor : [];
         setLeads(listaLeads);
         setPedidos(Array.isArray(pedidosDados) ? pedidosDados : []);
@@ -183,6 +186,17 @@ export default function FollowupPage() {
   };
 
   const hoje = hojeISO();
+
+  const metaProspeccao = {
+    prospectados: metas[hoje]?.prospectados ?? 0,
+    meta: metas[hoje]?.meta ?? 10,
+  };
+
+  const alterarMetaProspeccao = (mudanca: Partial<{ prospectados: number; meta: number }>) => {
+    const novo = { ...metas, [hoje]: { ...metaProspeccao, ...mudanca } };
+    setMetas(novo);
+    gravar("metas", novo);
+  };
 
   const contatosPendentes = leads
     .filter((l) => l.proximaData && l.proximaData <= hoje && l.telefone)
@@ -314,6 +328,60 @@ export default function FollowupPage() {
 
         {aba === "hoje" && (
           <section className="space-y-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-4">
+              <h2 className="text-lg font-bold text-gray-800">🎯 Metas de hoje</h2>
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="font-semibold text-gray-900">Resolver todas as ações de hoje</p>
+                  <p className="text-sm text-gray-500">
+                    {passosHoje.length + passosAtrasados.length === 0
+                      ? "Tudo em dia ✅"
+                      : `Faltam ${passosHoje.length + passosAtrasados.length}`}
+                  </p>
+                </div>
+                <span className={`text-2xl ${passosHoje.length + passosAtrasados.length === 0 ? "text-green-600" : "text-gray-300"}`}>
+                  {passosHoje.length + passosAtrasados.length === 0 ? "✓" : "○"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="font-semibold text-gray-900">Prospectar novos contatos</p>
+                  <p className="text-sm text-gray-500">
+                    {metaProspeccao.prospectados} de {metaProspeccao.meta}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={1}
+                    value={metaProspeccao.meta}
+                    onChange={(e) => alterarMetaProspeccao({ meta: Math.max(1, Number(e.target.value) || 1) })}
+                    className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm text-center"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => alterarMetaProspeccao({ prospectados: metaProspeccao.prospectados + 1 })}
+                    className="px-4 py-2 rounded-lg font-bold bg-[#7BC9C2] hover:bg-[#5fb3ac] text-white"
+                  >
+                    +1
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => alterarMetaProspeccao({ prospectados: Math.max(0, metaProspeccao.prospectados - 1) })}
+                    className="px-3 py-2 rounded-lg font-bold bg-gray-200 hover:bg-gray-300 text-gray-700"
+                  >
+                    −1
+                  </button>
+                </div>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#7BC9C2]"
+                  style={{ width: `${Math.min(100, (metaProspeccao.prospectados / metaProspeccao.meta) * 100)}%` }}
+                />
+              </div>
+            </div>
+
             <div className="space-y-3">
               <h2 className="text-lg font-bold text-gray-800">✅ Para fazer hoje ({passosHoje.length})</h2>
               {passosHoje.length === 0 && <p className="text-gray-500">Nada para fazer hoje nos planos.</p>}
