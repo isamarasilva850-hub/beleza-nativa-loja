@@ -6,6 +6,7 @@ import { telefoneWhatsApp } from "@/lib/vitrine";
 import {
   criarPlano,
   dataDoPasso,
+  passosDeHoje,
   Planos,
   preencherNome,
   Plano,
@@ -215,6 +216,16 @@ export default function FollowupPage() {
       return da < db ? -1 : 1;
     });
 
+  const passosHoje = passosDeHoje(planos, hoje);
+  const passosAtrasados = Object.entries(planos)
+    .flatMap(([id, plano]) =>
+      plano.passos
+        .map((passo, indice) => ({ id, plano, indice, passo, data: dataDoPasso(plano, passo) }))
+        .filter((x) => !x.passo.feito && x.data < hoje)
+    )
+    .sort((a, b) => (a.data < b.data ? -1 : 1))
+    .slice(0, 20);
+
   const planosLeads = listaPlanos.filter((x) => x.plano.tipo === "lead");
   const planosRevenda = listaPlanos.filter((x) => x.plano.tipo === "revenda");
 
@@ -301,8 +312,60 @@ export default function FollowupPage() {
         </div>
 
         {aba === "hoje" && (
-          <section className="space-y-3">
-            {contatosPendentes.length === 0 && <p className="text-gray-500">Nenhum contato pendente hoje.</p>}
+          <section className="space-y-6">
+            <div className="space-y-3">
+              <h2 className="text-lg font-bold text-gray-800">✅ Para fazer hoje ({passosHoje.length})</h2>
+              {passosHoje.length === 0 && <p className="text-gray-500">Nada para fazer hoje nos planos.</p>}
+              {passosHoje.map((x) => {
+                const texto = preencherNome(x.passo.mensagem, x.plano.nome);
+                return (
+                  <div key={`${x.id}-${x.indice}`} className={cartao}>
+                    <div className="flex justify-between text-xs text-gray-600">
+                      <span className="font-bold">{x.plano.nome} · {x.plano.tipo === "lead" ? "Lead" : "Revendedora"}</span>
+                      <span>{x.passo.titulo}</span>
+                    </div>
+                    <p className="text-sm text-gray-700 whitespace-pre-line">{texto}</p>
+                    <div className="flex gap-2">
+                      <a href={linkWhats(x.plano.telefone, texto)} target="_blank" rel="noopener noreferrer" className="flex-1 text-center bg-[#25D366] hover:bg-[#1ebe5b] text-white text-sm font-bold py-2 rounded-lg">
+                        Chamar
+                      </a>
+                      <button type="button" onClick={() => marcarPasso(x.id, x.indice)} className="flex-1 text-sm font-bold py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800">
+                        ✓ Feito
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {passosAtrasados.length > 0 && (
+              <div className="space-y-3">
+                <h2 className="text-lg font-bold text-red-700">⚠️ Atrasados ({passosAtrasados.length})</h2>
+                {passosAtrasados.map((x) => {
+                  const texto = preencherNome(x.passo.mensagem, x.plano.nome);
+                  return (
+                    <div key={`${x.id}-${x.indice}`} className="rounded-2xl border border-red-200 bg-red-50 p-4 space-y-2">
+                      <div className="flex justify-between text-xs text-gray-600">
+                        <span className="font-bold">{x.plano.nome} · {formatarData(x.data)}</span>
+                        <span>{x.passo.titulo}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <a href={linkWhats(x.plano.telefone, texto)} target="_blank" rel="noopener noreferrer" className="flex-1 text-center bg-[#25D366] hover:bg-[#1ebe5b] text-white text-sm font-bold py-2 rounded-lg">
+                          Chamar
+                        </a>
+                        <button type="button" onClick={() => marcarPasso(x.id, x.indice)} className="flex-1 text-sm font-bold py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800">
+                          ✓ Feito
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <h2 className="text-lg font-bold text-gray-800">Contatos do CRM ({contatosPendentes.length})</h2>
+              {contatosPendentes.length === 0 && <p className="text-gray-500">Nenhum contato pendente hoje.</p>}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {contatosPendentes.map((l) => {
                 const passo = passoPorLead[l.id] ?? 0;
@@ -332,6 +395,7 @@ export default function FollowupPage() {
                   </div>
                 );
               })}
+            </div>
             </div>
           </section>
         )}
