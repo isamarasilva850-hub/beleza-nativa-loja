@@ -56,6 +56,16 @@ export default function CRMMetodoBN() {
   const [templateEdicao, setTemplateEdicao] = useState<Record<string, string>>({});
   const [leadsHoje, setLeadsHoje] = useState<Lead[]>([]);
   const [notificacaoEnviada, setNotificacaoEnviada] = useState(false);
+  const [registrosFollowup, setRegistrosFollowup] = useState<Record<string, { data: string; texto: string }[]>>({});
+
+  useEffect(() => {
+    fetch("/api/crm-dados?chave=followup")
+      .then((r) => r.json())
+      .then((dados) => {
+        if (dados.valor && typeof dados.valor === "object" && !Array.isArray(dados.valor)) setRegistrosFollowup(dados.valor);
+      })
+      .catch((err) => console.error("Erro ao carregar registros do follow-up", err));
+  }, []);
 
   // Carregar leads e templates do localStorage
   useEffect(() => {
@@ -587,6 +597,19 @@ export default function CRMMetodoBN() {
                   placeholder="Anotar o que ela respondeu..."
                 />
               </div>
+
+              {(registrosFollowup[`lead-${selecionado.id}`] || []).length > 0 && (
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">🔁 Registros do follow-up:</label>
+                  <div className="space-y-1 max-h-40 overflow-y-auto">
+                    {[...(registrosFollowup[`lead-${selecionado.id}`] || [])].reverse().map((r, i) => (
+                      <p key={i} className="text-xs text-gray-700 bg-gray-50 rounded-lg p-2">
+                        <span className="text-gray-400">{new Date(r.data).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" })}</span> — {r.texto}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* PRÓXIMA AÇÃO */}
               <div>
