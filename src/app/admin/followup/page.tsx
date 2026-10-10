@@ -83,23 +83,77 @@ function MensagemEditavel({ valor, onSalvar }: { valor: string; onSalvar: (texto
 function RegistroContato({
   historico,
   onRegistrar,
+  onAlterar,
 }: {
   historico: Registro[];
   onRegistrar: (texto: string) => void;
+  onAlterar: (novo: Registro[]) => void;
 }) {
   const [texto, setTexto] = useState("");
-  const ultimos = [...historico].reverse().slice(0, 3);
+  const [editandoIndice, setEditandoIndice] = useState<number | null>(null);
+  const [textoEdicao, setTextoEdicao] = useState("");
+  const todos = [...historico].reverse();
 
   return (
     <div className="border-t border-gray-100 pt-3 space-y-2">
-      {ultimos.length > 0 && (
-        <div className="space-y-1">
-          <p className="text-xs font-bold text-gray-600">Últimos registros:</p>
-          {ultimos.map((r, i) => (
-            <p key={i} className="text-xs text-gray-700 bg-gray-50 rounded-lg p-2">
-              <span className="text-gray-400">{formatarDataHora(r.data)}</span> — {r.texto}
-            </p>
-          ))}
+      {todos.length > 0 && (
+        <div className="space-y-1 max-h-48 overflow-y-auto">
+          <p className="text-xs font-bold text-gray-600">Registros:</p>
+          {todos.map((r, i) => {
+            const indiceOriginal = historico.length - 1 - i;
+            return editandoIndice === i ? (
+              <div key={i} className="space-y-1">
+                <textarea
+                  value={textoEdicao}
+                  onChange={(e) => setTextoEdicao(e.target.value)}
+                  className="w-full p-2 border border-gray-200 rounded-lg text-xs h-16 resize-none"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const novo = historico.map((h, k) => (k === indiceOriginal ? { ...h, texto: textoEdicao.trim() || h.texto } : h));
+                      onAlterar(novo);
+                      setEditandoIndice(null);
+                    }}
+                    className="text-xs font-bold text-[#3d8c85] underline"
+                  >
+                    Salvar
+                  </button>
+                  <button type="button" onClick={() => setEditandoIndice(null)} className="text-xs text-gray-500 underline">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div key={i} className="text-xs text-gray-700 bg-gray-50 rounded-lg p-2 flex justify-between gap-2">
+                <p>
+                  <span className="text-gray-400">{formatarDataHora(r.data)}</span> — {r.texto}
+                </p>
+                <div className="flex gap-2 whitespace-nowrap">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditandoIndice(i);
+                      setTextoEdicao(r.texto);
+                    }}
+                    className="text-xs font-bold text-gray-600 underline"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm("Apagar este registro?")) onAlterar(historico.filter((_, k) => k !== indiceOriginal));
+                    }}
+                    className="text-xs font-bold text-red-600 underline"
+                  >
+                    Apagar
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
       <textarea
@@ -210,6 +264,12 @@ export default function FollowupPage() {
     salvarLeads(leads.filter((l) => l.id !== lead.id));
     const { [`lead-${lead.id}`]: _removido, ...resto } = planos;
     alterarPlanos(resto);
+  };
+
+  const alterarRegistros = (id: string, novo: Registro[]) => {
+    const atualizado: Registros = { ...registros, [id]: novo };
+    setRegistros(atualizado);
+    gravar("followup", atualizado);
   };
 
   const registrarContato = (id: string, texto: string) => {
@@ -353,7 +413,7 @@ export default function FollowupPage() {
             );
           })}
         </div>
-        <RegistroContato historico={registros[id] || []} onRegistrar={(t) => registrarContato(id, t)} />
+        <RegistroContato historico={registros[id] || []} onRegistrar={(t) => registrarContato(id, t)} onAlterar={(n) => alterarRegistros(id, n)} />
       </div>
     );
   };
@@ -464,7 +524,7 @@ export default function FollowupPage() {
                     </div>
                     <RegistroContato
                       historico={registros[x.id] || []}
-                      onRegistrar={(t) => registrarContato(x.id, t)}
+                      onRegistrar={(t) => registrarContato(x.id, t)} onAlterar={(n) => alterarRegistros(x.id, n)}
                     />
                   </div>
                 );
@@ -492,7 +552,7 @@ export default function FollowupPage() {
                       </div>
                       <RegistroContato
                         historico={registros[x.id] || []}
-                        onRegistrar={(t) => registrarContato(x.id, t)}
+                        onRegistrar={(t) => registrarContato(x.id, t)} onAlterar={(n) => alterarRegistros(x.id, n)}
                       />
                     </div>
                   );
@@ -527,7 +587,7 @@ export default function FollowupPage() {
                     </a>
                     <RegistroContato
                       historico={registros[`lead-${l.id}`] || []}
-                      onRegistrar={(texto) => registrarContato(`lead-${l.id}`, texto)}
+                      onRegistrar={(texto) => registrarContato(`lead-${l.id}`, texto)} onAlterar={(n) => alterarRegistros(`lead-${l.id}`, n)}
                     />
                   </div>
                 );
@@ -641,7 +701,7 @@ export default function FollowupPage() {
                   {l.notas && <p className="text-xs text-gray-600 bg-yellow-50 rounded-lg p-2 whitespace-pre-line">📝 {l.notas}</p>}
                   <RegistroContato
                     historico={registros[`lead-${l.id}`] || []}
-                    onRegistrar={(texto) => registrarContato(`lead-${l.id}`, texto)}
+                    onRegistrar={(texto) => registrarContato(`lead-${l.id}`, texto)} onAlterar={(n) => alterarRegistros(`lead-${l.id}`, n)}
                   />
                 </div>
               ))}
@@ -671,7 +731,7 @@ export default function FollowupPage() {
                   </a>
                   <RegistroContato
                     historico={registros[`pedido-${p.id}`] || []}
-                    onRegistrar={(texto) => registrarContato(`pedido-${p.id}`, texto)}
+                    onRegistrar={(texto) => registrarContato(`pedido-${p.id}`, texto)} onAlterar={(n) => alterarRegistros(`pedido-${p.id}`, n)}
                   />
                 </div>
               ))}
@@ -703,7 +763,7 @@ export default function FollowupPage() {
                   </a>
                   <RegistroContato
                     historico={registros[`revenda-${r.id}`] || []}
-                    onRegistrar={(texto) => registrarContato(`revenda-${r.id}`, texto)}
+                    onRegistrar={(texto) => registrarContato(`revenda-${r.id}`, texto)} onAlterar={(n) => alterarRegistros(`revenda-${r.id}`, n)}
                   />
                 </div>
               ))}
