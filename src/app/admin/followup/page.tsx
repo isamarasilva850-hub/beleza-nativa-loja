@@ -64,6 +64,22 @@ const dataDoLead = (lead: any) => {
   return new Date(ms).toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
 };
 
+function MensagemEditavel({ valor, onSalvar }: { valor: string; onSalvar: (texto: string) => void }) {
+  const [texto, setTexto] = useState(valor);
+  useEffect(() => setTexto(valor), [valor]);
+  return (
+    <textarea
+      value={texto}
+      onChange={(e) => setTexto(e.target.value)}
+      onBlur={() => {
+        if (texto !== valor && texto.trim()) onSalvar(texto);
+      }}
+      className="w-full p-2 border border-gray-200 rounded-lg text-sm bg-white h-20 resize-none focus:outline-none focus:border-[#7BC9C2]"
+      title="Edite a mensagem. Ela salva quando você sai do campo."
+    />
+  );
+}
+
 function RegistroContato({
   historico,
   onRegistrar,
@@ -198,6 +214,12 @@ export default function FollowupPage() {
     gravar("planos", novo);
   };
 
+  const alterarMensagemPasso = (planoId: string, indice: number, mensagem: string) => {
+    const plano = planos[planoId];
+    const passos = plano.passos.map((p, i) => (i === indice ? { ...p, mensagem } : p));
+    alterarPlanos({ ...planos, [planoId]: { ...plano, passos } });
+  };
+
   const marcarPasso = (planoId: string, indice: number) => {
     const plano = planos[planoId];
     const passos = plano.passos.map((p, i) =>
@@ -308,7 +330,7 @@ export default function FollowupPage() {
                   <span className="font-bold">{p.titulo}</span>
                   <span>{formatarData(data)}{vencido ? " · atrasado" : ""}</span>
                 </div>
-                <p className="text-sm text-gray-700 whitespace-pre-line">{texto}</p>
+                <MensagemEditavel valor={p.mensagem} onSalvar={(t) => alterarMensagemPasso(id, i, t)} />
                 <div className="flex gap-2">
                   <a href={linkWhats(plano.telefone, texto)} target="_blank" rel="noopener noreferrer" className="flex-1 text-center bg-[#25D366] hover:bg-[#1ebe5b] text-white text-sm font-bold py-2 rounded-lg">
                     Chamar
@@ -421,7 +443,7 @@ export default function FollowupPage() {
                       <span className="font-bold">{x.plano.nome} · {x.plano.tipo === "lead" ? "Lead" : "Revendedora"}</span>
                       <span>{x.passo.titulo}</span>
                     </div>
-                    <p className="text-sm text-gray-700 whitespace-pre-line">{texto}</p>
+                    <MensagemEditavel valor={x.passo.mensagem} onSalvar={(t) => alterarMensagemPasso(x.id, x.indice, t)} />
                     <div className="flex gap-2">
                       <a href={linkWhats(x.plano.telefone, texto)} target="_blank" rel="noopener noreferrer" className="flex-1 text-center bg-[#25D366] hover:bg-[#1ebe5b] text-white text-sm font-bold py-2 rounded-lg">
                         Chamar
