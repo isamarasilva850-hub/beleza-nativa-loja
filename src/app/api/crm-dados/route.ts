@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     const { error } = await supabase()
       .from('crm_dados')
-      .upsert({ chave, valor, atualizado_em: new Date().toISOString() }, { onConflict: 'chave' });
+      .upsert({ chave, valor }, { onConflict: 'chave' });
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
