@@ -60,6 +60,27 @@ export default function CRMMetodoBN() {
   const [editandoDados, setEditandoDados] = useState(false);
   const [dadosEdicao, setDadosEdicao] = useState({ nome: "", telefone: "" });
 
+  const excluirLead = async () => {
+    if (!selecionado) return;
+    if (!window.confirm(`Excluir ${selecionado.nome}? Isso apaga o lead e o plano de contato dele.`)) return;
+    const idLead = selecionado.id;
+    setLeads(leads.filter((l) => l.id !== idLead));
+    setSelecionado(null);
+    try {
+      const resposta = await fetch("/api/crm-dados?chave=planos");
+      const dados = await resposta.json();
+      const planos = dados.valor && typeof dados.valor === "object" && !Array.isArray(dados.valor) ? dados.valor : {};
+      delete planos[`lead-${idLead}`];
+      await fetch("/api/crm-dados", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chave: "planos", valor: planos }),
+      });
+    } catch (err) {
+      console.error("Erro ao apagar o plano do lead", err);
+    }
+  };
+
   const salvarDadosLead = async () => {
     if (!selecionado || !dadosEdicao.nome.trim() || !dadosEdicao.telefone.trim()) return;
     const atualizado = { ...selecionado, nome: dadosEdicao.nome.trim(), telefone: dadosEdicao.telefone.trim() };
@@ -602,16 +623,25 @@ export default function CRMMetodoBN() {
                 <>
                   <div className="flex justify-between items-start gap-2">
                     <h2 className="font-bold text-xl text-gray-800">{selecionado.nome}</h2>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setDadosEdicao({ nome: selecionado.nome, telefone: selecionado.telefone });
-                        setEditandoDados(true);
-                      }}
-                      className="text-sm font-bold text-gray-600 underline whitespace-nowrap"
-                    >
-                      ✏️ Editar
-                    </button>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDadosEdicao({ nome: selecionado.nome, telefone: selecionado.telefone });
+                          setEditandoDados(true);
+                        }}
+                        className="text-sm font-bold text-gray-600 underline whitespace-nowrap"
+                      >
+                        ✏️ Editar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={excluirLead}
+                        className="text-sm font-bold text-red-600 underline whitespace-nowrap"
+                      >
+                        🗑️ Excluir
+                      </button>
+                    </div>
                   </div>
                   <p className="text-sm text-gray-600 mt-1">📱 {selecionado.telefone}</p>
                 </>
