@@ -150,8 +150,10 @@ export default function FollowupPage() {
       fetch("/api/crm-dados?chave=followup").then((r) => r.json()),
       fetch("/api/crm-dados?chave=planos").then((r) => r.json()),
       fetch("/api/crm-dados?chave=metas").then((r) => r.json()),
+      fetch("/api/crm-dados?chave=mensagens").then((r) => r.json()),
     ])
-      .then(([crm, pedidosDados, parceiros, reg, pl, mt]) => {
+      .then(([crm, pedidosDados, parceiros, reg, pl, mt, msgs]) => {
+        if (msgs.valor && typeof msgs.valor === "object" && !Array.isArray(msgs.valor)) setMensagensEditadas(msgs.valor);
         if (mt.valor && typeof mt.valor === "object" && !Array.isArray(mt.valor)) setMetas(mt.valor);
         const listaLeads: any[] = Array.isArray(crm.valor) ? crm.valor : [];
         setLeads(listaLeads);
@@ -175,6 +177,14 @@ export default function FollowupPage() {
       .catch((err) => console.error("Erro ao carregar follow-up", err))
       .finally(() => setCarregando(false));
   }, []);
+
+  const [mensagensEditadas, setMensagensEditadas] = useState<Record<string, string>>({});
+
+  const salvarMensagemCard = (chave: string, texto: string) => {
+    const novo = { ...mensagensEditadas, [chave]: texto };
+    setMensagensEditadas(novo);
+    gravar("mensagens", novo);
+  };
 
   const [editandoLeadId, setEditandoLeadId] = useState<string | null>(null);
   const [edicaoLead, setEdicaoLead] = useState({ nome: "", telefone: "" });
@@ -496,7 +506,7 @@ export default function FollowupPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {contatosPendentes.map((l) => {
                 const passo = passoPorLead[l.id] ?? 0;
-                const textoAtual = SEQUENCIA_RECUPERACAO[passo].texto.replace("[NOME]", l.nome);
+                const textoAtual = mensagensEditadas[`seq-${l.id}-${passo}`] ?? SEQUENCIA_RECUPERACAO[passo].texto.replace("[NOME]", l.nome);
                 return (
                   <div key={l.id} className={cartao}>
                     <p className="font-semibold text-gray-900">{l.nome}</p>
@@ -511,7 +521,7 @@ export default function FollowupPage() {
                         <option key={i} value={i}>{s.rotulo}</option>
                       ))}
                     </select>
-                    <p className="text-sm text-gray-700 whitespace-pre-line">{textoAtual}</p>
+                    <MensagemEditavel valor={textoAtual} onSalvar={(t) => salvarMensagemCard(`seq-${l.id}-${passo}`, t)} />
                     <a href={linkWhats(l.telefone, textoAtual)} target="_blank" rel="noopener noreferrer" className={botao}>
                       Chamar no WhatsApp
                     </a>
@@ -647,8 +657,12 @@ export default function FollowupPage() {
                 <div key={p.id} className={cartao}>
                   <p className="font-semibold text-gray-900">{p.partnerName}</p>
                   <p className="text-xs text-gray-500">Pedido de {p.date || p.created_at?.slice(0, 10)}</p>
+                  <MensagemEditavel
+                    valor={mensagensEditadas[`pos-${p.id}`] ?? `Oi, ${p.partnerName}! Tudo bem? Passando para saber se as peças chegaram certinho e se você gostou. Qualquer dúvida, estou à disposição 💛`}
+                    onSalvar={(t) => salvarMensagemCard(`pos-${p.id}`, t)}
+                  />
                   <a
-                    href={linkWhats(p.partnerPhone, `Oi, ${p.partnerName}! Tudo bem? Passando para saber se as peças chegaram certinho e se você gostou. Qualquer dúvida, estou à disposição 💛`)}
+                    href={linkWhats(p.partnerPhone, mensagensEditadas[`pos-${p.id}`] ?? `Oi, ${p.partnerName}! Tudo bem? Passando para saber se as peças chegaram certinho e se você gostou. Qualquer dúvida, estou à disposição 💛`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={botao}
@@ -675,8 +689,12 @@ export default function FollowupPage() {
                   <p className="text-xs text-gray-500">
                     Última compra há {diasEntre(ultimoPedidoPorRevendedora.get(r.id) || "")} dias
                   </p>
+                  <MensagemEditavel
+                    valor={mensagensEditadas[`reativa-${r.id}`] ?? `Oi, ${r.name}! Saudades 💛 Chegaram peças novas na Beleza Nativa. Quer que eu te mande as novidades?`}
+                    onSalvar={(t) => salvarMensagemCard(`reativa-${r.id}`, t)}
+                  />
                   <a
-                    href={linkWhats(r.phone, `Oi, ${r.name}! Saudades 💛 Chegaram peças novas na Beleza Nativa. Quer que eu te mande as novidades?`)}
+                    href={linkWhats(r.phone, mensagensEditadas[`reativa-${r.id}`] ?? `Oi, ${r.name}! Saudades 💛 Chegaram peças novas na Beleza Nativa. Quer que eu te mande as novidades?`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={botao}
