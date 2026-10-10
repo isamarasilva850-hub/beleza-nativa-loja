@@ -57,6 +57,20 @@ export default function CRMMetodoBN() {
   const [leadsHoje, setLeadsHoje] = useState<Lead[]>([]);
   const [notificacaoEnviada, setNotificacaoEnviada] = useState(false);
   const [registrosFollowup, setRegistrosFollowup] = useState<Record<string, { data: string; texto: string }[]>>({});
+  const [editandoRegistro, setEditandoRegistro] = useState<number | null>(null);
+  const [textoRegistro, setTextoRegistro] = useState("");
+
+  const alterarRegistrosFicha = (novo: { data: string; texto: string }[]) => {
+    if (!selecionado) return;
+    const atualizado = { ...registrosFollowup, [`lead-${selecionado.id}`]: novo };
+    setRegistrosFollowup(atualizado);
+    fetch("/api/crm-dados", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chave: "followup", valor: atualizado }),
+    }).catch((err) => console.error("Erro ao salvar registros", err));
+  };
+
   const [editandoDados, setEditandoDados] = useState(false);
   const [dadosEdicao, setDadosEdicao] = useState({ nome: "", telefone: "" });
 
@@ -695,10 +709,62 @@ export default function CRMMetodoBN() {
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">🔁 Registros do follow-up:</label>
                   <div className="space-y-1 max-h-40 overflow-y-auto">
-                    {[...(registrosFollowup[`lead-${selecionado.id}`] || [])].reverse().map((r, i) => (
-                      <p key={i} className="text-xs text-gray-700 bg-gray-50 rounded-lg p-2">
-                        <span className="text-gray-400">{new Date(r.data).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" })}</span> — {r.texto}
-                      </p>
+                    {(registrosFollowup[`lead-${selecionado.id}`] || []).map((r, idx) => (
+                      <div key={idx} className="text-xs text-gray-700 bg-gray-50 rounded-lg p-2">
+                        {editandoRegistro === idx ? (
+                          <div className="space-y-1">
+                            <textarea
+                              value={textoRegistro}
+                              onChange={(e) => setTextoRegistro(e.target.value)}
+                              className="w-full p-2 border border-gray-200 rounded-lg text-xs h-16 resize-none"
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const lista = registrosFollowup[`lead-${selecionado.id}`] || [];
+                                  alterarRegistrosFicha(lista.map((x, k) => (k === idx ? { ...x, texto: textoRegistro.trim() || x.texto } : x)));
+                                  setEditandoRegistro(null);
+                                }}
+                                className="font-bold text-[#3d8c85] underline"
+                              >
+                                Salvar
+                              </button>
+                              <button type="button" onClick={() => setEditandoRegistro(null)} className="text-gray-500 underline">
+                                Cancelar
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex justify-between gap-2">
+                            <p>
+                              <span className="text-gray-400">{new Date(r.data).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" })}</span> — {r.texto}
+                            </p>
+                            <div className="flex gap-2 whitespace-nowrap">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditandoRegistro(idx);
+                                  setTextoRegistro(r.texto);
+                                }}
+                                className="font-bold text-gray-600 underline"
+                              >
+                                Editar
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (!window.confirm("Apagar este registro?")) return;
+                                  alterarRegistrosFicha((registrosFollowup[`lead-${selecionado.id}`] || []).filter((_, k) => k !== idx));
+                                }}
+                                className="font-bold text-red-600 underline"
+                              >
+                                Apagar
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>
