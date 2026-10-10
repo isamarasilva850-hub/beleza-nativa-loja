@@ -160,6 +160,32 @@ export default function FollowupPage() {
       .finally(() => setCarregando(false));
   }, []);
 
+  const [editandoLeadId, setEditandoLeadId] = useState<string | null>(null);
+  const [edicaoLead, setEdicaoLead] = useState({ nome: "", telefone: "" });
+
+  const salvarLeads = (novos: any[]) => {
+    setLeads(novos);
+    gravar("leads", novos);
+  };
+
+  const salvarEdicaoLead = (lead: any) => {
+    if (!edicaoLead.nome.trim() || !edicaoLead.telefone.trim()) return;
+    const atualizado = { ...lead, nome: edicaoLead.nome.trim(), telefone: edicaoLead.telefone.trim() };
+    salvarLeads(leads.map((l) => (l.id === lead.id ? atualizado : l)));
+    const idPlano = `lead-${lead.id}`;
+    if (planos[idPlano]) {
+      alterarPlanos({ ...planos, [idPlano]: { ...planos[idPlano], nome: atualizado.nome, telefone: atualizado.telefone } });
+    }
+    setEditandoLeadId(null);
+  };
+
+  const excluirLeadFollowup = (lead: any) => {
+    if (!window.confirm(`Excluir ${lead.nome}? Isso apaga o lead e o plano de contato dele.`)) return;
+    salvarLeads(leads.filter((l) => l.id !== lead.id));
+    const { [`lead-${lead.id}`]: _removido, ...resto } = planos;
+    alterarPlanos(resto);
+  };
+
   const registrarContato = (id: string, texto: string) => {
     const novo: Registro = { data: new Date().toISOString(), texto };
     const atualizado: Registros = { ...registros, [id]: [...(registros[id] || []), novo] };
@@ -534,7 +560,49 @@ export default function FollowupPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {todosLeads.map((l) => (
                 <div key={l.id} className={cartao}>
-                  <p className="font-semibold text-gray-900">{l.nome}</p>
+                  {editandoLeadId === l.id ? (
+                    <div className="space-y-2">
+                      <input
+                        value={edicaoLead.nome}
+                        onChange={(e) => setEdicaoLead({ ...edicaoLead, nome: e.target.value })}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                        placeholder="Nome"
+                      />
+                      <input
+                        value={edicaoLead.telefone}
+                        onChange={(e) => setEdicaoLead({ ...edicaoLead, telefone: e.target.value })}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                        placeholder="Telefone com DDD"
+                      />
+                      <div className="flex gap-2">
+                        <button type="button" onClick={() => salvarEdicaoLead(l)} className="px-4 py-2 rounded-lg text-sm font-bold bg-[#7BC9C2] text-white">
+                          Salvar
+                        </button>
+                        <button type="button" onClick={() => setEditandoLeadId(null)} className="px-4 py-2 rounded-lg text-sm font-bold bg-gray-200 text-gray-700">
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-start gap-2">
+                      <p className="font-semibold text-gray-900">{l.nome}</p>
+                      <div className="flex gap-3 whitespace-nowrap">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEdicaoLead({ nome: l.nome, telefone: l.telefone });
+                            setEditandoLeadId(l.id);
+                          }}
+                          className="text-sm font-bold text-gray-600 underline"
+                        >
+                          ✏️ Editar
+                        </button>
+                        <button type="button" onClick={() => excluirLeadFollowup(l)} className="text-sm font-bold text-red-600 underline">
+                          🗑️ Excluir
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   <p className="text-xs text-gray-500">
                     Etapa: {l.etapa || "—"} · Próximo contato: {formatarData(l.proximaData)} · {l.telefone}
                   </p>
