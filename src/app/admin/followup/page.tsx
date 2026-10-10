@@ -7,6 +7,7 @@ import {
   criarPlano,
   dataDoPasso,
   passosDeHoje,
+  Passo,
   Planos,
   preencherNome,
   Plano,
@@ -232,13 +233,14 @@ export default function FollowupPage() {
 
   const passosHoje = passosDeHoje(planos, hoje);
   const passosAtrasados = Object.entries(planos)
-    .flatMap(([id, plano]) =>
-      plano.passos
-        .map((passo, indice) => ({ id, plano, indice, passo, data: dataDoPasso(plano, passo) }))
-        .filter((x) => !x.passo.feito && x.data < hoje)
-    )
-    .sort((a, b) => (a.data < b.data ? -1 : 1))
-    .slice(0, 20);
+    .map(([id, plano]) => {
+      const indice = plano.passos.findIndex((p) => !p.feito);
+      if (indice < 0) return null;
+      const passo = plano.passos[indice];
+      return { id, plano, indice, passo, data: dataDoPasso(plano, passo) };
+    })
+    .filter((x): x is { id: string; plano: Plano; indice: number; passo: Passo; data: string } => !!x && x.data < hoje)
+    .sort((a, b) => (a.data < b.data ? -1 : 1));
 
   const planosLeads = listaPlanos.filter((x) => x.plano.tipo === "lead");
   const planosRevenda = listaPlanos.filter((x) => x.plano.tipo === "revenda");

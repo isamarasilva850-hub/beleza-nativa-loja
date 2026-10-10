@@ -16,10 +16,10 @@ export default function CRM() {
         const planos: Planos = dados.valor && typeof dados.valor === "object" && !Array.isArray(dados.valor) ? dados.valor : {};
         const hoje = new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
         const hojeCount = passosDeHoje(planos, hoje).length;
-        const atrasados = Object.values(planos).reduce(
-          (total, plano) => total + plano.passos.filter((p) => !p.feito && dataDoPasso(plano, p) < hoje).length,
-          0
-        );
+        const atrasados = Object.values(planos).filter((plano) => {
+          const proximo = plano.passos.find((p) => !p.feito);
+          return !!proximo && dataDoPasso(plano, proximo) < hoje;
+        }).length;
         setAcoesHoje(hojeCount + atrasados);
       })
       .catch((err) => console.error("Erro ao contar ações", err));
