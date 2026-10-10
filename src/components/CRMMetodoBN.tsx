@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface Message {
   id: string;
@@ -83,6 +83,48 @@ export default function CRMMetodoBN() {
     } catch (e) {
       console.error("Erro ao salvar leads:", e);
     }
+  }, [leads]);
+
+  // Leads e anotações no banco, para aparecerem em qualquer computador ou navegador
+  const crmPronto = useRef(false);
+
+  useEffect(() => {
+    let cancelado = false;
+    fetch("/api/crm-dados?chave=leads")
+      .then((r) => r.json())
+      .then((dados) => {
+        if (cancelado) return;
+        const doServidor = Array.isArray(dados.valor) ? dados.valor : [];
+        if (doServidor.length > 0) {
+          setLeads(doServidor);
+        } else {
+          const doNavegador = JSON.parse(localStorage.getItem(LEADS_KEY) || "[]");
+          if (doNavegador.length > 0) {
+            fetch("/api/crm-dados", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ chave: "leads", valor: doNavegador }),
+            });
+          }
+        }
+        crmPronto.current = true;
+      })
+      .catch((err) => console.error("Erro ao carregar leads do banco", err));
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!crmPronto.current) return;
+    const timer = setTimeout(() => {
+      fetch("/api/crm-dados", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chave: "leads", valor: leads }),
+      }).catch((err) => console.error("Erro ao salvar leads no banco", err));
+    }, 800);
+    return () => clearTimeout(timer);
   }, [leads]);
 
   // Salvar templates no localStorage
