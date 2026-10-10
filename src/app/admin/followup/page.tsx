@@ -6,6 +6,21 @@ import { telefoneWhatsApp } from "@/lib/vitrine";
 
 const DIAS_REATIVACAO = 60;
 
+const SEQUENCIA_RECUPERACAO = [
+  {
+    rotulo: "Dia 1: perguntar se ficou dúvida",
+    texto: "Oi, [NOME]! Te mandei o catálogo e os preços. Ficou alguma dúvida? Posso te ajudar a escolher as peças 😊",
+  },
+  {
+    rotulo: "Dia 4: trazer um motivo novo",
+    texto: "[NOME], uma peça que está saindo bastante é a [NOME DA PEÇA]. Você já trabalha com algum modelo parecido?",
+  },
+  {
+    rotulo: "Dia 10: oferecer um começo pequeno",
+    texto: "Oi, [NOME]! Se quiser começar devagar, posso montar um pedido só com 3 ou 4 peças para você testar. Quer que eu faça?",
+  },
+];
+
 const hojeISO = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
 
 const linkWhats = (telefone: string, texto: string) =>
@@ -21,6 +36,7 @@ export default function FollowupPage() {
   const [leads, setLeads] = useState<any[]>([]);
   const [pedidos, setPedidos] = useState<any[]>([]);
   const [revendedoras, setRevendedoras] = useState<any[]>([]);
+  const [passoPorLead, setPassoPorLead] = useState<Record<string, number>>({});
 
   useEffect(() => {
     Promise.all([
@@ -79,21 +95,29 @@ export default function FollowupPage() {
           <h2 className="text-lg font-bold text-gray-800">📞 Contatos de hoje e atrasados ({contatosPendentes.length})</h2>
           {contatosPendentes.length === 0 && <p className="text-gray-500">Nenhum contato pendente.</p>}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {contatosPendentes.map((l) => (
-              <div key={l.id} className={cartao}>
-                <p className="font-semibold text-gray-900">{l.nome}</p>
-                <p className="text-xs text-gray-500">Próximo contato: {l.proximaData.split("-").reverse().join("/")}</p>
-                {l.proximaAcao && <p className="text-sm text-gray-700 whitespace-pre-line">{l.proximaAcao.replace("[NOME]", l.nome)}</p>}
-                <a
-                  href={linkWhats(l.telefone, (l.proximaAcao || "Oi!").replace("[NOME]", l.nome))}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={botao}
-                >
-                  Chamar no WhatsApp
-                </a>
-              </div>
-            ))}
+            {contatosPendentes.map((l) => {
+              const passo = passoPorLead[l.id] ?? 0;
+              const textoAtual = SEQUENCIA_RECUPERACAO[passo].texto.replace("[NOME]", l.nome);
+              return (
+                <div key={l.id} className={cartao}>
+                  <p className="font-semibold text-gray-900">{l.nome}</p>
+                  <p className="text-xs text-gray-500">Etapa: {l.etapa || "—"} · Próximo contato: {l.proximaData.split("-").reverse().join("/")}</p>
+                  <select
+                    value={passo}
+                    onChange={(e) => setPassoPorLead({ ...passoPorLead, [l.id]: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                  >
+                    {SEQUENCIA_RECUPERACAO.map((s, i) => (
+                      <option key={i} value={i}>{s.rotulo}</option>
+                    ))}
+                  </select>
+                  <p className="text-sm text-gray-700 whitespace-pre-line">{textoAtual}</p>
+                  <a href={linkWhats(l.telefone, textoAtual)} target="_blank" rel="noopener noreferrer" className={botao}>
+                    Chamar no WhatsApp
+                  </a>
+                </div>
+              );
+            })}
           </div>
         </section>
 
