@@ -716,14 +716,6 @@ export default function PalmiraUploadPage() {
                   type="button"
                   onClick={handleSearchExistingProduct}
                   disabled={loadingSearchExisting || !formData.ref.trim()}
-                  className="bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-lg"
-                >
-                  {loadingSearchExisting ? "🔍 Buscando..." : "🔍 Buscar"}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSearchExistingProduct}
-                  disabled={loadingSearchExisting || !formData.ref.trim()}
                   className="bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-lg transition-colors"
                 >
                   {loadingSearchExisting ? "🔍 Buscando..." : "🔍 Buscar Existente"}
