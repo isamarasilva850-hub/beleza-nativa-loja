@@ -27,7 +27,7 @@ interface CartContextType {
   removeItem: (productId: number, color: string, size: string) => void;
   updateQuantity: (productId: number, color: string, size: string, quantity: number) => void;
   clearCart: () => void;
-  checkout: (revendedora: string) => Promise<number>;
+  checkout: (revendedora: string, telefone?: string) => Promise<number>;
   totalItems: number;
   totalPrice: number;
   minOrder: number;
@@ -137,7 +137,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => setItems([]), []);
 
-  const checkout = useCallback(async (revendedora: string): Promise<number> => {
+  const checkout = useCallback(async (revendedora: string, telefone: string = ""): Promise<number> => {
     if (items.length === 0) return 0;
 
     const totalPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -153,7 +153,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({
           partnerId: null,
           partnerName: revendedora,
-          partnerPhone: "",
+          partnerPhone: telefone,
           items: items.map((i) => ({
             ref: i.ref,
             name: i.name,

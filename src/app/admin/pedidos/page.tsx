@@ -17,6 +17,7 @@ interface Order {
   number: number;
   date: string;
   revendedora: string;
+  phone?: string;
   items: OrderItem[];
   total: number;
   totalItems: number;
@@ -55,6 +56,7 @@ function deServidor(row: any): Order {
     // created_at tem hora, então a data aparece certa no fuso do Brasil
     date: row.created_at || row.date || "",
     revendedora: row.partnername || "",
+    phone: row.partnerphone || "",
     items,
     total: Number(row.total) || 0,
     totalItems: items.reduce((soma, i) => soma + (Number(i.quantity) || 0), 0),
@@ -111,11 +113,11 @@ export default function AdminPedidos() {
   };
 
   const sendToWhatsApp = (order: Order) => {
-    // Buscar cliente no CRM para pegar o telefone
+    // Primeiro o telefone salvo no próprio pedido; se não houver, busca no CRM do navegador
+    let clientPhone = (order.phone || "").replace(/\D/g, "");
     const crmClientes = localStorage.getItem("belezanativa_crm_clientes");
-    let clientPhone = "";
 
-    if (crmClientes) {
+    if (!clientPhone && crmClientes) {
       try {
         const clientes = JSON.parse(crmClientes);
         const cliente = clientes.find((c: any) =>
@@ -174,7 +176,7 @@ export default function AdminPedidos() {
         <body>
           <div class="header">
             <h1>📦 PEDIDO #${order.number}</h1>
-            <div class="order-number">Gerado em ${new Date(order.date).toLocaleDateString("pt-BR", { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+            <div class="order-number">Gerado em ${new Date(order.date).toLocaleDateString("pt-BR", { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}</div>
           </div>
 
           <div class="info-grid">

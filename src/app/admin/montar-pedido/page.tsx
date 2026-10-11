@@ -95,44 +95,48 @@ export default function MontarPedidoPage() {
       c.phone.includes(searchCliente)
   );
 
-  const saveOrderToPanel = () => {
+  // Salva o pedido no servidor (o número vem de lá). Retorna null se não conseguir salvar.
+  const saveOrderToPanel = async (): Promise<number | null> => {
     if (!selectedCliente || items.length === 0) return null;
 
-    // Gerar número único para o pedido
-    const orderNumber = Date.now();
-
-    // Estrutura do pedido igual ao esperado pelo Painel de Pedidos
-    const newOrder = {
-      number: orderNumber,
-      date: new Date().toISOString(),
-      revendedora: selectedCliente.name,
-      items: items.map(item => ({
-        ref: item.ref,
-        name: item.name,
-        color: item.color,
-        size: item.size,
-        quantity: item.quantity,
-        unitPrice: item.price,
-        total: item.price * item.quantity,
-      })),
-      total: total,
-      totalItems: items.reduce((sum, item) => sum + item.quantity, 0),
-      status: "pendente" as const,
-    };
-
-    // Salvar no localStorage
-    const existingOrders = JSON.parse(localStorage.getItem("belezanativa_orders") || "[]");
-    existingOrders.push(newOrder);
-    localStorage.setItem("belezanativa_orders", JSON.stringify(existingOrders));
-
-    return orderNumber;
+    try {
+      const resposta = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          partnerId: null,
+          partnerName: selectedCliente.name,
+          partnerPhone: selectedCliente.phone.replace(/\D/g, ""),
+          items: items.map((item) => ({
+            ref: item.ref,
+            name: item.name,
+            color: item.color,
+            size: item.size,
+            quantity: item.quantity,
+            unitPrice: item.price,
+            total: item.price * item.quantity,
+          })),
+          total: total,
+          date: new Date().toISOString().split("T")[0],
+          status: "pendente",
+        }),
+      });
+      if (!resposta.ok) throw new Error(`Servidor respondeu ${resposta.status}`);
+      const salvo = await resposta.json();
+      return Number(salvo.id) || null;
+    } catch (err) {
+      console.error("Erro ao salvar pedido", err);
+      alert("Não foi possível salvar o pedido no servidor. Tente de novo antes de enviar pelo WhatsApp.");
+      return null;
+    }
   };
 
-  const sendWhatsApp = () => {
+  const sendWhatsApp = async () => {
     if (!selectedCliente || items.length === 0) return;
 
     // Salvar pedido antes de enviar
-    const orderNumber = saveOrderToPanel();
+    const orderNumber = await saveOrderToPanel();
+    if (!orderNumber) return;
 
     const resumoTexto = `📦 *PEDIDO #${orderNumber}*\n*PARA ${selectedCliente.name.toUpperCase()}*\n\n${items
       .map((item) => `*REF ${item.ref}*\n${item.name}\n${item.color} - ${item.size}\nQtd: ${item.quantity} x R$ ${item.price.toFixed(2).replace(".", ",")}`)

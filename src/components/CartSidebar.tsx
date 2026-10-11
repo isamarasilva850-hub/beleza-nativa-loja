@@ -87,6 +87,7 @@ export default function CartSidebar() {
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [revendedora, setRevendedora] = useState("");
+  const [telefoneCliente, setTelefoneCliente] = useState("");
   const [showReceipt, setShowReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const [receiptTab, setReceiptTab] = useState<"resumo" | "artes">("artes");
@@ -142,7 +143,7 @@ export default function CartSidebar() {
     const savedCount = totalItems;
 
     // Número do pedido vem do servidor (ou do número local, se o servidor falhar)
-    const orderNumber = await checkout(name);
+    const orderNumber = await checkout(name, telefoneCliente.replace(/\D/g, ""));
 
     setReceiptData({
       name,
@@ -664,6 +665,15 @@ export default function CartSidebar() {
               onChange={(e) => setRevendedora(e.target.value)}
               className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2] mb-4"
               autoFocus
+            />
+
+            <label className="block text-sm font-medium text-gray-700 mb-1">Seu WhatsApp (com DDD)</label>
+            <input
+              type="tel"
+              placeholder="(35) 99999-0000"
+              value={telefoneCliente}
+              onChange={(e) => setTelefoneCliente(e.target.value)}
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2] mb-4"
             />
 
             <div className="flex gap-3">
