@@ -4,36 +4,6 @@ import Image from "next/image";
 export default function Footer() {
   return (
     <footer>
-      {/* Newsletter */}
-      <section className="bg-white border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center gap-6">
-          <div className="flex items-center gap-3">
-            <svg className="w-10 h-10 text-primary flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-            </svg>
-            <div>
-              <p className="text-lg font-bold text-gray-800 uppercase">Newsletter</p>
-              <p className="text-xs text-gray-500">Seja a primeira a saber de nossas novidades e promoções!</p>
-            </div>
-          </div>
-          <div className="flex flex-1 gap-3 w-full md:w-auto">
-            <input
-              type="text"
-              placeholder="Seu nome"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-primary"
-            />
-            <input
-              type="email"
-              placeholder="Seu e-mail"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-primary"
-            />
-            <button className="bg-primary hover:bg-primary-dark text-white font-bold px-6 py-2 rounded text-sm transition-colors whitespace-nowrap">
-              EU QUERO
-            </button>
-          </div>
-        </div>
-      </section>
-
       {/* Main Footer */}
       <div className="bg-gray-800 text-white">
         <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
