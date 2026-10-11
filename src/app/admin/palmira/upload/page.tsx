@@ -299,6 +299,29 @@ export default function PalmiraUploadPage() {
     }
   };
 
+  // Apaga direto da lista "Meus Produtos", com confirmação
+  const apagarDaLista = async (ref: string) => {
+    if (!confirm(`Apagar o produto ${ref}? Esta ação não pode ser desfeita.`)) return;
+    setError("");
+    setSuccess("");
+    try {
+      const response = await fetch("/api/admin/delete-product", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ref }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.details || "Erro ao deletar");
+      }
+      setSuccess(`🗑️ Produto "${ref}" deletado com sucesso!`);
+      setTimeout(() => setSuccess(""), 4000);
+      loadAllProducts();
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -478,28 +501,6 @@ export default function PalmiraUploadPage() {
           >
             ✏️ Editar Produto
           </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("preco")}
-            className={`px-6 py-3 rounded-lg font-bold transition-all ${
-              activeTab === "preco"
-                ? "bg-yellow-500 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            💰 Corrigir Preço
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("deletar")}
-            className={`px-6 py-3 rounded-lg font-bold transition-all ${
-              activeTab === "deletar"
-                ? "bg-red-500 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            🗑️ Deletar Produto
-          </button>
         </div>
 
         <div className="space-y-8 bg-white rounded-xl shadow-sm p-8">
@@ -582,11 +583,7 @@ export default function PalmiraUploadPage() {
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => {
-                                    setDeleteRef(product.ref);
-                                    setActiveTab("deletar");
-                                    handleSearchProduct();
-                                  }}
+                                  onClick={() => apagarDaLista(product.ref)}
                                   className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded font-bold"
                                 >
                                   🗑️
@@ -1115,138 +1112,6 @@ export default function PalmiraUploadPage() {
                 {success && !editMode && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
                 {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
               </div>
-            </div>
-          )}
-
-          {/* TAB: Corrigir Preço */}
-          {activeTab === "preco" && (
-            <div className="space-y-6">
-              <h2 className="text-lg font-bold text-gray-800">💰 Corrigir Preço</h2>
-              <div className="flex gap-2 mb-4">
-                <input
-                  type="text"
-                  placeholder="Digite a REF do produto"
-                  value={deleteRef}
-                  onChange={(e) => setDeleteRef(e.target.value)}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-yellow-500"
-                />
-                <button
-                  type="button"
-                  onClick={handleSearchProduct}
-                  disabled={loadingSearch || !deleteRef.trim()}
-                  className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-lg transition-colors"
-                >
-                  {loadingSearch ? "🔍 Buscando..." : "🔍 BUSCAR"}
-                </button>
-              </div>
-
-              {foundProduct && (
-                <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
-                  <p className="font-bold text-gray-800 mb-3">✅ Produto encontrado:</p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                      <p className="text-xs font-bold text-gray-700">Nome</p>
-                      <p className="text-gray-900 font-semibold">{foundProduct.name}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-gray-700">REF</p>
-                      <p className="text-gray-900 font-semibold">{foundProduct.ref}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-gray-700">Preço Atual</p>
-                      <p className="text-lg font-black text-yellow-600">R$ {foundProduct.price?.toFixed(2).replace(".", ",")}</p>
-                    </div>
-                  </div>
-
-                  {foundProduct.images && foundProduct.images.length > 0 && (
-                    <div className="mb-4">
-                      <img src={foundProduct.images[0]} alt={foundProduct.name} className="w-32 h-32 object-cover rounded" />
-                    </div>
-                  )}
-
-                  <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Novo Preço:</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="number"
-                        step="0.01"
-                        placeholder={foundProduct.price?.toString()}
-                        value={formData.price}
-                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-yellow-500 text-lg font-bold"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newPrice = formData.price;
-                          if (newPrice && newPrice !== foundProduct.price?.toString()) {
-                            handleSubmit({ preventDefault: () => {} } as any);
-                          }
-                        }}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-6 py-3 rounded-lg transition-colors"
-                      >
-                        💾 ATUALIZAR
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {success && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
-              {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
-            </div>
-          )}
-
-          {/* TAB: Deletar Produto */}
-          {activeTab === "deletar" && (
-            <div className="space-y-6">
-              <h2 className="text-lg font-bold text-red-600">🗑️ Deletar Produto</h2>
-              <div className="flex gap-2 mb-4">
-                <input
-                  type="text"
-                  placeholder="Digite a REF do produto para deletar"
-                  value={deleteRef}
-                  onChange={(e) => setDeleteRef(e.target.value)}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-red-500"
-                />
-                <button
-                  type="button"
-                  onClick={handleSearchProduct}
-                  disabled={loadingSearch || !deleteRef.trim()}
-                  className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-lg transition-colors"
-                >
-                  {loadingSearch ? "🔍 Buscando..." : "🔍 BUSCAR"}
-                </button>
-              </div>
-
-              {foundProduct && (
-                <div className="bg-red-50 border-2 border-red-300 rounded-lg p-4">
-                  <p className="font-bold text-gray-800 mb-3">⚠️ Produto encontrado:</p>
-                  <div className="space-y-2 text-sm mb-4">
-                    <p><strong>Nome:</strong> {foundProduct.name}</p>
-                    <p><strong>REF:</strong> {foundProduct.ref}</p>
-                    <p><strong>Preço:</strong> R$ {foundProduct.price?.toFixed(2).replace(".", ",")}</p>
-                    {foundProduct.images && foundProduct.images.length > 0 && (
-                      <div>
-                        <strong>Imagem:</strong>
-                        <img src={foundProduct.images[0]} alt={foundProduct.name} className="mt-2 w-24 h-24 object-cover rounded" />
-                      </div>
-                    )}
-                  </div>
-                  <form onSubmit={handleDelete} className="mt-4">
-                    <button
-                      type="submit"
-                      disabled={loadingDelete}
-                      className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-lg transition-colors"
-                    >
-                      {loadingDelete ? "⏳ Deletando..." : "🗑️ DELETAR ESTE PRODUTO"}
-                    </button>
-                  </form>
-                </div>
-              )}
-
-              {success && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</div>}
-              {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
             </div>
           )}
         </div>
