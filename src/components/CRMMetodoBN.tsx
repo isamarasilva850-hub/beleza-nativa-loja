@@ -177,6 +177,7 @@ export default function CRMMetodoBN() {
           }
         }
         crmPronto.current = true;
+        importarLeadsDoSite(true);
       })
       .catch((err) => console.error("Erro ao carregar leads do banco", err));
     return () => {
@@ -332,40 +333,45 @@ export default function CRMMetodoBN() {
   };
 
   // Importar leads do site
-  const importarLeadsDoSite = () => {
+  // Traz para o CRM os leads que o formulário gravou no banco (crm_leads).
+  // Só adiciona os que ainda não estão na lista, comparando id e telefone.
+  const importarLeadsDoSite = async (silencioso = false) => {
     try {
-      const capturedLeads = localStorage.getItem("belezanativa_leads");
-      if (!capturedLeads) {
-        alert("Nenhum lead capturado do site ainda!");
-        return;
+      const resposta = await fetch("/api/crm/leads");
+      const doSite = await resposta.json();
+      if (!Array.isArray(doSite)) throw new Error("Resposta inesperada do servidor");
+
+      const soDigitos = (t: string) => String(t || "").replace(/\D/g, "");
+      let quantidade = 0;
+
+      setLeads((atuais) => {
+        const idsExistentes = new Set(atuais.map((l: any) => String(l.id)));
+        const telefonesExistentes = new Set(atuais.map((l: any) => soDigitos(l.telefone)));
+
+        const novos = doSite
+          .filter((l: any) => !idsExistentes.has(String(l.id)) && !telefonesExistentes.has(soDigitos(l.telefone)))
+          .map((l: any) => ({
+            id: String(l.id),
+            nome: l.nome || "",
+            telefone: l.telefone || "",
+            etapa: "abrir" as const,
+            proximaAcao: PERGUNTAS_POR_ETAPA.abrir,
+            proximaData: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+            notas: `Origem: ${l.origem || "site"}${l.notas ? ` | ${l.notas}` : ""}`,
+            mensagens: [],
+            ultimaRespostaDato: null,
+          }));
+
+        quantidade = novos.length;
+        return novos.length > 0 ? [...novos, ...atuais] : atuais;
+      });
+
+      if (!silencioso) {
+        alert(quantidade > 0 ? `${quantidade} lead(s) importado(s) do site!` : "Todos os leads do site já estão no CRM!");
       }
-
-      const leadsSite = JSON.parse(capturedLeads);
-      const leadsImportados = leadsSite.map((l: any) => ({
-        id: l.id,
-        nome: l.name,
-        telefone: l.phone,
-        etapa: "abrir" as const,
-        proximaAcao: PERGUNTAS_POR_ETAPA.abrir,
-        proximaData: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-        notas: "Importado do site",
-        mensagens: [],
-        ultimaRespostaDato: null,
-      }));
-
-      // Evitar duplicatas
-      const leadsExistentes = new Set(leads.map((l: any) => l.telefone));
-      const novoLeads = leadsImportados.filter((l: any) => !leadsExistentes.has(l.telefone));
-
-      if (novoLeads.length === 0) {
-        alert("Todos os leads do site já estão no CRM!");
-        return;
-      }
-
-      setLeads([...novoLeads, ...leads]);
-      alert(`${novoLeads.length} lead(s) importado(s) com sucesso!`);
     } catch (e) {
-      alert("Erro ao importar leads: " + e);
+      if (!silencioso) alert("Erro ao importar leads: " + e);
+      else console.error("Erro ao importar leads do site", e);
     }
   };
 
@@ -536,7 +542,7 @@ export default function CRMMetodoBN() {
             ➕ Novo Lead
           </button>
           <button
-            onClick={importarLeadsDoSite}
+            onClick={() => importarLeadsDoSite()}
             className="w-full bg-gradient-to-r from-blue-400 to-cyan-400 text-white font-bold py-2 rounded-xl hover:shadow-lg transition-all text-sm"
           >
             📥 Importar do Site
