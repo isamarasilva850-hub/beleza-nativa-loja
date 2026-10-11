@@ -35,7 +35,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { partnerId, partnerName, partnerPhone, items, total, date, status } = body;
 
-    if (!partnerId || !items) {
+    // partnerId é opcional: pedido do site (cliente sem parceira cadastrada) vai sem ele
+    if (!items) {
       return NextResponse.json({ error: 'Dados incompletos' }, { status: 400 });
     }
 
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
         .from('orders')
         .insert({
           id: String(numero),
-          partnerid: partnerId,
+          partnerid: partnerId || null,
           partnername: partnerName,
           partnerphone: partnerPhone,
           items: items,

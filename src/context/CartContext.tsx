@@ -151,7 +151,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          partnerId: "loja-site",
+          partnerId: null,
           partnerName: revendedora,
           partnerPhone: "",
           items: items.map((i) => ({
