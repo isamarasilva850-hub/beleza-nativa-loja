@@ -218,6 +218,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </svg>
             Voltar à Loja
           </Link>
+          <button
+            type="button"
+            onClick={async () => {
+              await fetch("/api/admin/sessao", { method: "DELETE" });
+              window.location.href = "/admin";
+            }}
+            className="mt-1 w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-gray-300 hover:bg-white/10 transition-colors"
+          >
+            Sair
+          </button>
         </div>
       </aside>
 
