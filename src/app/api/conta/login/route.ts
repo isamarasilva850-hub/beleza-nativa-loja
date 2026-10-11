@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { conferirSenha } from '@/lib/senha';
+import { estaBloqueado, registrarFalha, limparFalhas, chaveLimite } from '@/lib/limite';
 
 const supabase = () =>
   createClient(
@@ -13,6 +14,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const login = String(body.email || '').trim().toLowerCase();
     const senha = String(body.password || '');
+    const chave = chaveLimite(request.headers.get('x-forwarded-for'), login);
+
+    if (estaBloqueado(chave)) {
+      return NextResponse.json({ error: 'Muitas tentativas. Tente de novo em 15 minutos.' }, { status: 429 });
+    }
 
     const { data: conta } = await supabase()
       .from('clientes_conta')
@@ -22,8 +28,10 @@ export async function POST(request: NextRequest) {
 
     // Mesma resposta para login inexistente e senha errada, para não revelar contas
     if (!conta || !(await conferirSenha(senha, conta.senha_hash))) {
+      registrarFalha(chave);
       return NextResponse.json({ error: 'E-mail ou senha incorretos.' }, { status: 401 });
     }
+    limparFalhas(chave);
 
     return NextResponse.json({
       email: conta.login,
