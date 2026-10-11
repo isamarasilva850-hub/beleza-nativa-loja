@@ -158,40 +158,10 @@ export default function PalmiraDashboard() {
             <div className="pt-4 border-t border-gray-100 text-blue-600 font-semibold text-sm">Clique para fazer upload →</div>
           </Link>
 
-          <Link href="/admin/palmira/produtos" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-purple-500 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-xl font-bold text-gray-800">📦 Produtos</h3>
-                <p className="text-sm text-gray-600 mt-1">Veja todos os produtos</p>
-              </div>
-              <div className="text-4xl">📋</div>
-            </div>
-            <div className="space-y-2 text-sm text-gray-600 mb-4">
-              <div className="flex items-center gap-2"><span className="text-purple-500">✓</span><span>Galeria com miniaturas</span></div>
-              <div className="flex items-center gap-2"><span className="text-purple-500">✓</span><span>Pesquisa por referência</span></div>
-              <div className="flex items-center gap-2"><span className="text-purple-500">✓</span><span>Total: {productCount} produtos</span></div>
-            </div>
-            <div className="pt-4 border-t border-gray-100 text-purple-600 font-semibold text-sm">Clique para visualizar →</div>
-          </Link>
-
-          <Link href="/admin/palmira/estoque" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-green-500 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-xl font-bold text-gray-800">📊 Estoque</h3>
-                <p className="text-sm text-gray-600 mt-1">Controle de quantidade</p>
-              </div>
-              <div className="text-4xl">📈</div>
-            </div>
-            <div className="space-y-2 text-sm text-gray-600 mb-4">
-              <div className="flex items-center gap-2"><span className="text-green-500">✓</span><span>Total de peças em estoque</span></div>
-              <div className="flex items-center gap-2"><span className="text-green-500">✓</span><span>Alerta de baixo estoque</span></div>
-              <div className="flex items-center gap-2"><span className="text-green-500">✓</span><span>Ordenar por quantidade</span></div>
-            </div>
-            <div className="pt-4 border-t border-gray-100 text-green-600 font-semibold text-sm">Clique para acompanhar →</div>
-          </Link>
 
 
-          <Link href="/admin/palmira/reordenar-produtos" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-orange-500 p-6">
+
+          <Link href="/admin/palmira/upload" className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 border-l-4 border-orange-500 p-6">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="text-xl font-bold text-gray-800">🔄 Reordenar</h3>
