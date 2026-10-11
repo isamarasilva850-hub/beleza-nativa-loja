@@ -21,19 +21,26 @@ export default function MinhaConta() {
   const [remember, setRemember] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && isLoggedIn) {
-      const savedOrders = JSON.parse(localStorage.getItem("belezanativa_orders") || "[]");
-      setOrders(savedOrders.sort((a: Order, b: Order) => b.number - a.number));
-    }
-  }, [isLoggedIn]);
-
+  // Pedidos da cliente vêm do servidor, pelo WhatsApp da conta. Carregam logo depois do login
+  // (a senha é conferida no servidor, por isso não fica guardada no navegador).
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     const resultado = await login(email, password);
     if (!resultado.ok) {
       setError(resultado.erro || "E-mail ou senha incorretos. Verifique seus dados ou cadastre-se.");
+      return;
+    }
+    try {
+      const resposta = await fetch("/api/conta/pedidos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const lista = await resposta.json();
+      if (Array.isArray(lista)) setOrders(lista.sort((a: Order, b: Order) => b.number - a.number));
+    } catch (err) {
+      console.error("Erro ao carregar pedidos", err);
     }
   };
 
