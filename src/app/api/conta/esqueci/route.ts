@@ -49,7 +49,8 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        to: digitos,
+        // WaSender exige o número com código do país (55). Número com DDD tem 10 ou 11 dígitos.
+        to: digitos.length >= 12 ? digitos : `55${digitos}`,
         text: `Beleza Nativa: seu código para criar uma nova senha é ${codigo}. Ele vale por 10 minutos. Se você não pediu, ignore esta mensagem.`,
       }),
     });
