@@ -63,24 +63,22 @@ export default function MontarPedidoPage() {
       .catch((err) => console.error("Erro ao carregar produtos", err));
   }, []);
 
-  // Carrega clientes do CRM
+  // Clientes = carteira de parceiras, que fica no servidor
   useEffect(() => {
-    const crmClientes = localStorage.getItem("belezanativa_crm_clientes");
-    if (crmClientes) {
-      try {
-        const parsed = JSON.parse(crmClientes);
+    fetch("/api/partners")
+      .then((r) => r.json())
+      .then((lista) => {
+        if (!Array.isArray(lista)) return;
         setClientes(
-          parsed.map((c: any) => ({
+          lista.map((c: any) => ({
             id: c.id,
-            name: c.nome || c.name,
-            phone: c.telefone || c.phone || "",
+            name: c.name || "",
+            phone: c.phone || "",
             email: c.email || "",
           }))
         );
-      } catch (e) {
-        console.error("Erro ao carregar clientes", e);
-      }
-    }
+      })
+      .catch((e) => console.error("Erro ao carregar clientes", e));
   }, []);
 
   const filteredProducts = products.filter(
@@ -415,29 +413,17 @@ export default function MontarPedidoPage() {
               </div>
             )}
 
-            {/* Resumo Copiável */}
+            {/* Copiar o resumo (sem o cartão grande; o texto vai para o WhatsApp de qualquer forma) */}
             {items.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-lg font-bold text-gray-800 mb-3">📋 Resumo Copiável</h2>
-                <div
-                  onClick={() => {
-                    navigator.clipboard.writeText(resumoTexto);
-                    alert("✅ Copiado para a área de transferência!");
-                  }}
-                  className="bg-gray-50 p-4 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors whitespace-pre-wrap text-xs font-mono border-2 border-dashed border-gray-300 hover:border-[#7BC9C2]"
-                >
-                  {resumoTexto}
-                </div>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(resumoTexto);
-                    alert("✅ Copiado para a área de transferência!");
-                  }}
-                  className="w-full mt-3 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-lg transition-colors"
-                >
-                  📋 Copiar Resumo
-                </button>
-              </div>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(resumoTexto);
+                  alert("✅ Resumo copiado!");
+                }}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-lg transition-colors"
+              >
+                📋 Copiar resumo
+              </button>
             )}
 
             {/* Botão WhatsApp */}
