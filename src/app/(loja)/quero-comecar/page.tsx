@@ -92,6 +92,11 @@ export default function QueroComecear() {
         return;
       }
 
+      if (resultado.jaExiste) {
+        setErro('Você já tem cadastro com este WhatsApp. Entre na sua conta em "Minha conta" com a sua senha.');
+        return;
+      }
+
       setErro('');
       setSubmitted(true);
       setFormData({ name: '', phone: '', type: 'Revendedora', status: 'Quer começar' });
