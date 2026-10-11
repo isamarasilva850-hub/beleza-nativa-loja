@@ -38,6 +38,7 @@ export default function QueroComecear() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState('');
 
   const produto = PRODUCTS.find(p => p.id === selectedProduct);
   const precoCost = produto?.priceCost || 0;
@@ -65,8 +66,8 @@ export default function QueroComecear() {
         console.log('Usuário já existe, apenas salvando como lead');
       }
 
-      // Também salvar como lead no CRM
-      await fetch('/api/crm/leads', {
+      // Também salvar como lead no CRM. Só mostra sucesso se o servidor confirmar.
+      const resposta = await fetch('/api/crm/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -76,8 +77,14 @@ export default function QueroComecear() {
           status: 'novo',
           notas: `Tipo: ${formData.type} | Status: ${formData.status}`
         })
-      }).catch(err => console.log('Lead CRM (opcional):', err));
+      }).catch(() => null);
 
+      if (!resposta || !resposta.ok) {
+        setErro('Não conseguimos enviar seu cadastro agora. Tente de novo em alguns minutos ou fale com a gente pelo WhatsApp.');
+        return;
+      }
+
+      setErro('');
       setSubmitted(true);
       setFormData({ name: '', phone: '', type: 'Revendedora', status: 'Quer começar' });
       setTimeout(() => setSubmitted(false), 5000);
@@ -271,6 +278,12 @@ export default function QueroComecear() {
           {submitted && (
             <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4 mb-6 text-green-800">
               ✅ Recebemos seu interesse! Em breve entraremos em contato.
+            </div>
+          )}
+
+          {erro && (
+            <div className="bg-red-50 border-2 border-red-400 rounded-lg p-4 mb-6 text-red-800">
+              {erro}
             </div>
           )}
 
