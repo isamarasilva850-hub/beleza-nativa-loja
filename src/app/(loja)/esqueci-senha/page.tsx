@@ -107,6 +107,7 @@ export default function EsqueciSenha() {
               type="password"
               required
               minLength={4}
+              autoComplete="new-password"
               value={senhaNova}
               onChange={(e) => setSenhaNova(e.target.value)}
               placeholder="Nova senha (mínimo 4 caracteres)"

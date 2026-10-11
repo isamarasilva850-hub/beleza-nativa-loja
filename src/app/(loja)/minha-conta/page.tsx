@@ -294,6 +294,7 @@ function TrocarSenha({ login }: { login: string }) {
             type="password"
             required
             minLength={4}
+            autoComplete="new-password"
             placeholder="Nova senha (mínimo 4 caracteres)"
             value={senhaNova}
             onChange={(e) => setSenhaNova(e.target.value)}
