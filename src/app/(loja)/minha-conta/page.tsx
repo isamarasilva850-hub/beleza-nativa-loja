@@ -88,6 +88,8 @@ export default function MinhaConta() {
               </p>
             </div>
 
+            <TrocarSenha login={user.email} />
+
             <button
               onClick={logout}
               className="w-full py-3 border border-red-200 text-red-500 rounded-lg font-bold text-sm hover:bg-red-50 transition-colors"
@@ -217,6 +219,98 @@ export default function MinhaConta() {
           </a>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Troca a senha da própria cliente (precisa da senha atual)
+function TrocarSenha({ login }: { login: string }) {
+  const [aberto, setAberto] = useState(false);
+  const [senhaAtual, setSenhaAtual] = useState("");
+  const [senhaNova, setSenhaNova] = useState("");
+  const [msg, setMsg] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null);
+  const [enviando, setEnviando] = useState(false);
+
+  const trocar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMsg(null);
+    if (senhaNova.length < 4) {
+      setMsg({ tipo: "erro", texto: "A nova senha deve ter pelo menos 4 caracteres." });
+      return;
+    }
+    setEnviando(true);
+    try {
+      const resposta = await fetch("/api/conta/trocar-senha", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ login, senhaAtual, senhaNova }),
+      });
+      const dados = await resposta.json();
+      if (!resposta.ok) {
+        setMsg({ tipo: "erro", texto: dados.error || "Não foi possível trocar a senha." });
+        return;
+      }
+      setMsg({ tipo: "ok", texto: "Senha trocada com sucesso!" });
+      setSenhaAtual("");
+      setSenhaNova("");
+      setAberto(false);
+    } catch {
+      setMsg({ tipo: "erro", texto: "Sem conexão. Tente de novo." });
+    } finally {
+      setEnviando(false);
+    }
+  };
+
+  return (
+    <div className="mb-6">
+      {msg && (
+        <p className={`text-sm mb-3 ${msg.tipo === "ok" ? "text-green-700" : "text-red-600"}`}>{msg.texto}</p>
+      )}
+      {!aberto ? (
+        <button
+          type="button"
+          onClick={() => setAberto(true)}
+          className="w-full py-3 border border-gray-200 text-gray-700 rounded-lg font-bold text-sm hover:bg-gray-50 transition-colors"
+        >
+          TROCAR SENHA
+        </button>
+      ) : (
+        <form onSubmit={trocar} className="space-y-3 border border-gray-200 rounded-lg p-4">
+          <input
+            type="password"
+            required
+            placeholder="Senha atual"
+            value={senhaAtual}
+            onChange={(e) => setSenhaAtual(e.target.value)}
+            className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none"
+          />
+          <input
+            type="password"
+            required
+            minLength={4}
+            placeholder="Nova senha (mínimo 4 caracteres)"
+            value={senhaNova}
+            onChange={(e) => setSenhaNova(e.target.value)}
+            className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none"
+          />
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={enviando}
+              className="flex-1 py-2 bg-teal-600 text-white rounded-lg font-bold text-sm disabled:opacity-50"
+            >
+              {enviando ? "Salvando..." : "Salvar nova senha"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setAberto(false)}
+              className="flex-1 py-2 border border-gray-200 rounded-lg text-sm"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }
