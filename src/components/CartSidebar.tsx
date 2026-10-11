@@ -95,13 +95,13 @@ export default function CartSidebar() {
   const [legendaMode, setLegendaMode] = useState<Record<string, "completa" | "curta">>({});
   const [tipoCompra] = useState<"revenda" | "uso_proprio">("uso_proprio");
   const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; type: "percentual" | "fixo" | "frete"; value: number } | null>(null);
   const [isFirstPurchase, setIsFirstPurchase] = useState(false);
 
   const handleFirstPurchaseChange = () => {
     if (!isFirstPurchase) {
       setIsFirstPurchase(true);
-      setAppliedCoupon({ code: "PRIMEIRA_COMPRA", discount: 0.10 });
+      setAppliedCoupon({ code: "PRIMEIRA_COMPRA", type: "percentual", value: 10 });
     } else {
       setIsFirstPurchase(false);
       setAppliedCoupon(null);
@@ -119,15 +119,54 @@ export default function CartSidebar() {
   if (!isOpen && !showReceipt) return null;
 
   const minOrderAdjusted = 0;
-  const discountAmount = appliedCoupon ? totalPrice * appliedCoupon.discount : 0;
+  // Desconto conforme o tipo do cupom: porcentagem, valor fixo ou frete (frete não se aplica no carrinho)
+  const calcularDesconto = (cupom: { type: string; value: number } | null) => {
+    if (!cupom) return 0;
+    if (cupom.type === "percentual") return totalPrice * (cupom.value / 100);
+    if (cupom.type === "fixo") return Math.min(cupom.value, totalPrice);
+    return 0;
+  };
+  const discountAmount = calcularDesconto(appliedCoupon);
   const finalPrice = totalPrice - discountAmount;
   const canCheckout = finalPrice >= minOrderAdjusted;
 
-  const applyCoupon = () => {
-    const coupon = VALID_COUPONS[couponCode.toUpperCase()];
-    if (coupon) {
-      setAppliedCoupon({ code: couponCode.toUpperCase(), discount: coupon.discount });
-      setCouponCode("");
+  // Valida o cupom digitado contra a lista do servidor; se não achar, tenta os códigos antigos da loja
+  const applyCoupon = async () => {
+    const codigo = couponCode.trim().toUpperCase();
+    if (!codigo) return;
+    try {
+      const resposta = await fetch("/api/crm-dados?chave=cupons");
+      const dados = await resposta.json();
+      const lista: any[] = Array.isArray(dados.valor) ? dados.valor : [];
+      const hoje = new Date().toISOString().split("T")[0];
+      const cupom = lista.find((c) => String(c.code).toUpperCase() === codigo);
+
+      if (cupom) {
+        const valido =
+          cupom.active &&
+          (!cupom.validFrom || cupom.validFrom <= hoje) &&
+          (!cupom.validUntil || cupom.validUntil >= hoje) &&
+          (cupom.usedCount || 0) < (cupom.maxUses || Infinity) &&
+          totalPrice >= (cupom.minOrder || 0);
+        if (!valido) {
+          alert("Este cupom não está válido para este pedido.");
+          return;
+        }
+        setAppliedCoupon({ code: codigo, type: cupom.type, value: Number(cupom.value) || 0 });
+        setCouponCode("");
+        return;
+      }
+
+      const antigo = VALID_COUPONS[codigo];
+      if (antigo) {
+        setAppliedCoupon({ code: codigo, type: "percentual", value: antigo.discount * 100 });
+        setCouponCode("");
+        return;
+      }
+      alert("Cupom não encontrado.");
+    } catch (err) {
+      console.error("Erro ao validar cupom", err);
+      alert("Não foi possível validar o cupom agora. Tente de novo.");
     }
   };
 
@@ -144,6 +183,27 @@ export default function CartSidebar() {
 
     // Número do pedido vem do servidor (ou do número local, se o servidor falhar)
     const orderNumber = await checkout(name, telefoneCliente.replace(/\D/g, ""));
+
+    // Conta o uso do cupom no servidor (para respeitar o limite de usos)
+    if (appliedCoupon && appliedCoupon.code !== "PRIMEIRA_COMPRA") {
+      try {
+        const resposta = await fetch("/api/crm-dados?chave=cupons");
+        const dados = await resposta.json();
+        const lista: any[] = Array.isArray(dados.valor) ? dados.valor : [];
+        const atualizada = lista.map((c) =>
+          String(c.code).toUpperCase() === appliedCoupon.code
+            ? { ...c, usedCount: (c.usedCount || 0) + 1, lastUsedAt: new Date().toISOString() }
+            : c
+        );
+        await fetch("/api/crm-dados", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chave: "cupons", valor: atualizada }),
+        });
+      } catch (err) {
+        console.error("Erro ao registrar uso do cupom", err);
+      }
+    }
 
     setReceiptData({
       name,
@@ -563,7 +623,7 @@ export default function CartSidebar() {
                 {isFirstPurchase ? "🎉 Primeira compra!" : "✨ Cupom aplicado!"}
               </p>
               <p className="text-xs">
-                Desconto de {(appliedCoupon.discount * 100).toFixed(0)}% - Código: {appliedCoupon.code}
+                Desconto de {appliedCoupon.type === "percentual" ? `${appliedCoupon.value}%` : `R$ ${appliedCoupon.value.toFixed(2).replace(".", ",")}`} - Código: {appliedCoupon.code}
               </p>
             </div>
           )}

@@ -21,14 +21,21 @@ export default function Cupons() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ code: "", type: "percentual" as Coupon["type"], value: 10, minOrder: 0, maxUses: 100, validFrom: new Date().toISOString().split("T")[0], validUntil: "" });
 
+  // Cupons ficam no servidor (crm_dados, chave "cupons"), para a loja conseguir usar
   useEffect(() => {
-    const stored = localStorage.getItem("belezanativa_coupons");
-    if (stored) setCoupons(JSON.parse(stored));
+    fetch("/api/crm-dados?chave=cupons")
+      .then((r) => r.json())
+      .then((d) => setCoupons(Array.isArray(d.valor) ? d.valor : []))
+      .catch((err) => console.error("Erro ao carregar cupons", err));
   }, []);
 
   const save = (updated: Coupon[]) => {
     setCoupons(updated);
-    localStorage.setItem("belezanativa_coupons", JSON.stringify(updated));
+    fetch("/api/crm-dados", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chave: "cupons", valor: updated }),
+    }).catch((err) => console.error("Erro ao salvar cupons", err));
   };
 
   const addCoupon = () => {
