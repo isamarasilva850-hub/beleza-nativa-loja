@@ -4,7 +4,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import CartSidebar from "@/components/CartSidebar";
-import LeadCaptureModal from "@/components/LeadCaptureModal";
 import VisitTracker from "@/components/VisitTracker";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -22,7 +21,6 @@ export default function LojaLayout({
         <Footer />
         <WhatsAppButton />
         <CartSidebar />
-        <LeadCaptureModal />
         <VisitTracker />
       </CartProvider>
     </AuthProvider>
