@@ -12,6 +12,31 @@ export default function ContasPage() {
   const [resultado, setResultado] = useState<{ nome: string; login: string; senhaTemporaria: string } | null>(null);
   const [contas, setContas] = useState<{ login: string; nome: string | null; telefone: string | null; criado_em: string }[] | null>(null);
   const [busca, setBusca] = useState('');
+  const [equipe, setEquipe] = useState({ usuario: '', nome: '', perfil: 'admin', senha: '' });
+  const [equipeMsg, setEquipeMsg] = useState('');
+
+  // Cria a pessoa da equipe (ou troca a senha, se o usuário já existir)
+  const salvarEquipe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEquipeMsg('');
+    try {
+      sessionStorage.setItem(SEGREDO_KEY, segredo);
+    } catch {
+      // ignora
+    }
+    const resposta = await fetch('/api/admin/usuarios', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': segredo },
+      body: JSON.stringify(equipe),
+    });
+    const dados = await resposta.json();
+    if (!resposta.ok) {
+      setEquipeMsg(dados.error || 'Não foi possível salvar.');
+      return;
+    }
+    setEquipeMsg(`✅ Usuário "${dados.usuario}" salvo como ${dados.perfil}.`);
+    setEquipe({ usuario: '', nome: '', perfil: 'admin', senha: '' });
+  };
 
   useEffect(() => {
     try {
@@ -163,6 +188,52 @@ export default function ContasPage() {
             </button>
           </>
         )}
+      </div>
+
+      <div className="mt-10 bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-2">👩‍💼 Equipe (acesso ao admin)</h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Cria o usuário para entrar no admin, ou troca a senha se ele já existir. Use o segredo do admin acima.
+        </p>
+        <form onSubmit={salvarEquipe} className="space-y-3">
+          <input
+            type="text"
+            required
+            placeholder="Usuário (ex.: rose)"
+            value={equipe.usuario}
+            onChange={(e) => setEquipe({ ...equipe, usuario: e.target.value })}
+            className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none"
+          />
+          <input
+            type="text"
+            placeholder="Nome (ex.: Rose)"
+            value={equipe.nome}
+            onChange={(e) => setEquipe({ ...equipe, nome: e.target.value })}
+            className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none"
+          />
+          <select
+            value={equipe.perfil}
+            onChange={(e) => setEquipe({ ...equipe, perfil: e.target.value })}
+            className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none"
+          >
+            <option value="admin">Administradora (acesso a tudo)</option>
+            <option value="palmira">Palmira (só o painel dela)</option>
+          </select>
+          <input
+            type="password"
+            required
+            minLength={4}
+            autoComplete="new-password"
+            placeholder="Senha inicial (mínimo 4 caracteres)"
+            value={equipe.senha}
+            onChange={(e) => setEquipe({ ...equipe, senha: e.target.value })}
+            className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none"
+          />
+          <button type="submit" disabled={!segredo} className="w-full bg-teal-600 text-white font-bold py-3 rounded-lg disabled:opacity-50">
+            Salvar usuário
+          </button>
+        </form>
+        {equipeMsg && <p className="mt-3 text-sm">{equipeMsg}</p>}
       </div>
     </div>
   );
