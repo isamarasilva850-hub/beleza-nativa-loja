@@ -613,6 +613,29 @@ export default function CartSidebar() {
 
         {/* Footer */}
         <div className="border-t border-gray-200 p-4">
+          {!appliedCoupon && (
+            <div className="flex gap-2 mb-4">
+              <input
+                type="text"
+                placeholder="Cupom de desconto"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") applyCoupon();
+                }}
+                className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm uppercase focus:outline-none focus:border-[#7BC9C2]"
+              />
+              <button
+                type="button"
+                onClick={applyCoupon}
+                disabled={!couponCode.trim()}
+                className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-bold disabled:opacity-40"
+              >
+                Aplicar
+              </button>
+            </div>
+          )}
+
           {appliedCoupon && (
             <div className={`mb-4 p-3 rounded-lg text-sm ${
               isFirstPurchase
@@ -625,6 +648,11 @@ export default function CartSidebar() {
               <p className="text-xs">
                 Desconto de {appliedCoupon.type === "percentual" ? `${appliedCoupon.value}%` : `R$ ${appliedCoupon.value.toFixed(2).replace(".", ",")}`} - Código: {appliedCoupon.code}
               </p>
+              {!isFirstPurchase && (
+                <button type="button" onClick={removeCoupon} className="text-xs underline mt-1">
+                  Remover cupom
+                </button>
+              )}
             </div>
           )}
 
