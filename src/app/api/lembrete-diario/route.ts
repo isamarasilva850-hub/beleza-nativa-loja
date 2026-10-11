@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Configure WASENDER_API_KEY e LEMBRETE_TELEFONE' }, { status: 500 });
     }
 
-    const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+    const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!);
     const { data, error } = await db.from('crm_dados').select('valor').eq('chave', 'planos').maybeSingle();
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
