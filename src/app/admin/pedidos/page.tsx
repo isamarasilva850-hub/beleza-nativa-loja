@@ -39,7 +39,8 @@ function deServidor(row: any): Order {
   return {
     id: String(row.id),
     number: numero,
-    date: row.date || row.created_at || "",
+    // created_at tem hora, então a data aparece certa no fuso do Brasil
+    date: row.created_at || row.date || "",
     revendedora: row.partnername || "",
     items,
     total: Number(row.total) || 0,
