@@ -182,19 +182,38 @@ export async function GET() {
     // Produtos estáticos do arquivo JSON
     const productsPath = path.join(process.cwd(), 'src', 'data', 'products.json');
     const productsData = fs.readFileSync(productsPath, 'utf-8');
-    const staticProducts = JSON.parse(productsData).map((p: any, index: number) => ({
-      id: p.id,
-      ref: p.ref,
-      slug: p.ref.toLowerCase().replace(/\s+/g, '-'),
-      name: p.name,
-      price: p.price,
-      images: p.images || [],
-      gender: p.gender,
-      category: p.category,
-      collection: p.collection,
-      variants: p.variants || [],
-      display_order: index, // Produtos antigos recebem ordem padrão
-    }));
+    // Correções de nome de cor feitas pela Palmira (guardadas no banco, chave "ajustes_cor")
+    let ajustes: Record<string, Record<string, string>> = {};
+    try {
+      const { data: ajustesDb } = await createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!
+      ).from('crm_dados').select('valor').eq('chave', 'ajustes_cor').maybeSingle();
+      if (ajustesDb?.valor && typeof ajustesDb.valor === 'object') ajustes = ajustesDb.valor as any;
+    } catch {
+      // Sem ajustes, a loja mostra os nomes originais
+    }
+
+    const staticProducts = JSON.parse(productsData).map((p: any, index: number) => {
+      const mapaCor = ajustes[p.ref] || {};
+      return {
+        id: p.id,
+        ref: p.ref,
+        slug: p.ref.toLowerCase().replace(/\s+/g, '-'),
+        name: p.name,
+        price: p.price,
+        images: p.images || [],
+        gender: p.gender,
+        category: p.category,
+        collection: p.collection,
+        variants: (p.variants || []).map((v: any) => ({
+          ...v,
+          colorOriginal: v.color,
+          color: mapaCor[v.color] || v.color,
+        })),
+        display_order: index, // Produtos antigos recebem ordem padrão
+      };
+    });
 
     // Produtos uploadados do Supabase
     const supabase = createClient(

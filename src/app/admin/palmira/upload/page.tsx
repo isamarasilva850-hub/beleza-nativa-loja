@@ -582,6 +582,37 @@ export default function PalmiraUploadPage() {
                                 </button>
                                 <button
                                   type="button"
+                                  onClick={async () => {
+                                    const mapa: Record<string, string> = {};
+                                    for (const v of product.variants || []) {
+                                      const original = v.colorOriginal || v.color;
+                                      const nova = window.prompt(
+                                        `Nome da cor "${v.color}" no produto ${product.ref} (deixe igual se estiver certo):`,
+                                        v.color
+                                      );
+                                      if (nova === null) return;
+                                      mapa[original] = nova.trim() || original;
+                                    }
+                                    const r = await fetch("/api/admin/ajustes-cor", {
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({ ref: product.ref, mapa }),
+                                    });
+                                    if (!r.ok) {
+                                      setError("Não foi possível salvar as cores.");
+                                      return;
+                                    }
+                                    setSuccess(`🎨 Cores do produto "${product.ref}" salvas!`);
+                                    setTimeout(() => setSuccess(""), 4000);
+                                    loadAllProducts();
+                                  }}
+                                  className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded font-bold"
+                                  title="Corrigir nomes das cores"
+                                >
+                                  🎨
+                                </button>
+                                <button
+                                  type="button"
                                   onClick={() => apagarDaLista(product.ref)}
                                   className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded font-bold"
                                 >
