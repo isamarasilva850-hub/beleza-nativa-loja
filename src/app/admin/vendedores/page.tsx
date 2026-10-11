@@ -16,14 +16,11 @@ export default function Vendedores() {
   const [agenda, setAgenda] = useState<any[]>([]);
 
   useEffect(() => {
-    // Pedidos vêm do servidor; o resto ainda é do navegador
+    // Tudo vem do servidor, para aparecer em qualquer computador
     carregarPedidos().then(setOrders).catch((err) => console.error("Erro ao carregar pedidos", err));
-    const p = localStorage.getItem("belezanativa_partners");
-    const l = localStorage.getItem("belezanativa_leads");
-    const a = localStorage.getItem("belezanativa_agenda");
-    if (p) setPartners(JSON.parse(p));
-    if (l) setLeads(JSON.parse(l));
-    if (a) setAgenda(JSON.parse(a));
+    fetch("/api/partners").then((r) => r.json()).then((d) => setPartners(Array.isArray(d) ? d : [])).catch(() => {});
+    fetch("/api/crm/leads").then((r) => r.json()).then((d) => setLeads(Array.isArray(d) ? d : [])).catch(() => {});
+    fetch("/api/crm-dados?chave=agenda").then((r) => r.json()).then((d) => setAgenda(Array.isArray(d.valor) ? d.valor : [])).catch(() => {});
   }, []);
 
   const getStats = (name: string) => {

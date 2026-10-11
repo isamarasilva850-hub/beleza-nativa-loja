@@ -23,14 +23,21 @@ export default function Agenda() {
   const [form, setForm] = useState({ clientName: "", phone: "", date: new Date().toISOString().split("T")[0], time: "09:00", type: "whatsapp" as AgendaItem["type"], notes: "", vendedor: "Isamara" });
   const [view, setView] = useState<"pendentes" | "concluidos" | "todos">("pendentes");
 
+  // A agenda fica no servidor (crm_dados), para aparecer em qualquer computador
   useEffect(() => {
-    const stored = localStorage.getItem("belezanativa_agenda");
-    if (stored) setItems(JSON.parse(stored));
+    fetch("/api/crm-dados?chave=agenda")
+      .then((r) => r.json())
+      .then((d) => setItems(Array.isArray(d.valor) ? d.valor : []))
+      .catch((err) => console.error("Erro ao carregar agenda", err));
   }, []);
 
   const save = (updated: AgendaItem[]) => {
     setItems(updated);
-    localStorage.setItem("belezanativa_agenda", JSON.stringify(updated));
+    fetch("/api/crm-dados", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chave: "agenda", valor: updated }),
+    }).catch((err) => console.error("Erro ao salvar agenda", err));
   };
 
   const addItem = () => {
