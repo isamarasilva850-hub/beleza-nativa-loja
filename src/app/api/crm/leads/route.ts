@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
     );
 
     const body = await request.json();
+    if (!body.nome || !body.telefone) return NextResponse.json({ error: 'Informe nome e WhatsApp.' }, { status: 400 });
     const { data, error } = await supabase
       .from('crm_leads')
       .insert({

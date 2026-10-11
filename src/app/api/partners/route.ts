@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
       (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!
     );
     const body = await request.json();
+    if (!body.name || !body.phone) return NextResponse.json({ error: 'Informe nome e WhatsApp.' }, { status: 400 });
     const { name, phone, company, cnpj, email, city, state } = body;
 
     if (!name || !phone) {

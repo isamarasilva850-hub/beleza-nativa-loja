@@ -47,13 +47,28 @@ export default function AdminDashboard() {
   const [crmStats, setCrmStats] = useState({ total: 0, convertidos: 0, taxaConversao: "0" });
 
   useEffect(() => {
-    const stock = localStorage.getItem("belezanativa_stock");
-    if (stock) {
-      const items = JSON.parse(stock);
-      setStockTotal(items.reduce((sum: number, s: { quantity: number }) => sum + s.quantity, 0));
-    }
-    const partners = localStorage.getItem("belezanativa_partners");
-    if (partners) setPartnersCount(JSON.parse(partners).filter((p: { status: string }) => p.status === "ativo").length);
+    // Números vêm do servidor, iguais para toda a equipe
+    fetch("/api/products")
+      .then((r) => r.json())
+      .then((lista) => {
+        if (!Array.isArray(lista)) return;
+        const total = lista.reduce((soma: number, p: any) => {
+          const variantes = p.variants?.length ? p.variants : [];
+          const porVariante = variantes.reduce(
+            (s: number, v: any) => s + Object.values(v.stock || {}).reduce((a: number, q: any) => a + (Number(q) || 0), 0),
+            0
+          );
+          return soma + porVariante;
+        }, 0);
+        setStockTotal(total);
+      })
+      .catch(() => {});
+    fetch("/api/partners")
+      .then((r) => r.json())
+      .then((lista) => {
+        if (Array.isArray(lista)) setPartnersCount(lista.filter((p: { status: string }) => p.status === "ativo").length);
+      })
+      .catch(() => {});
 
     // Orders & Sales Data
     // Pedidos vêm do servidor, para aparecerem em qualquer computador
@@ -97,19 +112,26 @@ export default function AdminDashboard() {
     }).catch((err) => console.error("Erro ao carregar pedidos do dashboard", err));
 
     // CRM Data
-    const crmClientesData = localStorage.getItem("belezanativa_crm_clientes");
-    if (crmClientesData) setCrmClientes(JSON.parse(crmClientesData).length);
-    const crmLeadsRaw = localStorage.getItem("belezanativa_crm_leads");
-    if (crmLeadsRaw) {
-      const leads: CRMLead[] = JSON.parse(crmLeadsRaw);
-      setCrmLeads(leads);
-      const convertidos = leads.filter((l) => l.etapa === "convertido").length;
-      setCrmStats({
-        total: leads.length,
-        convertidos,
-        taxaConversao: leads.length > 0 ? ((convertidos / leads.length) * 100).toFixed(1) : "0",
-      });
-    }
+    fetch("/api/crm/clientes")
+      .then((r) => r.json())
+      .then((lista) => {
+        if (Array.isArray(lista)) setCrmClientes(lista.length);
+      })
+      .catch(() => {});
+    fetch("/api/crm/leads")
+      .then((r) => r.json())
+      .then((lista) => {
+        if (!Array.isArray(lista)) return;
+        const leads = lista.map((l: any) => ({ ...l, etapa: l.status === "convertido" ? "convertido" : l.etapa }));
+        setCrmLeads(leads as CRMLead[]);
+        const convertidos = leads.filter((l: any) => l.etapa === "convertido" || l.status === "convertido").length;
+        setCrmStats({
+          total: leads.length,
+          convertidos,
+          taxaConversao: leads.length > 0 ? ((convertidos / leads.length) * 100).toFixed(1) : "0",
+        });
+      })
+      .catch(() => {});
   }, []);
 
 
