@@ -282,8 +282,6 @@ export default function AdminDashboard() {
             Gestão de Produtos
           </h3>
           <div className="space-y-1">
-            <Link href="/admin/produtos" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Gerenciar Produtos</Link>
-            <Link href="/admin/estoque" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Controle de Estoque</Link>
           </div>
         </div>
 
@@ -308,7 +306,6 @@ export default function AdminDashboard() {
           </h3>
           <div className="space-y-1">
             <a href="https://wa.me/5535992100072" target="_blank" rel="noopener noreferrer" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">WhatsApp Comercial</a>
-            <Link href="/admin/tabela-precos" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Imprimir Tabela de Preços</Link>
             <Link href="/" className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Ver Loja Virtual</Link>
           </div>
         </div>
@@ -442,7 +439,6 @@ export default function AdminDashboard() {
         <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Produtos Recentes</h3>
-            <Link href="/admin/produtos" className="text-xs text-[#7BC9C2] hover:underline">Ver todos</Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
