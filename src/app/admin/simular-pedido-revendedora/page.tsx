@@ -86,12 +86,11 @@ export default function SimularPedidoRevendedora() {
       const partner = partners.find((p) => p.id === selectedPartnerId) || null;
       setSelectedPartner(partner);
 
-      const savedPurchases = localStorage.getItem(`belezanativa_purchases_${selectedPartnerId}`);
-      if (savedPurchases) {
-        setPurchases(JSON.parse(savedPurchases));
-      } else {
-        setPurchases([]);
-      }
+      // Compras da parceira ficam no servidor (crm_dados, "compras_<id>")
+      fetch(`/api/crm-dados?chave=compras_${selectedPartnerId}`)
+        .then((r) => r.json())
+        .then((d) => setPurchases(Array.isArray(d.valor) ? d.valor : []))
+        .catch(() => setPurchases([]));
 
       setCart([]);
     }

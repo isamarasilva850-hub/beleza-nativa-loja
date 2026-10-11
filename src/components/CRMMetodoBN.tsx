@@ -132,14 +132,18 @@ export default function CRMMetodoBN() {
       const saved = localStorage.getItem(LEADS_KEY);
       if (saved) setLeads(JSON.parse(saved));
 
-      const savedTemplates = localStorage.getItem(TEMPLATES_KEY);
-      if (savedTemplates) {
-        const parsed = JSON.parse(savedTemplates);
-        setTemplates(parsed);
-        setTemplateEdicao(parsed);
-      } else {
-        setTemplateEdicao({...PERGUNTAS_POR_ETAPA});
-      }
+      // Modelos de mensagem ficam no servidor (crm_dados, "templates")
+      fetch("/api/crm-dados?chave=templates")
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.valor && typeof d.valor === "object" && Object.keys(d.valor).length > 0) {
+            setTemplates(d.valor);
+            setTemplateEdicao(d.valor);
+          } else {
+            setTemplateEdicao({...PERGUNTAS_POR_ETAPA});
+          }
+        })
+        .catch(() => setTemplateEdicao({...PERGUNTAS_POR_ETAPA}));
     } catch (e) {
       console.error("Erro ao carregar dados:", e);
     }
@@ -201,7 +205,11 @@ export default function CRMMetodoBN() {
   useEffect(() => {
     try {
       if (Object.keys(templates).length > 0) {
-        localStorage.setItem(TEMPLATES_KEY, JSON.stringify(templates));
+        fetch("/api/crm-dados", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chave: "templates", valor: templates }),
+        }).catch((err) => console.error("Erro ao salvar templates no banco", err));
       }
     } catch (e) {
       console.error("Erro ao salvar templates:", e);
