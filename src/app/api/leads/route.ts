@@ -1,3 +1,4 @@
+import { negarSeNaoAdmin } from '@/lib/sessao';
 import { NextRequest, NextResponse } from 'next/server';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -50,7 +51,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  { const negado = negarSeNaoAdmin(request, ['admin']); if (negado) return NextResponse.json({ error: negado.error }, { status: negado.status }); }
   try {
     const response = await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
       method: 'GET',

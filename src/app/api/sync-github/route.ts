@@ -1,3 +1,5 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { negarSeNaoAdmin } from '@/lib/sessao';
 import { Octokit } from "@octokit/rest";
 
 const octokit = new Octokit({
@@ -21,6 +23,7 @@ interface ProductForGithub {
 }
 
 export async function POST(req: Request) {
+  { const negado = negarSeNaoAdmin(req, ['admin']); if (negado) return NextResponse.json({ error: negado.error }, { status: negado.status }); }
   try {
     const { products } = await req.json();
 

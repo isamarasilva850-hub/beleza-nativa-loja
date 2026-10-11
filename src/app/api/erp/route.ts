@@ -1,4 +1,7 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { negarSeNaoAdmin } from '@/lib/sessao';
 export async function POST(req: Request) {
+  { const negado = negarSeNaoAdmin(req, ['admin']); if (negado) return NextResponse.json({ error: negado.error }, { status: negado.status }); }
   try {
     const body = await req.json();
     const { method, path, body: erpBody } = body;
@@ -34,6 +37,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
+  { const negado = negarSeNaoAdmin(req, ['admin']); if (negado) return NextResponse.json({ error: negado.error }, { status: negado.status }); }
   const { searchParams } = new URL(req.url);
   const path = searchParams.get("path") || "";
   const erpUrl = `http://localhost:3000${path}`;

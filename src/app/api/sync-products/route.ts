@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { negarSeNaoAdmin } from '@/lib/sessao';
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
 export async function POST(req: Request) {
+  { const negado = negarSeNaoAdmin(req, ['admin']); if (negado) return NextResponse.json({ error: negado.error }, { status: negado.status }); }
   try {
     const { products } = await req.json();
 

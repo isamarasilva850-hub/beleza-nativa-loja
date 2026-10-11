@@ -1,16 +1,23 @@
+import { negarSeNaoAdmin } from '@/lib/sessao';
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!
     );
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .order('created_at', { ascending: false });
+    // Consulta de um pedido pelo número (página de arte do cliente) é pública.
+    // A lista completa de pedidos é só da equipe.
+    const id = request.nextUrl.searchParams.get('id');
+    if (!id) {
+      const negado = negarSeNaoAdmin(request, ['admin']);
+      if (negado) return NextResponse.json({ error: negado.error }, { status: negado.status });
+    }
+    let consulta = supabase.from('orders').select('*');
+    if (id) consulta = consulta.eq('id', id);
+    const { data, error } = await consulta.order('created_at', { ascending: false });
 
     if (error) throw error;
     const pedidos = (data || []).map((o: any) => ({

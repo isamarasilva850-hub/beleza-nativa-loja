@@ -1,8 +1,10 @@
+import { negarSeNaoAdmin } from '@/lib/sessao';
 ﻿import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
 export async function DELETE(request: Request) {
+  { const negado = negarSeNaoAdmin(request, ['admin']); if (negado) return NextResponse.json({ error: negado.error }, { status: negado.status }); }
   try {
     const { productId } = await request.json();
 

@@ -1,9 +1,11 @@
+import { negarSeNaoAdmin } from '@/lib/sessao';
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
+  { const negado = negarSeNaoAdmin(request, ['admin', 'palmira']); if (negado) return NextResponse.json({ error: negado.error }, { status: negado.status }); }
   try {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
