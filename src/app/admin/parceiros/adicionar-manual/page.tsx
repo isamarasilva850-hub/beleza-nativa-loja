@@ -33,7 +33,7 @@ export default function AdicionarManual() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -44,25 +44,24 @@ export default function AdicionarManual() {
     }
 
     try {
-      const partners = JSON.parse(localStorage.getItem("belezanativa_partners") || "[]");
-
-      const newPartner: Partner = {
-        id: Date.now().toString(36),
-        name: form.name,
-        company: form.company || "",
-        cnpj: form.cnpj || "",
-        phone: form.phone,
-        email: form.email,
-        city: form.city || "",
-        state: form.state || "",
-        status: "ativo",
-        createdAt: new Date().toLocaleDateString("pt-BR"),
-        totalOrders: 0,
-        totalSpent: 0,
-      };
-
-      partners.push(newPartner);
-      localStorage.setItem("belezanativa_partners", JSON.stringify(partners));
+      // Grava direto no servidor (carteira de parceiras), para aparecer em qualquer computador
+      const resposta = await fetch("/api/partners", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          company: form.company || null,
+          cnpj: form.cnpj || null,
+          email: form.email,
+          city: form.city || null,
+          state: form.state || null,
+        }),
+      });
+      if (!resposta.ok) {
+        const dados = await resposta.json().catch(() => ({}));
+        throw new Error(dados.error || "Não foi possível salvar a parceira.");
+      }
 
       setSuccess(`✅ ${form.name} adicionada com sucesso!`);
       setForm({
