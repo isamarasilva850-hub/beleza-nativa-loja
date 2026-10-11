@@ -1,17 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
-
-interface Lead {
-  id: string;
-  name: string;
-  phone: string;
-  createdAt: string;
-}
 
 export default function LeadCaptureModal() {
-  const { register } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "" });
@@ -39,49 +30,27 @@ export default function LeadCaptureModal() {
     setIsSubmitting(true);
 
     try {
-      // Registrar como revendedora no sistema
-      const email = `${form.phone.replace(/\D/g, "")}@belezanativa.local`;
-      const success = register({
-        email,
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        type: "revendedor",
-        password: form.phone.replace(/\D/g, ""),
-        createdAt: new Date().toISOString()
-      });
+      // Grava o lead no banco (crm_leads), o mesmo lugar do "Quero começar" e do cadastro.
+      // Só fecha o popup se o servidor confirmar.
+      const resposta = await fetch("/api/crm/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome: form.name.trim(),
+          telefone: form.phone.trim(),
+          origem: "popup_site",
+          status: "novo",
+          notas: "Captado pelo popup do site",
+        }),
+      }).catch(() => null);
 
-      if (!success) {
-        console.log("Usuário já existe");
+      if (!resposta || !resposta.ok) {
+        setError("Não conseguimos salvar seus dados agora. Tente novamente.");
+        return;
       }
 
-      // Create lead object
-      const lead: Lead = {
-        id: `lead_${Date.now()}`,
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        createdAt: new Date().toISOString(),
-      };
-
-      // Save to localStorage
-      const existingLeads = JSON.parse(
-        localStorage.getItem("belezanativa_leads") || "[]"
-      );
-      existingLeads.push(lead);
-      localStorage.setItem("belezanativa_leads", JSON.stringify(existingLeads));
-
-      // Mark as captured
+      // Marca que o popup já foi respondido neste navegador
       localStorage.setItem("belezanativa_lead_captured", "true");
-
-      // Try to send to backend (optional)
-      try {
-        await fetch("/api/leads", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(lead),
-        });
-      } catch (err) {
-        console.log("Lead saved locally (backend unavailable)");
-      }
 
       setIsOpen(false);
       setForm({ name: "", phone: "" });

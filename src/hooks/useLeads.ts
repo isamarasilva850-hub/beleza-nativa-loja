@@ -6,8 +6,24 @@ export interface Lead {
   phone: string;
   type: 'Lojista' | 'Revendedora';
   status: 'Já revende' | 'Quer começar';
+  origem?: string;
   created_at: string;
   updated_at: string;
+}
+
+// Converte a linha de crm_leads (servidor) para o formato desta tela
+function deCrmLead(l: any): Lead {
+  const notas: string = l.notas || '';
+  return {
+    id: String(l.id),
+    name: l.nome || '',
+    phone: l.telefone || '',
+    type: /lojista/i.test(notas) ? 'Lojista' : 'Revendedora',
+    status: /já revende/i.test(notas) ? 'Já revende' : 'Quer começar',
+    origem: l.origem || undefined,
+    created_at: l.created_at || '',
+    updated_at: l.updated_at || l.created_at || '',
+  };
 }
 
 export function useLeads() {
@@ -19,10 +35,10 @@ export function useLeads() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/leads');
+      const response = await fetch('/api/crm/leads');
       if (!response.ok) throw new Error('Erro ao carregar leads');
       const data = await response.json();
-      setLeads(data || []);
+      setLeads(Array.isArray(data) ? data.map(deCrmLead) : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
       console.error('Erro ao carregar leads:', err);

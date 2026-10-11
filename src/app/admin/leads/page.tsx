@@ -3,27 +3,19 @@
 import { useEffect, useState } from 'react';
 import { useLeads } from '@/hooks/useLeads';
 
-interface CapturedLead {
-  id: string;
-  name: string;
-  phone: string;
-  createdAt: string;
-}
-
 export default function LeadsPage() {
   const { leads, loading, error, loadLeads, getStats } = useLeads();
   const [filter, setFilter] = useState<'todos' | 'Lojista' | 'Revendedora'>('todos');
   const [statusFilter, setStatusFilter] = useState<'todos' | 'Já revende' | 'Quer começar'>('todos');
-  const [capturedLeads, setCapturedLeads] = useState<CapturedLead[]>([]);
 
   useEffect(() => {
     loadLeads();
-    // Load captured leads from localStorage
-    const saved = localStorage.getItem("belezanativa_leads");
-    if (saved) {
-      setCapturedLeads(JSON.parse(saved));
-    }
   }, [loadLeads]);
+
+  // Visitantes do popup do site, vindos do banco (não do navegador desta tela)
+  const capturedLeads = leads
+    .filter(l => l.origem === 'popup_site')
+    .map(l => ({ id: l.id, name: l.name, phone: l.phone, createdAt: l.created_at }));
 
   const stats = getStats();
 
