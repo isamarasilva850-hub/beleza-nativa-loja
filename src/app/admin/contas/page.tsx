@@ -10,6 +10,8 @@ export default function ContasPage() {
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState('');
   const [resultado, setResultado] = useState<{ nome: string; login: string; senhaTemporaria: string } | null>(null);
+  const [contas, setContas] = useState<{ login: string; nome: string | null; telefone: string | null; criado_em: string }[] | null>(null);
+  const [busca, setBusca] = useState('');
 
   useEffect(() => {
     try {
@@ -48,6 +50,28 @@ export default function ContasPage() {
       setCarregando(false);
     }
   };
+
+  const carregarLista = async () => {
+    setErro('');
+    try {
+      sessionStorage.setItem(SEGREDO_KEY, segredo);
+    } catch {
+      // ignora
+    }
+    const resposta = await fetch('/api/conta/lista', { headers: { 'x-admin-secret': segredo } });
+    const dados = await resposta.json();
+    if (!resposta.ok) {
+      setErro(dados.error || 'Não foi possível carregar a lista.');
+      return;
+    }
+    setContas(dados);
+  };
+
+  const filtradas = (contas || []).filter((c) => {
+    const termo = busca.trim().toLowerCase();
+    if (!termo) return true;
+    return (c.nome || '').toLowerCase().includes(termo) || c.login.toLowerCase().includes(termo) || (c.telefone || '').includes(termo);
+  });
 
   return (
     <div className="p-6 max-w-xl">
@@ -98,6 +122,48 @@ export default function ContasPage() {
           <p className="text-sm">Envie para a cliente pelo WhatsApp, para ela entrar em "Minha conta". Esta senha aparece só agora.</p>
         </div>
       )}
+
+      <div className="mt-10">
+        <h2 className="text-xl font-bold text-gray-900 mb-2">👥 Clientes com conta</h2>
+        {contas === null ? (
+          <button
+            type="button"
+            onClick={carregarLista}
+            disabled={!segredo}
+            className="w-full border-2 border-teal-600 text-teal-700 font-bold py-3 rounded-lg disabled:opacity-50"
+          >
+            Carregar lista
+          </button>
+        ) : (
+          <>
+            <input
+              type="text"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              placeholder="Buscar por nome ou WhatsApp"
+              className="w-full px-3 py-2 mb-3 border-2 border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none"
+            />
+            <p className="text-sm text-gray-500 mb-2">{filtradas.length} de {contas.length} clientes</p>
+            <div className="bg-white rounded-lg shadow divide-y">
+              {filtradas.length === 0 && <p className="p-4 text-sm text-gray-500">Nenhuma cliente encontrada.</p>}
+              {filtradas.map((c) => (
+                <div key={c.login} className="p-4 flex justify-between gap-4">
+                  <div>
+                    <p className="font-semibold text-gray-900">{c.nome || '(sem nome)'}</p>
+                    <p className="text-sm text-gray-600">{c.telefone || c.login}</p>
+                  </div>
+                  <p className="text-xs text-gray-500 whitespace-nowrap">
+                    {new Date(c.criado_em).toLocaleDateString('pt-BR')}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <button type="button" onClick={carregarLista} className="mt-3 text-sm text-teal-700 underline">
+              Atualizar lista
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
