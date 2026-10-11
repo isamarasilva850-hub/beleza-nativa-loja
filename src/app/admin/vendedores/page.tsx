@@ -64,35 +64,20 @@ export default function Vendedores() {
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="bg-green-50 rounded-lg p-3">
-                  <p className="text-[10px] font-bold text-gray-500 uppercase">Receita</p>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase">Vendido</p>
                   <p className="text-lg font-bold text-green-600">R$ {stats.revenue.toFixed(2).replace(".", ",")}</p>
                 </div>
                 <div className="bg-blue-50 rounded-lg p-3">
                   <p className="text-[10px] font-bold text-gray-500 uppercase">Pedidos</p>
                   <p className="text-lg font-bold text-blue-600">{stats.orders}</p>
                 </div>
-                <div className="bg-purple-50 rounded-lg p-3">
-                  <p className="text-[10px] font-bold text-gray-500 uppercase">Clientes</p>
-                  <p className="text-lg font-bold text-purple-600">{stats.partners}</p>
-                </div>
                 <div className="bg-orange-50 rounded-lg p-3">
-                  <p className="text-[10px] font-bold text-gray-500 uppercase">Leads</p>
-                  <p className="text-lg font-bold text-orange-600">{stats.leads}</p>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase">Leads convertidos</p>
+                  <p className="text-lg font-bold text-orange-600">{stats.converted} de {stats.leads}</p>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4 mt-4">
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xl font-bold text-[#7BC9C2]">{stats.conversionRate}%</p>
-                  <p className="text-[10px] text-gray-500 mt-0.5">Tx. Conversão</p>
-                </div>
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xl font-bold text-yellow-600">{stats.pendingAgenda}</p>
-                  <p className="text-[10px] text-gray-500 mt-0.5">Agenda Pendente</p>
-                </div>
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xl font-bold text-emerald-600">{stats.completedAgenda}</p>
-                  <p className="text-[10px] text-gray-500 mt-0.5">Agenda Concluída</p>
+                <div className="bg-yellow-50 rounded-lg p-3">
+                  <p className="text-[10px] font-bold text-gray-500 uppercase">Agenda pendente</p>
+                  <p className="text-lg font-bold text-yellow-600">{stats.pendingAgenda}</p>
                 </div>
               </div>
             </div>

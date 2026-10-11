@@ -103,11 +103,12 @@ export default function Agenda() {
       )}
 
       <div className="flex gap-2">
-        {(["pendentes", "concluidos", "todos"] as const).map((v) => (
-          <button key={v} onClick={() => setView(v)} className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${view === v ? "bg-[#7BC9C2] text-white" : "bg-white text-gray-600 border border-gray-200"}`}>
-            {v === "pendentes" ? "Pendentes" : v === "concluidos" ? "Concluídos" : "Todos"}
-          </button>
-        ))}
+        <button
+          onClick={() => setView(view === "concluidos" ? "pendentes" : "concluidos")}
+          className="px-3 py-1.5 text-xs rounded-lg font-medium bg-white text-gray-600 border border-gray-200"
+        >
+          {view === "concluidos" ? "Voltar aos pendentes" : "Ver concluídos"}
+        </button>
       </div>
 
       <div className="space-y-2">
