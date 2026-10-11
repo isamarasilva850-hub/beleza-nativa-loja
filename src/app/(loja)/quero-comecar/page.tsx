@@ -1,22 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { products } from '@/data/products';
 
 const LUCRO_PERCENT = 100; // 100% de lucro para revendedoras!
 
-// Calcular preço de revenda
-const PRODUCTS = products.slice(0, 10).map(p => ({
-  id: p.id,
-  name: p.name,
-  priceCost: p.price, // Preço que a revendedora compra
-  priceReseller: p.price * 2 // Preço sugerido de venda (2x o custo)
-}));
-
 export default function QueroComecear() {
   const { register } = useAuth();
-  const [selectedProduct, setSelectedProduct] = useState<number>(1);
+  const [PRODUCTS, setPRODUCTS] = useState<{ id: number; name: string; priceCost: number; priceReseller: number }[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<number>(0);
+
+  useEffect(() => {
+    fetch('/api/products')
+      .then(r => r.json())
+      .then((lista: any[]) => {
+        if (!Array.isArray(lista)) return;
+        const itens = lista.slice(0, 10).map((p, i) => {
+          const custo = Number(p.price) || 0;
+          return {
+            id: i,
+            name: p.name,
+            priceCost: custo,
+            priceReseller: custo * 2
+          };
+        });
+        setPRODUCTS(itens);
+        if (itens.length > 0) setSelectedProduct(itens[0].id);
+      })
+      .catch(err => console.error('Erro ao carregar peças da calculadora', err));
+  }, []);
   const [quantidade, setQuantidade] = useState(10);
   const [formData, setFormData] = useState({
     name: '',
