@@ -13,6 +13,7 @@ interface OrderItem {
 }
 
 interface Order {
+  id: string;
   number: number;
   date: string;
   revendedora: string;
@@ -30,7 +31,22 @@ const statusColors: Record<string, string> = {
   cancelado: "bg-red-100 text-red-600",
 };
 
-const ORDERS_KEY = "belezanativa_orders";
+// Converte a linha de orders (servidor) para o formato desta tela.
+// Pedidos novos têm o número como ID; pedidos antigos sem número ficam como 0.
+function deServidor(row: any): Order {
+  const items: OrderItem[] = Array.isArray(row.items) ? row.items : [];
+  const numero = /^\d+$/.test(String(row.id)) ? Number(row.id) : 0;
+  return {
+    id: String(row.id),
+    number: numero,
+    date: row.date || row.created_at || "",
+    revendedora: row.partnername || "",
+    items,
+    total: Number(row.total) || 0,
+    totalItems: items.reduce((soma, i) => soma + (Number(i.quantity) || 0), 0),
+    status: row.status || "pendente",
+  };
+}
 
 export default function AdminPedidos() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -40,27 +56,42 @@ export default function AdminPedidos() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
+  // Pedidos vêm do servidor, para aparecerem em qualquer computador
   useEffect(() => {
-    const saved = localStorage.getItem(ORDERS_KEY);
-    if (saved) setOrders(JSON.parse(saved));
+    fetch("/api/orders")
+      .then((r) => r.json())
+      .then((rows) => {
+        if (!Array.isArray(rows)) return;
+        setOrders(rows.map(deServidor));
+      })
+      .catch((err) => console.error("Erro ao carregar pedidos", err));
   }, []);
 
-  const saveOrders = (updated: Order[]) => {
-    setOrders(updated);
-    localStorage.setItem(ORDERS_KEY, JSON.stringify(updated));
+  const updateStatus = async (orderNumber: number, newStatus: Order["status"]) => {
+    const pedido = orders.find((o) => o.number === orderNumber);
+    if (!pedido) return;
+    const resposta = await fetch(`/api/orders/${pedido.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus }),
+    });
+    if (!resposta.ok) {
+      alert("Não foi possível atualizar o status. Tente de novo.");
+      return;
+    }
+    setOrders((atuais) => atuais.map((o) => (o.number === orderNumber ? { ...o, status: newStatus } : o)));
   };
 
-  const updateStatus = (orderNumber: number, newStatus: Order["status"]) => {
-    saveOrders(
-      orders.map((o) =>
-        o.number === orderNumber ? { ...o, status: newStatus } : o
-      )
-    );
-  };
-
-  const deleteOrder = (orderNumber: number) => {
+  const deleteOrder = async (orderNumber: number) => {
     if (confirm("Tem certeza que deseja deletar este pedido? Esta ação não pode ser desfeita.")) {
-      saveOrders(orders.filter((o) => o.number !== orderNumber));
+      const pedido = orders.find((o) => o.number === orderNumber);
+      if (!pedido) return;
+      const resposta = await fetch(`/api/orders/${pedido.id}`, { method: "DELETE" });
+      if (!resposta.ok) {
+        alert("Não foi possível deletar o pedido. Tente de novo.");
+        return;
+      }
+      setOrders((atuais) => atuais.filter((o) => o.number !== orderNumber));
       setExpandedOrder(null);
     }
   };

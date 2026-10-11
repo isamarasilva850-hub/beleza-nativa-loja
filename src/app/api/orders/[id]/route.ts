@@ -33,3 +33,22 @@ export async function PATCH(
     return NextResponse.json({ error: 'Erro ao atualizar pedido' }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!
+    );
+    const { id: orderId } = await params;
+    const { error } = await supabase.from('orders').delete().eq('id', orderId);
+    if (error) throw error;
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error('Erro ao apagar pedido:', error);
+    return NextResponse.json({ error: 'Erro ao apagar pedido' }, { status: 500 });
+  }
+}

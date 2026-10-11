@@ -134,21 +134,15 @@ export default function CartSidebar() {
     setAppliedCoupon(null);
   };
 
-  const confirmOrder = () => {
+  const confirmOrder = async () => {
     const name = revendedora.trim() || "Não informado";
 
     const savedItems = items.map((i) => ({ ...i }));
     const savedTotal = totalPrice;
     const savedCount = totalItems;
 
-    checkout(name);
-
-    let orderNumber = 0;
-    try {
-      const orders = JSON.parse(localStorage.getItem("belezanativa_orders") || "[]");
-      const lastOrder = orders[orders.length - 1];
-      if (lastOrder) orderNumber = lastOrder.number;
-    } catch {}
+    // Número do pedido vem do servidor (ou do número local, se o servidor falhar)
+    const orderNumber = await checkout(name);
 
     setReceiptData({
       name,

@@ -27,7 +27,7 @@ interface CartContextType {
   removeItem: (productId: number, color: string, size: string) => void;
   updateQuantity: (productId: number, color: string, size: string, quantity: number) => void;
   clearCart: () => void;
-  checkout: (revendedora: string) => void;
+  checkout: (revendedora: string) => Promise<number>;
   totalItems: number;
   totalPrice: number;
   minOrder: number;
@@ -137,18 +137,49 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => setItems([]), []);
 
-  const checkout = useCallback((revendedora: string) => {
-    if (items.length === 0) return;
+  const checkout = useCallback(async (revendedora: string): Promise<number> => {
+    if (items.length === 0) return 0;
 
-    const orderNumber = getNextOrderNumber();
+    const totalPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const totalQty = items.reduce((sum, i) => sum + i.quantity, 0);
+
+    // O servidor dá o número do pedido. Se ele falhar, o pedido continua indo pelo WhatsApp
+    // com o número local, para a venda não se perder.
+    let orderNumber = getNextOrderNumber();
+    try {
+      const resposta = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          partnerId: "loja-site",
+          partnerName: revendedora,
+          partnerPhone: "",
+          items: items.map((i) => ({
+            ref: i.ref,
+            name: i.name,
+            color: i.color,
+            size: i.size,
+            quantity: i.quantity,
+            unitPrice: i.price,
+            total: i.price * i.quantity,
+          })),
+          total: totalPrice,
+          date: new Date().toISOString().split("T")[0],
+          status: "pendente",
+        }),
+      });
+      if (resposta.ok) {
+        const salvo = await resposta.json();
+        orderNumber = Number(salvo.id) || orderNumber;
+      }
+    } catch (err) {
+      console.error("Pedido não chegou ao servidor, usando número local", err);
+    }
 
     const orderLines = items.map(
       (item) =>
         `${item.ref} - ${item.name} | ${item.color} | ${item.size} | Qtd: ${item.quantity} | R$ ${(item.price * item.quantity).toFixed(2).replace(".", ",")}`
     );
-
-    const totalPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const totalQty = items.reduce((sum, i) => sum + i.quantity, 0);
 
     const storeMsg = [
       `📦 *PEDIDO #${orderNumber}*`,
@@ -207,6 +238,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     setItems([]);
     setIsOpen(false);
+    return orderNumber;
   }, [items]);
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
