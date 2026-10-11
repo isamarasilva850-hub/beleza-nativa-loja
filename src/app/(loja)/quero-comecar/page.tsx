@@ -39,6 +39,7 @@ export default function QueroComecear() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
+  const [senhaConta, setSenhaConta] = useState('');
 
   const produto = PRODUCTS.find(p => p.id === selectedProduct);
   const precoCost = produto?.priceCost || 0;
@@ -51,20 +52,27 @@ export default function QueroComecear() {
     setLoading(true);
 
     try {
-      // Registrar como revendedora no sistema
+      if (senhaConta.length < 4) {
+        setErro('Crie uma senha com pelo menos 4 caracteres.');
+        return;
+      }
+
+      // Registrar como revendedora no sistema (a conta fica no servidor)
       const email = `${formData.phone.replace(/\D/g, '')}@belezanativa.local`;
-      const success = register({
+      const resultado = await register({
         email,
         name: formData.name.trim(),
         phone: formData.phone.trim(),
         type: formData.type === 'Revendedora' ? 'revendedor' : 'consumidor',
-        password: formData.phone.replace(/\D/g, ''), // Usar telefone como senha temporária
+        password: senhaConta,
         createdAt: new Date().toISOString()
       });
 
-      if (!success) {
-        console.log('Usuário já existe, apenas salvando como lead');
+      if (!resultado.ok && !resultado.jaExiste) {
+        setErro(resultado.erro || 'Não conseguimos criar sua conta agora. Tente de novo em alguns minutos.');
+        return;
       }
+      // Se a conta já existe, seguimos e salvamos o interesse mesmo assim
 
       // Também salvar como lead no CRM. Só mostra sucesso se o servidor confirmar.
       const resposta = await fetch('/api/crm/leads', {
@@ -315,6 +323,22 @@ export default function QueroComecear() {
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none"
                 placeholder="(35) 99181-2558"
+              />
+            </div>
+
+            {/* Senha da conta */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Crie uma senha para acompanhar seu cadastro *
+              </label>
+              <input
+                type="password"
+                required
+                minLength={4}
+                value={senhaConta}
+                onChange={(e) => setSenhaConta(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none"
+                placeholder="Mínimo 4 caracteres"
               />
             </div>
 

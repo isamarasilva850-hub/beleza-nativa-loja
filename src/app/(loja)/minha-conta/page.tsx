@@ -28,12 +28,12 @@ export default function MinhaConta() {
     }
   }, [isLoggedIn]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    const ok = login(email, password);
-    if (!ok) {
-      setError("E-mail ou senha incorretos. Verifique seus dados ou cadastre-se.");
+    const resultado = await login(email, password);
+    if (!resultado.ok) {
+      setError(resultado.erro || "E-mail ou senha incorretos. Verifique seus dados ou cadastre-se.");
     }
   };
 

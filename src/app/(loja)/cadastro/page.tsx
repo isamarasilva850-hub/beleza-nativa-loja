@@ -41,7 +41,7 @@ export default function Cadastro() {
       return;
     }
 
-    const ok = register({
+    const resultado = await register({
       email: form.email,
       name: form.name,
       phone: form.phone,
@@ -55,8 +55,8 @@ export default function Cadastro() {
       createdAt: new Date().toISOString(),
     });
 
-    if (!ok) {
-      setError("Este e-mail já está cadastrado. Faça login.");
+    if (!resultado.ok) {
+      setError(resultado.erro || "Não foi possível criar a conta. Tente de novo.");
       return;
     }
 
