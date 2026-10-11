@@ -35,25 +35,30 @@ export default function ParceiroCompras() {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("P");
 
+  // Parceira vem da carteira no servidor; compras ficam no banco (crm_dados, "compras_<id>")
   useEffect(() => {
-    // Carregar parceiro
-    const saved = localStorage.getItem("belezanativa_partners");
-    if (saved) {
-      const partners = JSON.parse(saved);
-      const found = partners.find((p: Partner) => p.id === id);
-      setPartner(found || null);
-    }
+    fetch("/api/partners")
+      .then((r) => r.json())
+      .then((lista) => {
+        if (!Array.isArray(lista)) return;
+        const found = lista.find((p: any) => String(p.id) === String(id));
+        setPartner(found || null);
+      })
+      .catch((err) => console.error("Erro ao carregar parceira", err));
 
-    // Carregar compras existentes
-    const savedPurchases = localStorage.getItem(`belezanativa_purchases_${id}`);
-    if (savedPurchases) {
-      setPurchases(JSON.parse(savedPurchases));
-    }
+    fetch(`/api/crm-dados?chave=compras_${id}`)
+      .then((r) => r.json())
+      .then((d) => setPurchases(Array.isArray(d.valor) ? d.valor : []))
+      .catch((err) => console.error("Erro ao carregar compras", err));
   }, [id]);
 
   const savePurchases = (data: PurchasedProduct[]) => {
     setPurchases(data);
-    localStorage.setItem(`belezanativa_purchases_${id}`, JSON.stringify(data));
+    fetch("/api/crm-dados", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chave: `compras_${id}`, valor: data }),
+    }).catch((err) => console.error("Erro ao salvar compras", err));
   };
 
   const handleAddProduct = () => {

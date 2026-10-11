@@ -46,15 +46,30 @@ export default function Configuracoes() {
   const [config, setConfig] = useState<Config>(defaultConfig);
   const [saved, setSaved] = useState(false);
 
+  // Configurações ficam no servidor (crm_dados, chave "config")
   useEffect(() => {
-    const stored = localStorage.getItem("belezanativa_config");
-    if (stored) setConfig(JSON.parse(stored));
+    fetch("/api/crm-dados?chave=config")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.valor && typeof d.valor === "object") setConfig({ ...defaultConfig, ...d.valor });
+      })
+      .catch((err) => console.error("Erro ao carregar configurações", err));
   }, []);
 
-  const handleSave = () => {
-    localStorage.setItem("belezanativa_config", JSON.stringify(config));
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const handleSave = async () => {
+    try {
+      const resposta = await fetch("/api/crm-dados", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chave: "config", valor: config }),
+      });
+      if (!resposta.ok) throw new Error(`Servidor respondeu ${resposta.status}`);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      console.error("Erro ao salvar configurações", err);
+      alert("Não foi possível salvar as configurações. Tente de novo.");
+    }
   };
 
   const update = (field: keyof Config, value: string | number) => setConfig((prev) => ({ ...prev, [field]: value }));
