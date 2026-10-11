@@ -34,7 +34,20 @@ const statusColors: Record<string, string> = {
 // Converte a linha de orders (servidor) para o formato desta tela.
 // Pedidos novos têm o número como ID; pedidos antigos sem número ficam como 0.
 function deServidor(row: any): Order {
-  const items: OrderItem[] = Array.isArray(row.items) ? row.items : [];
+  // Pedidos antigos guardam o preço em "price"; os novos, em "unitPrice". Normaliza os dois.
+  const items: OrderItem[] = (Array.isArray(row.items) ? row.items : []).map((i: any) => {
+    const quantidade = Number(i.quantity) || 0;
+    const unitario = Number(i.unitPrice ?? i.price) || 0;
+    return {
+      ref: String(i.ref ?? ""),
+      name: String(i.name ?? ""),
+      color: String(i.color ?? ""),
+      size: String(i.size ?? ""),
+      quantity: quantidade,
+      unitPrice: unitario,
+      total: Number(i.total) || unitario * quantidade,
+    };
+  });
   const numero = /^\d+$/.test(String(row.id)) ? Number(row.id) : 0;
   return {
     id: String(row.id),
