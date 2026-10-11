@@ -48,3 +48,13 @@ export const OPCOES_COOKIE = {
   path: '/',
   maxAge: DURACAO_MS / 1000,
 };
+
+// Confere se quem chama a rota está logado com um dos perfis permitidos.
+// Devolve a resposta de erro (401) quando não está, ou null quando está liberado.
+export function negarSeNaoAdmin(request: { cookies: { get: (n: string) => { value: string } | undefined } }, perfis: SessaoAdmin['perfil'][] = ['admin']) {
+  const sessao = lerToken(request.cookies.get(COOKIE_SESSAO)?.value);
+  if (!sessao || !perfis.includes(sessao.perfil)) {
+    return { error: 'Não autorizado. Entre no admin para continuar.', status: 401 } as const;
+  }
+  return null;
+}

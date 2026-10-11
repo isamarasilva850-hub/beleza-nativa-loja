@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { negarSeNaoAdmin } from '@/lib/sessao';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = () =>
@@ -9,6 +10,11 @@ export async function GET(request: NextRequest) {
     const chave = request.nextUrl.searchParams.get('chave');
     if (!chave) {
       return NextResponse.json({ error: 'chave é obrigatória' }, { status: 400 });
+    }
+    // Só a lista de cupons é pública (a loja precisa dela); o resto é dado interno
+    if (chave !== 'cupons') {
+      const negado = negarSeNaoAdmin(request);
+      if (negado) return NextResponse.json({ error: negado.error }, { status: negado.status });
     }
 
     const { data, error } = await supabase()
@@ -32,6 +38,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const negado = negarSeNaoAdmin(request);
+    if (negado) return NextResponse.json({ error: negado.error }, { status: negado.status });
+
     const { chave, valor } = await request.json();
     if (!chave || valor === undefined) {
       return NextResponse.json({ error: 'chave e valor são obrigatórios' }, { status: 400 });

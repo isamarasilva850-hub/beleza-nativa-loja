@@ -187,18 +187,10 @@ export default function CartSidebar() {
     // Conta o uso do cupom no servidor (para respeitar o limite de usos)
     if (appliedCoupon && appliedCoupon.code !== "PRIMEIRA_COMPRA") {
       try {
-        const resposta = await fetch("/api/crm-dados?chave=cupons");
-        const dados = await resposta.json();
-        const lista: any[] = Array.isArray(dados.valor) ? dados.valor : [];
-        const atualizada = lista.map((c) =>
-          String(c.code).toUpperCase() === appliedCoupon.code
-            ? { ...c, usedCount: (c.usedCount || 0) + 1, lastUsedAt: new Date().toISOString() }
-            : c
-        );
-        await fetch("/api/crm-dados", {
+        await fetch("/api/cupons/usar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chave: "cupons", valor: atualizada }),
+          body: JSON.stringify({ code: appliedCoupon.code }),
         });
       } catch (err) {
         console.error("Erro ao registrar uso do cupom", err);
