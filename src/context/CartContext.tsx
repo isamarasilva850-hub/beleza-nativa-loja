@@ -191,12 +191,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       `Itens: ${totalQty}`,
     ].join("\n");
 
-    const palmiraMsg = buildPalmiraMessage(
-      items.map((i) => ({ ref: i.ref, name: i.name, color: i.color, size: i.size, quantity: i.quantity })),
-      orderNumber,
-      revendedora
-    );
-
     // O estoque agora é só do painel da Palmira; a compra não desconta mais nada aqui.
 
     const order = {
@@ -226,13 +220,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       `https://wa.me/${STORE_PHONE}?text=${encodeURIComponent(storeMsg)}`,
       "_blank"
     );
-
-    setTimeout(() => {
-      window.open(
-        `https://wa.me/${PALMIRA_PHONE}?text=${encodeURIComponent(palmiraMsg)}`,
-        "_blank"
-      );
-    }, 1500);
 
     setItems([]);
     setIsOpen(false);

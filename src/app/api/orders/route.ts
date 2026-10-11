@@ -26,6 +26,33 @@ export async function GET() {
   }
 }
 
+// Número da Palmira (com DDI 55), que recebe o aviso de separação
+const PALMIRA_WHATSAPP = '5535997380503';
+
+// Envia pelo WaSender a lista de separação. Erros aqui não impedem o pedido de ser salvo.
+async function avisarPalmiraSeparar(pedidoId: string, cliente: string, itens: any[]) {
+  const apiKey = process.env.WASENDER_API_KEY;
+  if (!apiKey) {
+    console.error('WASENDER_API_KEY não configurada: aviso para a Palmira não enviado');
+    return;
+  }
+  try {
+    const linhas = (itens || []).map((i: any) =>
+      `• REF ${i.ref} - ${i.name}\n  ${i.color} | ${i.size} | Qtd: ${i.quantity}`
+    );
+    const texto = `📦 *PEDIDO #${pedidoId} para separar*\nCliente: ${cliente || 'Não informado'}\n\n${linhas.join('\n')}`;
+
+    const resposta = await fetch('https://wasenderapi.com/api/send-message', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: PALMIRA_WHATSAPP, text: texto }),
+    });
+    if (!resposta.ok) console.error('WaSender recusou o aviso da Palmira', resposta.status);
+  } catch (err) {
+    console.error('Erro ao avisar a Palmira', err);
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = createClient(
@@ -71,6 +98,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (error) throw error;
+
+    // Avisa a Palmira para separar o pedido. Se o envio falhar, o pedido continua salvo.
+    await avisarPalmiraSeparar(String(data.id), String(data.partnername || ''), items);
+
     return NextResponse.json(
       { ...data, partnerId: data.partnerid, partnerName: data.partnername, partnerPhone: data.partnerphone },
       { status: 201 }
