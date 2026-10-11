@@ -195,6 +195,12 @@ export default function MinhaConta() {
             </button>
           </form>
 
+          <div className="mt-3 text-center">
+            <Link href="/esqueci-senha" className="text-sm text-[#7BC9C2] hover:underline">
+              Esqueci minha senha
+            </Link>
+          </div>
+
           <div className="mt-6 pt-6 border-t border-gray-100 text-center">
             <p className="text-sm text-gray-500">
               Ainda não tem cadastro?{" "}
