@@ -117,7 +117,8 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
     const map: Record<string, number> = {};
     product.variants.forEach((v: any) => {
       v.sizes?.forEach((s: any) => {
-        map[`${v.color}-${s}`] = getStockQuantity(product.ref, v.color, s);
+        // Estoque vem do servidor (cadastrado pela Palmira); -1 = sem controle
+        map[`${v.color}-${s}`] = v.stock && typeof v.stock[s] === "number" ? v.stock[s] : -1;
       });
     });
     setStockMap(map);
