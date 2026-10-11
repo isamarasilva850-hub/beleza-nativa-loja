@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
-import { deductStock, buildPalmiraMessage, getStockQuantity } from "@/lib/stock";
+import { buildPalmiraMessage, getStockQuantity } from "@/lib/stock";
 
 const CART_KEY = "belezanativa_cart";
 
@@ -197,9 +197,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       revendedora
     );
 
-    deductStock(
-      items.map((i) => ({ ref: i.ref, color: i.color, size: i.size, quantity: i.quantity }))
-    );
+    // O estoque agora é só do painel da Palmira; a compra não desconta mais nada aqui.
 
     const order = {
       number: orderNumber,
