@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { products } from "@/data/products";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { carregarPedidos } from "@/lib/pedidos";
 
 const vendedores = [
   { id: 0, name: "TODA A EQUIPE", clients: 54 },
@@ -55,9 +56,9 @@ export default function AdminDashboard() {
     if (partners) setPartnersCount(JSON.parse(partners).filter((p: { status: string }) => p.status === "ativo").length);
 
     // Orders & Sales Data
-    const orders = localStorage.getItem("belezanativa_orders");
-    if (orders) {
-      const orderList: Order[] = JSON.parse(orders);
+    // Pedidos vêm do servidor, para aparecerem em qualquer computador
+    carregarPedidos().then((orderList) => {
+      if (orderList.length === 0) return;
       setOrdersCount(orderList.length);
       setPendingOrders(orderList.filter((o) => o.status === "pendente").length);
 
@@ -93,7 +94,7 @@ export default function AdminDashboard() {
         salesByDay[dia] = (salesByDay[dia] || 0) + o.total;
       });
       setChartData(Object.entries(salesByDay).map(([dia, valor]) => ({ dia, valor: parseFloat(valor.toFixed(2)) })));
-    }
+    }).catch((err) => console.error("Erro ao carregar pedidos do dashboard", err));
 
     // CRM Data
     const crmClientesData = localStorage.getItem("belezanativa_crm_clientes");

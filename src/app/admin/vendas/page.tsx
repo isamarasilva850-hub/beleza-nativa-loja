@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { carregarPedidos } from "@/lib/pedidos";
 
 interface Order {
   number: number;
@@ -17,9 +18,11 @@ export default function VendasTempoReal() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [period, setPeriod] = useState("hoje");
 
+  // Pedidos vêm do servidor, para aparecerem em qualquer computador
   useEffect(() => {
-    const stored = localStorage.getItem("belezanativa_orders");
-    if (stored) setOrders(JSON.parse(stored));
+    carregarPedidos()
+      .then((lista) => setOrders(lista as Order[]))
+      .catch((err) => console.error("Erro ao carregar pedidos", err));
   }, []);
 
   const filteredOrders = orders.filter((o) => {

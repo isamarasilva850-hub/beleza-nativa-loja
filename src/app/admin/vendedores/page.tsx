@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { carregarPedidos } from "@/lib/pedidos";
 
 const vendedores = [
   { id: 1, name: "Rosemari", role: "Vendedora", avatar: "RM" },
@@ -15,11 +16,11 @@ export default function Vendedores() {
   const [agenda, setAgenda] = useState<any[]>([]);
 
   useEffect(() => {
-    const o = localStorage.getItem("belezanativa_orders");
+    // Pedidos vêm do servidor; o resto ainda é do navegador
+    carregarPedidos().then(setOrders).catch((err) => console.error("Erro ao carregar pedidos", err));
     const p = localStorage.getItem("belezanativa_partners");
     const l = localStorage.getItem("belezanativa_leads");
     const a = localStorage.getItem("belezanativa_agenda");
-    if (o) setOrders(JSON.parse(o));
     if (p) setPartners(JSON.parse(p));
     if (l) setLeads(JSON.parse(l));
     if (a) setAgenda(JSON.parse(a));
