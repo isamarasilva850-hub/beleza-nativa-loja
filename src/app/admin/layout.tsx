@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import BelaAssistant from "@/components/BelaAssistant";
 
@@ -59,21 +59,34 @@ const sections = [
   },
 ];
 
-const ADMIN_KEY = "belezanativa_admin_auth";
-const ADMIN_PASS = "bn2026";
 // Force rebuild 2026-09-24 v2 - varejo changes
 
-function AdminGate({ onAuth }: { onAuth: () => void }) {
-  const [pass, setPass] = useState("");
-  const [error, setError] = useState(false);
+function AdminGate({ onAuth }: { onAuth: (perfil: string) => void }) {
+  const [usuario, setUsuario] = useState("");
+  const [senha, setSenha] = useState("");
+  const [error, setError] = useState("");
+  const [enviando, setEnviando] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (pass === ADMIN_PASS) {
-      sessionStorage.setItem(ADMIN_KEY, "1");
-      onAuth();
-    } else {
-      setError(true);
+    setError("");
+    setEnviando(true);
+    try {
+      const resposta = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuario, senha }),
+      });
+      const dados = await resposta.json();
+      if (!resposta.ok) {
+        setError(dados.error || "Usuário ou senha incorretos");
+        return;
+      }
+      onAuth(dados.perfil);
+    } catch {
+      setError("Sem conexão. Tente de novo.");
+    } finally {
+      setEnviando(false);
     }
   }
 
@@ -83,17 +96,26 @@ function AdminGate({ onAuth }: { onAuth: () => void }) {
         <div className="text-center">
           <div className="w-14 h-14 bg-[#7BC9C2] rounded-xl flex items-center justify-center text-white font-bold text-xl mx-auto mb-3">BN</div>
           <h1 className="text-lg font-bold text-gray-800">Painel Administrativo</h1>
-          <p className="text-sm text-gray-500">Digite a senha para acessar</p>
+          <p className="text-sm text-gray-500">Entre com seu usuário e senha</p>
         </div>
         <input
-          type="password"
-          value={pass}
-          onChange={e => { setPass(e.target.value); setError(false); }}
-          placeholder="Senha"
-          className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7BC9C2] ${error ? "border-red-400" : "border-gray-300"}`}
+          type="text"
+          value={usuario}
+          onChange={e => { setUsuario(e.target.value); setError(""); }}
+          placeholder="Usuário"
+          autoComplete="username"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7BC9C2]"
           autoFocus
         />
-        {error && <p className="text-xs text-red-500 text-center">Senha incorreta</p>}
+        <input
+          type="password"
+          value={senha}
+          onChange={e => { setSenha(e.target.value); setError(""); }}
+          placeholder="Senha"
+          autoComplete="current-password"
+          className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7BC9C2] ${error ? "border-red-400" : "border-gray-300"}`}
+        />
+        {error && <p className="text-xs text-red-500 text-center">{error}</p>}
         <button type="submit" className="w-full bg-[#7BC9C2] hover:bg-[#5fb3ac] text-white py-3 rounded-lg text-sm font-semibold transition-colors">
           Entrar
         </button>
@@ -105,17 +127,44 @@ function AdminGate({ onAuth }: { onAuth: () => void }) {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
+  const [perfil, setPerfil] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
 
+  // Quem está logado? (cookie de sessão, conferido pelo servidor)
   useEffect(() => {
-    setAuthenticated(sessionStorage.getItem(ADMIN_KEY) === "1");
-    setChecking(false);
+    fetch("/api/admin/sessao")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((sessao) => {
+        if (sessao) {
+          setAuthenticated(true);
+          setPerfil(sessao.perfil);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setChecking(false));
   }, []);
 
+  // A Palmira só vê o painel dela
+  useEffect(() => {
+    if (authenticated && perfil === "palmira" && !pathname.startsWith("/admin/palmira")) {
+      router.replace("/admin/palmira");
+    }
+  }, [authenticated, perfil, pathname, router]);
+
   if (checking) return null;
-  if (!authenticated) return <AdminGate onAuth={() => setAuthenticated(true)} />;
+  if (!authenticated) {
+    return (
+      <AdminGate
+        onAuth={(p) => {
+          setPerfil(p);
+          setAuthenticated(true);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50">
