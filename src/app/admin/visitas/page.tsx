@@ -20,6 +20,16 @@ export default function VisitasPage() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
   const [soIdentificadas, setSoIdentificadas] = useState(false);
+  const [interessadas, setInteressadas] = useState<{ nome: string; telefone: string; ultimaVisita: string; visitas: number }[]>([]);
+
+  useEffect(() => {
+    fetch("/api/visitas/interessadas")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setInteressadas(data);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/visitas")
@@ -45,6 +55,27 @@ export default function VisitasPage() {
 
         <h1 className="text-2xl font-bold text-gray-800 mb-2">👀 Visitas ao site</h1>
         <p className="text-gray-600 mb-6">Última visita de cada aparelho. Nome e telefone aparecem quando a pessoa já se identificou.</p>
+
+        {interessadas.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm border border-amber-200 p-4 mb-6">
+            <h2 className="font-bold text-gray-800 mb-1">📝 Interessadas (preencheram e não enviaram o formulário)</h2>
+            <p className="text-xs text-gray-500 mb-3">Para chamar no WhatsApp. Elas ainda não são leads.</p>
+            <div className="divide-y">
+              {interessadas.map((i) => (
+                <div key={i.telefone} className="py-2 flex justify-between gap-4 text-sm">
+                  <div>
+                    <p className="font-semibold text-gray-800">{i.nome || "(sem nome)"}</p>
+                    <p className="text-gray-600">{i.telefone}</p>
+                  </div>
+                  <div className="text-right text-xs text-gray-500">
+                    <p>{new Date(i.ultimaVisita).toLocaleDateString("pt-BR")}</p>
+                    <p>{i.visitas} {i.visitas === 1 ? "visita" : "visitas"}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <label className="flex items-center gap-2 mb-4 text-sm font-semibold text-gray-700">
           <input
