@@ -190,7 +190,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       "",
       ...orderLines,
       "",
-      `*Total: R$ ${totalPrice.toFixed(2).replace(".", ",")}*`,
+      `*Total: R$ ${(totalFinal ?? totalPrice).toFixed(2).replace(".", ",")}*`,
       `Itens: ${totalQty}`,
     ].join("\n");
 
