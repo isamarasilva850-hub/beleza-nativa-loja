@@ -2,7 +2,6 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { products } from "@/data/products";
 
 interface Partner {
   id: string;
@@ -29,6 +28,17 @@ export default function ParceiroCompras() {
   const id = params?.id as string;
 
   const [partner, setPartner] = useState<Partner | null>(null);
+  // Lista de produtos da loja (a mesma da vitrine), carregada do servidor
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/products")
+      .then((r) => r.json())
+      .then((lista) => {
+        if (Array.isArray(lista)) setProducts(lista);
+      })
+      .catch((err) => console.error("Erro ao carregar produtos", err));
+  }, []);
   const [purchases, setPurchases] = useState<PurchasedProduct[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState("");
@@ -158,7 +168,7 @@ export default function ParceiroCompras() {
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
                 >
                   <option value="">Selecione uma cor...</option>
-                  {variants.map((v) => (
+                  {variants.map((v: any) => (
                     <option key={v.color} value={v.color}>
                       {v.color}
                     </option>
@@ -177,8 +187,8 @@ export default function ParceiroCompras() {
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
                 >
                   {variants
-                    .find((v) => v.color === selectedColor)
-                    ?.sizes.map((s) => (
+                    .find((v: any) => v.color === selectedColor)
+                    ?.sizes.map((s: any) => (
                       <option key={s} value={s}>
                         {s}
                       </option>
