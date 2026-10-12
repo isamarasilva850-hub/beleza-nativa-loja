@@ -298,9 +298,12 @@ export async function GET() {
       .select('ref, display_order');
     const ordemMap = new Map((ordemRows || []).map((o: any) => [o.ref, o.display_order]));
 
-    // Combina ambos e ordena por display_order
+    // Combina ambos e ordena por display_order.
+    // Se a REF já foi cadastrada no banco (ex.: Palmira), a versão do catálogo original é deixada de fora,
+    // para não aparecer duas vezes.
+    const refsDoBanco = new Set(productsWithDetails.map((p: any) => String(p.ref)));
     const allProducts = [
-      ...staticProducts,
+      ...staticProducts.filter((p: any) => !refsDoBanco.has(String(p.ref))),
       ...productsWithDetails
     ]
       .map((p: any) => (ordemMap.has(p.ref) ? { ...p, display_order: ordemMap.get(p.ref) } : p))
