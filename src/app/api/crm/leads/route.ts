@@ -35,6 +35,18 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     if (!body.nome || !body.telefone) return NextResponse.json({ error: 'Informe nome e WhatsApp.' }, { status: 400 });
+
+    // Um lead por WhatsApp: se o número já existe, não cria outro e responde como sucesso
+    const digitos = String(body.telefone).replace(/\D/g, '');
+    const { data: existente } = await supabase
+      .from('crm_leads')
+      .select('id, telefone')
+      .like('telefone', `%${digitos}%`)
+      .limit(5);
+    if ((existente || []).some((l: any) => String(l.telefone || '').replace(/\D/g, '') === digitos)) {
+      return NextResponse.json({ ok: true, duplicado: true }, { status: 200 });
+    }
+
     const { data, error } = await supabase
       .from('crm_leads')
       .insert({
