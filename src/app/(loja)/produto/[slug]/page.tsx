@@ -135,6 +135,15 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
     }
   }, [product]);
 
+  // Enquanto os dados chegam, não mostra "não encontrado" (a cliente saía achando que o produto sumiu)
+  if (loading && !product) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+        <p className="text-gray-500">Carregando produto...</p>
+      </div>
+    );
+  }
+
   if (!product || !product.variants || product.variants.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center">
