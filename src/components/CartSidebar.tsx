@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useCart, CartItem } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
@@ -174,17 +174,26 @@ export default function CartSidebar() {
     setAppliedCoupon(null);
   };
 
+  const enviandoRef = useRef(false);
+
   const confirmOrder = async () => {
+    // Impede enviar o mesmo pedido duas vezes com cliques seguidos
+    if (enviandoRef.current) return;
+    enviandoRef.current = true;
+
     const name = revendedora.trim() || "Não informado";
 
     const savedItems = items.map((i) => ({ ...i }));
-    const savedTotal = totalPrice;
+    // Total já com o desconto do cupom (o que o cliente viu na tela)
+    const totalPedido = Math.max(0, totalPrice - discountAmount);
+    const savedTotal = totalPedido;
     const savedCount = totalItems;
 
     // Número do pedido vem do servidor (ou do número local, se o servidor falhar)
     // O cupom vai junto com o pedido: o servidor conta o uso só quando o pedido é salvo
     const cupomDoPedido = appliedCoupon && appliedCoupon.code !== "PRIMEIRA_COMPRA" ? appliedCoupon.code : "";
-    const orderNumber = await checkout(name, telefoneCliente.replace(/\D/g, ""), cupomDoPedido);
+    const orderNumber = await checkout(name, telefoneCliente.replace(/\D/g, ""), cupomDoPedido, totalPedido);
+    enviandoRef.current = false;
 
     setReceiptData({
       name,
