@@ -130,43 +130,7 @@
       "/produtos/542.jpg"
     ]
   },
-  {
-    "id": 4,
-    "ref": "433",
-    "name": "CONJUNTO BÁSICO COM RENDA",
-    "price": 49.9,
-    "description": "Conjunto confortável e elegante.",
-    "composition": "85% poliamida, 15% elastano. Forro: 100% algodão",
-    "care": "lavar com sabão neutro a mão e secar a sombra.",
-    "collection": "Lingerie",
-    "gender": "Feminino",
-    "category": "Conjuntos",
-    "variants": [
-      {
-        "color": "Base",
-        "colorHex": "#F5F5DC",
-        "sizes": [
-          "P",
-          "M",
-          "G",
-          "GG"
-        ]
-      },
-      {
-        "color": "Vermelho",
-        "colorHex": "#DC143C",
-        "sizes": [
-          "P",
-          "M",
-          "G",
-          "GG"
-        ]
-      }
-    ],
-    "images": [
-      "/produtos/433.jpg"
-    ]
-  },
+ 
   {
     "id": 5,
     "ref": "551",
