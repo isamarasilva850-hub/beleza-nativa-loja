@@ -101,7 +101,8 @@ export async function GET(request: NextRequest) {
     const orderStatus = {
       pendente: (orders || []).filter(o => o.status === 'pendente').length,
       pago: (orders || []).filter(o => o.status === 'pago').length,
-      entregue: (orders || []).filter(o => o.status === 'entregue').length
+      entregue: (orders || []).filter(o => o.status === 'entregue').length,
+      artesEnviadas: (orders || []).filter(o => o.status === 'artes_enviadas').length
     };
 
     // Vendas por mês

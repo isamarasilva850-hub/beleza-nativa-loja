@@ -54,7 +54,7 @@ export default function RelatoriosPage() {
 
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-4">📦 Status dos Pedidos</h2>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
             <p className="text-sm text-yellow-600 font-semibold">Pendente</p>
             <p className="text-2xl font-bold text-yellow-900">{data.orderStatus.pendente}</p>
@@ -66,6 +66,10 @@ export default function RelatoriosPage() {
           <div className="bg-green-50 p-4 rounded-lg border border-green-200">
             <p className="text-sm text-green-600 font-semibold">Entregue</p>
             <p className="text-2xl font-bold text-green-900">{data.orderStatus.entregue}</p>
+          </div>
+          <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+            <p className="text-sm text-purple-600 font-semibold">Artes enviadas</p>
+            <p className="text-2xl font-bold text-purple-900">{data.orderStatus.artesEnviadas}</p>
           </div>
         </div>
       </div>
