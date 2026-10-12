@@ -90,6 +90,8 @@ export default function CartSidebar() {
   const [telefoneCliente, setTelefoneCliente] = useState("");
   const [showReceipt, setShowReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
+  // Impede enviar o mesmo pedido duas vezes (declarado antes de qualquer return condicional)
+  const enviandoRef = useRef(false);
   const [receiptTab, setReceiptTab] = useState<"resumo" | "artes">("artes");
   const [copiedRef, setCopiedRef] = useState<string | null>(null);
   const [legendaMode, setLegendaMode] = useState<Record<string, "completa" | "curta">>({});
@@ -173,8 +175,6 @@ export default function CartSidebar() {
   const removeCoupon = () => {
     setAppliedCoupon(null);
   };
-
-  const enviandoRef = useRef(false);
 
   const confirmOrder = async () => {
     // Impede enviar o mesmo pedido duas vezes com cliques seguidos
