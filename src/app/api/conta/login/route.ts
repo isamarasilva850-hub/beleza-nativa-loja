@@ -12,7 +12,10 @@ const supabase = () =>
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const login = String(body.email || '').trim().toLowerCase();
+    const entrada = String(body.email || '').trim().toLowerCase();
+    // Cliente entra com o WhatsApp; a conta é guardada como "numero@belezanativa.local"
+    const digitos = entrada.replace(/\D/g, '');
+    const login = !entrada.includes('@') && digitos.length >= 10 ? `${digitos}@belezanativa.local` : entrada;
     const senha = String(body.password || '');
     const chave = chaveLimite(request.headers.get('x-forwarded-for'), login);
 
@@ -29,7 +32,7 @@ export async function POST(request: NextRequest) {
     // Mesma resposta para login inexistente e senha errada, para não revelar contas
     if (!conta || !(await conferirSenha(senha, conta.senha_hash))) {
       registrarFalha(chave);
-      return NextResponse.json({ error: 'E-mail ou senha incorretos.' }, { status: 401 });
+      return NextResponse.json({ error: 'WhatsApp ou senha incorretos.' }, { status: 401 });
     }
     limparFalhas(chave);
 

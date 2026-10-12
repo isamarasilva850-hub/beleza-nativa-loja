@@ -28,7 +28,7 @@ export default function MinhaConta() {
     setError("");
     const resultado = await login(email, password);
     if (!resultado.ok) {
-      setError(resultado.erro || "E-mail ou senha incorretos. Verifique seus dados ou cadastre-se.");
+      setError(resultado.erro || "WhatsApp ou senha incorretos. Verifique seus dados ou cadastre-se.");
       return;
     }
     try {
@@ -157,13 +157,13 @@ export default function MinhaConta() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp</label>
               <input
-                type="email"
+                type="tel"
                 required
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setError(""); }}
-                placeholder="seu@email.com"
+                placeholder="(35) 99181-2558"
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2] transition-colors"
               />
             </div>
