@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { carregarPedidos } from "@/lib/pedidos";
 
 type Vendedora = { id: number; name: string; role: string; avatar: string };
 
@@ -58,18 +57,20 @@ export default function Vendedores() {
       .catch((err) => console.error("Erro ao carregar vendedoras", err));
 
     // Tudo vem do servidor, para aparecer em qualquer computador
-    carregarPedidos().then(setOrders).catch((err) => console.error("Erro ao carregar pedidos", err));
+    // Pedido não tem vendedora; ela vem da revendedora (partnerid) cadastrada em partners.vendedor
+    fetch("/api/orders").then((r) => r.json()).then((d) => setOrders(Array.isArray(d) ? d : [])).catch((err) => console.error("Erro ao carregar pedidos", err));
     fetch("/api/partners").then((r) => r.json()).then((d) => setPartners(Array.isArray(d) ? d : [])).catch(() => {});
     fetch("/api/crm/leads").then((r) => r.json()).then((d) => setLeads(Array.isArray(d) ? d : [])).catch(() => {});
     fetch("/api/crm-dados?chave=agenda").then((r) => r.json()).then((d) => setAgenda(Array.isArray(d.valor) ? d.valor : [])).catch(() => {});
   }, []);
 
   const getStats = (name: string) => {
-    const myOrders = orders.filter((o: any) => (o.vendedor || o.revendedora || "").toLowerCase().includes(name.toLowerCase()));
+    const vendedoraDoPedido = (o: any) => partners.find((p: any) => p.id === o.partnerid)?.vendedor || "";
+    const myOrders = orders.filter((o: any) => vendedoraDoPedido(o).toLowerCase().includes(name.toLowerCase()));
     const myPartners = partners.filter((p: any) => (p.vendedor || "").toLowerCase().includes(name.toLowerCase()));
     const myLeads = leads.filter((l: any) => (l.vendedor || "").toLowerCase().includes(name.toLowerCase()));
     const myAgenda = agenda.filter((a: any) => (a.vendedor || "").toLowerCase().includes(name.toLowerCase()));
-    const revenue = myOrders.reduce((s: number, o: any) => s + (o.total || 0), 0);
+    const revenue = myOrders.reduce((s: number, o: any) => s + (Number(o.total) || 0), 0);
     const converted = myLeads.filter((l: any) => l.status === "convertido").length;
 
     return {
