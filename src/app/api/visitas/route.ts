@@ -5,6 +5,33 @@ import { createClient } from '@supabase/supabase-js';
 const supabase = () =>
   createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!);
 
+// Manda para o WhatsApp da Isa quem visitou o site identificado (nome e telefone).
+// Só avisa na primeira visita identificada do dia de cada aparelho.
+async function avisarVisitaIdentificada(db: any, aparelho: string, nome: string, telefone: string, pagina: string) {
+  const apiKey = process.env.WASENDER_API_KEY;
+  const meuNumero = process.env.LEMBRETE_TELEFONE;
+  if (!apiKey || !meuNumero) return;
+
+  const hojeBrasil = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+  const inicioDoDia = new Date(`${hojeBrasil}T00:00:00-03:00`).toISOString();
+  const { count } = await db
+    .from('visitas')
+    .select('id', { count: 'exact', head: true })
+    .eq('aparelho', aparelho)
+    .not('telefone', 'is', null)
+    .gte('criado_em', inicioDoDia);
+  if ((count || 0) > 1) return; // já avisou hoje
+
+  await fetch('https://wasenderapi.com/api/send-message', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      to: meuNumero,
+      text: `👀 Visita no site\n\nNome: ${nome}\nWhatsApp: ${telefone}\nÚltima página: ${pagina}\n\nVale entrar em contato.`,
+    }),
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { aparelho, nome, telefone, pagina } = await request.json();
@@ -13,7 +40,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'aparelho é obrigatório' }, { status: 400 });
     }
 
-    const { error } = await supabase()
+    const db = supabase();
+    const { error } = await db
       .from('visitas')
       .insert({
         aparelho: String(aparelho).slice(0, 80),
@@ -24,6 +52,13 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Visitante identificado (com WhatsApp): avisa a Isa, só na primeira visita do dia
+    if (telefone) {
+      avisarVisitaIdentificada(db, String(aparelho).slice(0, 80), String(nome || 'Sem nome').slice(0, 120), String(telefone).slice(0, 30), String(pagina || '/').slice(0, 200)).catch((err) =>
+        console.error('Erro ao avisar visita', err)
+      );
     }
 
     return NextResponse.json({ success: true }, { status: 201 });
