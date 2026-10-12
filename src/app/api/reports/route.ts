@@ -35,17 +35,19 @@ export async function GET(request: NextRequest) {
     // Top 5 revendedoras por faturamento
     const partnerSales: Record<string, { name: string; total: number; count: number }> = {};
     (orders || []).forEach(order => {
-      if (!partnerSales[order.partnerId]) {
-        const partner = (partners || []).find(p => p.id === order.partnerId);
-        partnerSales[order.partnerId] = {
-          name: partner?.name || 'Desconhecido',
+      // A coluna no banco é partnerid; sem parceira cadastrada, agrupa pelo nome salvo no pedido
+      const chave = String(order.partnerid || order.partnername || 'sem-nome');
+      if (!partnerSales[chave]) {
+        const partner = (partners || []).find(p => p.id === order.partnerid);
+        partnerSales[chave] = {
+          name: partner?.name || order.partnername || 'Cliente do site',
           total: 0,
           count: 0
         };
       }
       const total = typeof order.total === 'string' ? parseFloat(order.total) : order.total;
-      partnerSales[order.partnerId].total += total || 0;
-      partnerSales[order.partnerId].count += 1;
+      partnerSales[chave].total += total || 0;
+      partnerSales[chave].count += 1;
     });
 
     const topPartners = Object.entries(partnerSales)
