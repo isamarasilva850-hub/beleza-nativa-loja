@@ -182,20 +182,9 @@ export default function CartSidebar() {
     const savedCount = totalItems;
 
     // Número do pedido vem do servidor (ou do número local, se o servidor falhar)
-    const orderNumber = await checkout(name, telefoneCliente.replace(/\D/g, ""));
-
-    // Conta o uso do cupom no servidor (para respeitar o limite de usos)
-    if (appliedCoupon && appliedCoupon.code !== "PRIMEIRA_COMPRA") {
-      try {
-        await fetch("/api/cupons/usar", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code: appliedCoupon.code }),
-        });
-      } catch (err) {
-        console.error("Erro ao registrar uso do cupom", err);
-      }
-    }
+    // O cupom vai junto com o pedido: o servidor conta o uso só quando o pedido é salvo
+    const cupomDoPedido = appliedCoupon && appliedCoupon.code !== "PRIMEIRA_COMPRA" ? appliedCoupon.code : "";
+    const orderNumber = await checkout(name, telefoneCliente.replace(/\D/g, ""), cupomDoPedido);
 
     setReceiptData({
       name,

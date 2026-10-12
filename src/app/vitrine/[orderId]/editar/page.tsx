@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { agruparPecas, MENSAGEM_PADRAO, PecaVitrine } from "@/lib/vitrine";
 import { artesLegendasMap } from "@/data/artes-legendas";
 
@@ -33,6 +33,8 @@ function reduzirLogo(arquivo: File): Promise<string> {
 export default function EditarVitrine() {
   const params = useParams();
   const orderId = params?.orderId as string;
+  // Assinatura do link de edição (vem no endereço, gerado pela equipe)
+  const chaveEdicao = useSearchParams().get("k") || "";
 
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
@@ -108,7 +110,7 @@ export default function EditarVitrine() {
       const res = await fetch("/api/vitrine", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pedidoId: orderId, ...form, precos }),
+        body: JSON.stringify({ pedidoId: orderId, k: chaveEdicao, ...form, precos }),
       });
       const dados = await res.json();
       if (!res.ok) throw new Error(dados.error || "Erro ao salvar");

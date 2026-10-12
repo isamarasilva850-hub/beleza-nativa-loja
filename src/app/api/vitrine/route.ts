@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { tokenVitrine } from '@/lib/vitrine-token';
 
 const supabase = () =>
   createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!);
@@ -56,10 +57,18 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { pedidoId, nome, logo, mensagem, whatsapp, precos } = await request.json();
+    const { pedidoId, k, nome, logo, mensagem, whatsapp, precos } = await request.json();
 
     if (!pedidoId) {
       return NextResponse.json({ error: 'pedidoId é obrigatório' }, { status: 400 });
+    }
+    // Só salva com o link de edição gerado pela equipe (assinatura do pedido)
+    if (String(k || '') !== tokenVitrine(String(pedidoId))) {
+      return NextResponse.json({ error: 'Link de edição inválido ou antigo. Peça um novo link à equipe.' }, { status: 403 });
+    }
+    const { data: pedidoExiste } = await supabase().from('orders').select('id').eq('id', String(pedidoId)).maybeSingle();
+    if (!pedidoExiste) {
+      return NextResponse.json({ error: 'Pedido não encontrado' }, { status: 404 });
     }
     if (logo && String(logo).length > MAX_LOGO) {
       return NextResponse.json({ error: 'Logo muito grande. Use uma imagem menor.' }, { status: 400 });

@@ -18,8 +18,14 @@ export default function PedidosRevendedoras() {
     // Buscar REFs do pedido
     const refs = [...new Set((order.items || []).map((item: any): string => item.ref))] as string[];
 
-    // Gerar link do catálogo
-    const catalogLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/vitrine/${order.id}/editar`;
+    // Gerar link do catálogo (com a assinatura da equipe, para só ele salvar a vitrine)
+    const respostaLink = await fetch(`/api/vitrine/link?pedidoId=${encodeURIComponent(order.id)}`);
+    const dadosLink = await respostaLink.json();
+    if (!respostaLink.ok || !dadosLink.k) {
+      alert(dadosLink.error || 'Não foi possível gerar o link da vitrine.');
+      return;
+    }
+    const catalogLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/vitrine/${order.id}/editar?k=${dadosLink.k}`;
 
     // Criar mensagem com legendas de cada peça
     const caixa = '```';

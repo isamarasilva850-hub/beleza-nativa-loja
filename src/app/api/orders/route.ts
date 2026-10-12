@@ -60,6 +60,23 @@ async function avisarPalmiraSeparar(pedidoId: string, cliente: string, itens: an
   }
 }
 
+// Soma 1 em usedCount do cupom (lista em crm_dados "cupons"). Erro aqui não derruba o pedido.
+async function contarUsoCupom(supabase: any, codigo: string) {
+  try {
+    const alvo = codigo.trim().toUpperCase();
+    const { data } = await supabase.from('crm_dados').select('valor').eq('chave', 'cupons').maybeSingle();
+    const lista: any[] = Array.isArray(data?.valor) ? data!.valor : [];
+    const atualizada = lista.map((c) =>
+      String(c.code).toUpperCase() === alvo
+        ? { ...c, usedCount: (c.usedCount || 0) + 1, lastUsedAt: new Date().toISOString() }
+        : c
+    );
+    await supabase.from('crm_dados').upsert({ chave: 'cupons', valor: atualizada }, { onConflict: 'chave' });
+  } catch (err) {
+    console.error('Erro ao contar uso do cupom:', err);
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = createClient(
@@ -67,7 +84,7 @@ export async function POST(request: NextRequest) {
       (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!
     );
     const body = await request.json();
-    const { partnerId, partnerName, partnerPhone, items, total, date, status } = body;
+    const { partnerId, partnerName, partnerPhone, items, total, date, status, cupom } = body;
 
     // partnerId é opcional: pedido do site (cliente sem parceira cadastrada) vai sem ele
     if (!items) {
@@ -108,6 +125,9 @@ export async function POST(request: NextRequest) {
 
     // Avisa a Palmira para separar o pedido. Se o envio falhar, o pedido continua salvo.
     await avisarPalmiraSeparar(String(data.id), String(data.partnername || ''), items);
+
+    // Conta 1 uso do cupom, só porque o pedido foi salvo de verdade
+    if (cupom) await contarUsoCupom(supabase, String(cupom));
 
     return NextResponse.json(
       { ...data, partnerId: data.partnerid, partnerName: data.partnername, partnerPhone: data.partnerphone },
