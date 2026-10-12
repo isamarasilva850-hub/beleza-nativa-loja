@@ -193,6 +193,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
               <>
                 <Image
                   src={allImages[currentImageIndex]}
+                  unoptimized={String(allImages[currentImageIndex]).startsWith("data:")}
                   alt={`${product.ref} - ${product.name} - Foto ${currentImageIndex + 1}`}
                   fill
                   className="object-cover"
@@ -247,6 +248,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
                 >
                   <Image
                     src={img}
+                    unoptimized={String(img).startsWith("data:")}
                     alt={`Thumbnail ${index + 1}`}
                     width={64}
                     height={64}
