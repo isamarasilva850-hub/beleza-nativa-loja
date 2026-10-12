@@ -117,13 +117,13 @@ export default function ContasPage() {
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">WhatsApp ou e-mail da cliente</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">WhatsApp da cliente</label>
           <input
             type="text"
             required
             value={login}
             onChange={(e) => setLogin(e.target.value)}
-            placeholder="Ex.: 35999181226 ou e-mail"
+            placeholder="Ex.: 35999181226"
             className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-teal-500 focus:outline-none"
           />
         </div>
