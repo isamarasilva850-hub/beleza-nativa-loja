@@ -11,6 +11,7 @@ interface Partner {
   email: string;
   city: string;
   state: string;
+  vendedor?: string | null;
 }
 
 interface PurchasedProduct {
@@ -28,6 +29,29 @@ export default function ParceiroCompras() {
   const id = params?.id as string;
 
   const [partner, setPartner] = useState<Partner | null>(null);
+  // Nomes das vendedoras (mesma lista da tela Desempenho dos Vendedores)
+  const [vendedoras, setVendedoras] = useState<string[]>(["Rosemari", "Isamara", "Jaynie"]);
+
+  useEffect(() => {
+    fetch("/api/crm-dados?chave=vendedoras")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.valor) && d.valor.length > 0) setVendedoras(d.valor.map((v: any) => v.name));
+      })
+      .catch((err) => console.error("Erro ao carregar vendedoras", err));
+  }, []);
+
+  // Salva no banco a vendedora desta revendedora
+  const salvarVendedora = (nome: string) => {
+    if (!partner) return;
+    setPartner({ ...partner, vendedor: nome || null });
+    fetch(`/api/partners/${encodeURIComponent(partner.id)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ vendedor: nome }),
+    }).catch((err) => console.error("Erro ao salvar vendedora", err));
+  };
+
   // Lista de produtos da loja (a mesma da vitrine), carregada do servidor
   const [products, setProducts] = useState<any[]>([]);
 
@@ -130,6 +154,19 @@ export default function ParceiroCompras() {
         <p className="text-gray-600 text-sm mt-1">
           {partner.city}/{partner.state} • {partner.phone}
         </p>
+        <div className="mt-3 flex items-center gap-2 text-sm">
+          <label className="font-semibold text-gray-700">Vendedora responsável:</label>
+          <select
+            value={partner.vendedor || ""}
+            onChange={(e) => salvarVendedora(e.target.value)}
+            className="px-3 py-1.5 border border-gray-300 rounded-lg focus:border-[#7BC9C2] focus:outline-none"
+          >
+            <option value="">(sem vendedora)</option>
+            {vendedoras.map((nome) => (
+              <option key={nome} value={nome}>{nome}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
