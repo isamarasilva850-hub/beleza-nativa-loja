@@ -26,14 +26,28 @@ export async function GET(request: NextRequest) {
     const planos: Planos = data?.valor && typeof data.valor === 'object' && !Array.isArray(data.valor) ? data.valor : {};
     const pendentes = passosDeHoje(planos, hojeISO());
 
-    if (pendentes.length === 0) {
+    // Leads com a próxima ação marcada para hoje (mesma regra da tela do CRM)
+    const { data: dadosLeads } = await db.from('crm_dados').select('valor').eq('chave', 'leads').maybeSingle();
+    const hoje = hojeISO();
+    const leadsHoje: any[] = Array.isArray(dadosLeads?.valor)
+      ? dadosLeads!.valor.filter((l: any) => l.proximaData === hoje && l.etapa !== 'convertido')
+      : [];
+    // Não repete quem já aparece nos planos (pelo WhatsApp)
+    const telefonesDosPlanos = new Set(pendentes.map((p) => String(p.plano.telefone || '').replace(/\D/g, '')));
+    const leadsExtras = leadsHoje.filter((l) => !telefonesDosPlanos.has(String(l.telefone || '').replace(/\D/g, '')));
+
+    if (pendentes.length === 0 && leadsExtras.length === 0) {
       return NextResponse.json({ enviado: false, motivo: 'Nenhum contato para hoje' });
     }
 
-    const linhas = pendentes.map((item, i) => {
+    const linhasPlanos = pendentes.map((item, i) => {
       const tipo = item.plano.tipo === 'lead' ? 'Lead' : 'Revendedora';
       return `${i + 1}. ${item.plano.nome} (${item.plano.telefone}) - ${tipo} - ${item.passo.titulo}`;
     });
+    const linhasLeads = leadsExtras.map((l, i) =>
+      `${linhasPlanos.length + i + 1}. ${l.nome} (${l.telefone}) - Lead - ${l.proximaAcao || 'Próxima ação'}`
+    );
+    const linhas = [...linhasPlanos, ...linhasLeads];
 
     const texto = `🔔 Falar hoje com:\n\n${linhas.join('\n')}\n\nAbra o Follow-up no admin para ver as mensagens prontas e marcar como feito.`;
 
@@ -51,7 +65,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Falha ao enviar', status: resposta.status, retorno }, { status: 502 });
     }
 
-    return NextResponse.json({ enviado: true, quantidade: pendentes.length });
+    return NextResponse.json({ enviado: true, quantidade: linhas.length });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Erro desconhecido' },
