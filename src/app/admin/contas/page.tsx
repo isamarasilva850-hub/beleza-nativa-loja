@@ -4,6 +4,12 @@ import { useEffect, useState } from 'react';
 
 const SEGREDO_KEY = 'belezanativa_reset_secret';
 
+// Número no formato do wa.me (com 55 se a pessoa digitou só DDD + número)
+const numeroWhatsApp = (valor: string) => {
+  const digitos = valor.replace(/\D/g, '');
+  return digitos.length <= 11 ? `55${digitos}` : digitos;
+};
+
 export default function ContasPage() {
   const [segredo, setSegredo] = useState('');
   const [login, setLogin] = useState('');
@@ -144,7 +150,17 @@ export default function ContasPage() {
         <div className="mt-4 bg-green-50 border-2 border-green-500 rounded-lg p-4 text-green-900">
           <p className="font-semibold mb-2">Senha temporária de {resultado.nome || resultado.login}:</p>
           <p className="text-2xl font-mono font-bold tracking-widest mb-3">{resultado.senhaTemporaria}</p>
-          <p className="text-sm">Envie para a cliente pelo WhatsApp, para ela entrar em "Minha conta". Esta senha aparece só agora.</p>
+          <p className="text-sm mb-3">Envie para a cliente pelo WhatsApp, para ela entrar em "Minha conta". Esta senha aparece só agora.</p>
+          <a
+            href={`https://wa.me/${numeroWhatsApp(resultado.login)}?text=${encodeURIComponent(
+              `Oi${resultado.nome ? ` ${resultado.nome.split(' ')[0]}` : ''}! Sua senha temporária para entrar em "Minha conta" no site Beleza Nativa é: ${resultado.senhaTemporaria}\n\nDepois de entrar, você pode trocar por uma senha sua.`
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block w-full text-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg"
+          >
+            💬 Enviar senha pelo WhatsApp
+          </a>
         </div>
       )}
 
