@@ -22,6 +22,7 @@ export interface ReportData {
     pendente: number;
     pago: number;
     entregue: number;
+    artesEnviadas: number;
   };
   monthlySales: Array<{
     month: string;
