@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
 const LUCRO_PERCENT = 100; // 100% de lucro para revendedoras!
@@ -37,6 +37,12 @@ export default function QueroComecear() {
     status: 'Quer começar'
   });
   const [submitted, setSubmitted] = useState(false);
+  const avisoRef = useRef<HTMLDivElement>(null);
+
+  // Leva a tela até a confirmação, para a pessoa ver mesmo tendo rolado para baixo
+  useEffect(() => {
+    if (submitted) avisoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [submitted]);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
   const [senhaConta, setSenhaConta] = useState('');
@@ -100,7 +106,7 @@ export default function QueroComecear() {
       setErro('');
       setSubmitted(true);
       setFormData({ name: '', phone: '', type: 'Revendedora', status: 'Quer começar' });
-      setTimeout(() => setSubmitted(false), 5000);
+      setTimeout(() => setSubmitted(false), 20000);
     } catch (error) {
       console.error('Erro ao enviar:', error);
     } finally {
@@ -289,8 +295,10 @@ export default function QueroComecear() {
           </h2>
 
           {submitted && (
-            <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4 mb-6 text-green-800">
-              ✅ Recebemos seu interesse! Em breve entraremos em contato.
+            <div ref={avisoRef} className="bg-green-50 border-2 border-green-500 rounded-lg p-4 mb-6 text-green-800">
+              ✅ <strong>Cadastro feito!</strong> Recebemos seu interesse e criamos sua conta. Em breve entraremos em contato.
+              <br />
+              Para acompanhar, entre em <strong>Minha conta</strong> com o seu WhatsApp e a senha que você criou.
             </div>
           )}
 
