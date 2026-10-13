@@ -295,6 +295,8 @@ export async function GET() {
         return {
           ...product,
           images: imageList,
+          // Ids das fotos guardadas no banco, na mesma ordem (usados para apagar uma foto específica)
+          imageIds: (images || []).map((img: any) => img.id),
           colors: colors?.map((c: any) => ({
             color_name: c.nome_da_cor,
             color_hex: c.texto_hex_color,

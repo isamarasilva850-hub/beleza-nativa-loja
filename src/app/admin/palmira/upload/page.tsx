@@ -28,6 +28,8 @@ export default function PalmiraUploadPage() {
   const [colors, setColors] = useState<ColorInput[]>([]);
   const [savedColors, setSavedColors] = useState<ColorInput[]>([]);
   const [images, setImages] = useState<string[]>([]);
+  // Fotos já salvas do produto em edição (com o id para poder apagar uma só)
+  const [fotosAtuais, setFotosAtuais] = useState<{ src: string; id?: string }[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [savedImages, setSavedImages] = useState<string[]>([]);
   const [success, setSuccess] = useState("");
@@ -288,6 +290,7 @@ export default function PalmiraUploadPage() {
       }
 
       setEditMode(true);
+      setFotosAtuais((product.images || []).map((src: string, i: number) => ({ src, id: product.imageIds?.[i] })));
       setFormData({
         ref: product.ref,
         name: product.name,
@@ -899,6 +902,42 @@ export default function PalmiraUploadPage() {
               </div>
             )}
           </div>
+
+          {/* Fotos já salvas: a Palmira pode apagar uma foto errada sem apagar o produto */}
+          {fotosAtuais.length > 0 && (
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+              <p className="text-sm font-bold text-gray-700 mb-2">Fotos salvas deste produto</p>
+              <div className="grid grid-cols-4 gap-2">
+                {fotosAtuais.map((foto, idx) => (
+                  <div key={`${foto.id || idx}`} className="relative">
+                    <img src={foto.src} alt={`Foto ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border border-gray-200" />
+                    <button
+                      type="button"
+                      disabled={!foto.id}
+                      onClick={async () => {
+                        if (!confirm("Apagar esta foto? As outras fotos continuam.")) return;
+                        const r = await fetch("/api/admin/delete-image", {
+                          method: "DELETE",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ imageId: foto.id }),
+                        });
+                        if (r.ok) {
+                          setFotosAtuais((atuais) => atuais.filter((_, i) => i !== idx));
+                          setSuccess("✅ Foto apagada.");
+                        } else {
+                          setError("❌ Não foi possível apagar a foto.");
+                        }
+                      }}
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs font-bold disabled:opacity-40"
+                      title="Apagar esta foto"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Fotos */}
           <div>
