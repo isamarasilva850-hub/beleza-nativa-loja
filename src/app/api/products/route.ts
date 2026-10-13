@@ -1,4 +1,5 @@
 import { negarSeNaoAdmin } from '@/lib/sessao';
+import { invalidarCatalogo } from '@/lib/cache-catalogo';
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
@@ -165,6 +166,9 @@ export async function POST(request: NextRequest) {
       debugLogs.push(warnMsg);
     }
 
+    // Produto novo ou alterado aparece na loja logo depois de salvar
+    invalidarCatalogo();
+
     return NextResponse.json({
       ...productData,
       debug_image_logs: debugLogs,
@@ -182,6 +186,9 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+// Lista pública de produtos fica em cache por 60 segundos (reduz a transferência de dados do banco)
+export const revalidate = 60;
 
 export async function GET() {
   try {

@@ -1,4 +1,5 @@
 import { negarSeNaoAdmin } from '@/lib/sessao';
+import { invalidarCatalogo } from '@/lib/cache-catalogo';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
@@ -41,6 +42,7 @@ export async function PUT(request: NextRequest) {
       .eq('id', colorId);
 
     if (error) throw error;
+    invalidarCatalogo();
 
     return NextResponse.json({ success: true, updated: colorId });
   } catch (error) {

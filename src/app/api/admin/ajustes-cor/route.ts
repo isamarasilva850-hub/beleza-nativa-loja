@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { negarSeNaoAdmin } from '@/lib/sessao';
+import { invalidarCatalogo } from '@/lib/cache-catalogo';
 
 // Correção de nomes de cor de produtos antigos (do arquivo). Guardado em crm_dados, chave "ajustes_cor":
 // { "<ref>": { "<cor original>": "<cor corrigida>" } }. A loja aplica esses nomes ao montar os produtos.
@@ -50,6 +51,7 @@ export async function POST(request: NextRequest) {
       .from('crm_dados')
       .upsert({ chave: 'ajustes_cor', valor: atuais }, { onConflict: 'chave' });
     if (error) throw error;
+    invalidarCatalogo();
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error('Erro ao salvar ajustes de cor:', error);
