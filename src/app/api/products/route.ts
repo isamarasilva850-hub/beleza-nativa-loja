@@ -345,7 +345,10 @@ export async function GET() {
       console.log('📊 Produtos estáticos:', staticProducts.length);
     }
 
-    return NextResponse.json(allProducts);
+    // Cache na Vercel por 60 segundos (e até 5 minutos enquanto atualiza em segundo plano)
+    return NextResponse.json(allProducts, {
+      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
+    });
   } catch (error) {
     console.error('Erro ao buscar produtos:', error);
     return NextResponse.json(
