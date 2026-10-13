@@ -43,12 +43,12 @@ export function useSupabaseProducts() {
                 variants = item.colors?.map((color: any) => ({
                   color: color.color_name,
                   colorHex: color.color_hex || "#000000",
-                  sizes: [
-                    ...(parseInt(color.qty_p) > 0 ? ['P'] : []),
-                    ...(parseInt(color.qty_m) > 0 ? ['M'] : []),
-                    ...(parseInt(color.qty_g) > 0 ? ['G'] : []),
-                    ...(parseInt(color.qty_gg) > 0 ? ['GG'] : []),
-                  ],
+                  // Tamanhos livres (PP, P, M, G, GG, 46...); se não houver, usa as colunas antigas
+                  sizes: Object.entries(
+                    color.tamanhos || { P: color.qty_p, M: color.qty_m, G: color.qty_g, GG: color.qty_gg }
+                  )
+                    .filter(([, qtd]) => Number(qtd) > 0)
+                    .map(([tamanho]) => tamanho),
                 })) || [];
               }
 

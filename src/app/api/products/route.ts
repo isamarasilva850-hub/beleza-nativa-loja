@@ -84,10 +84,16 @@ export async function POST(request: NextRequest) {
           id_do_produto: productData.id,
           nome_da_cor: (color.name || 'Sem cor').toString().substring(0, 50),
           texto_hex_color: (color.hex || '#000000').toString().substring(0, 7),
-          qtd_p: Math.max(0, parseInt(color.qty_p) || 0),
-          qtd_m: Math.max(0, parseInt(color.qty_m) || 0),
-          qtd_g: Math.max(0, parseInt(color.qty_g) || 0),
-          qtd_gg: Math.max(0, parseInt(color.qty_gg) || 0),
+          // Tamanhos livres (PP, P, M, G, GG, 46...). As colunas antigas ficam iguais aos tamanhos P, M, G, GG
+          tamanhos: Object.fromEntries(
+            Object.entries(color.tamanhos || {})
+              .map(([k, q]) => [String(k).toUpperCase().substring(0, 10), Math.max(0, parseInt(q as string) || 0)])
+              .filter(([, q]) => (q as number) > 0)
+          ),
+          qtd_p: Math.max(0, parseInt(color.tamanhos?.P ?? color.qty_p) || 0),
+          qtd_m: Math.max(0, parseInt(color.tamanhos?.M ?? color.qty_m) || 0),
+          qtd_g: Math.max(0, parseInt(color.tamanhos?.G ?? color.qty_g) || 0),
+          qtd_gg: Math.max(0, parseInt(color.tamanhos?.GG ?? color.qty_gg) || 0),
         }));
 
         console.log('🎨 Cores a inserir:', JSON.stringify(colorInserts, null, 2));

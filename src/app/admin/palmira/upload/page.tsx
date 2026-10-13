@@ -7,11 +7,15 @@ interface ColorInput {
   id: string;
   name: string;
   hex: string;
-  qty_p: string;
-  qty_m: string;
-  qty_g: string;
-  qty_gg: string;
+  // Quantidade por tamanho, livre (PP, P, M, G, GG, 38...50). Ex.: { P: "2", GG: "5" }
+  tamanhos: Record<string, string>;
 }
+
+// Tamanhos que aparecem prontos para a Palmira preencher; ela pode acrescentar outros
+const TAMANHOS_PADRAO = ["PP", "P", "M", "G", "GG", "38", "40", "42", "44", "46", "48", "50"];
+
+// Soma de peças da cor (ignora tamanhos vazios)
+const temQuantidade = (c: ColorInput) => Object.values(c.tamanhos).some((q) => parseInt(q) > 0);
 
 export default function PalmiraUploadPage() {
   const [formData, setFormData] = useState({
@@ -116,7 +120,7 @@ export default function PalmiraUploadPage() {
       setError("❌ Nenhuma cor adicionada!");
       return;
     }
-    const validColors = colors.filter((c) => c.name && (parseInt(c.qty_p) > 0 || parseInt(c.qty_m) > 0 || parseInt(c.qty_g) > 0 || parseInt(c.qty_gg) > 0));
+    const validColors = colors.filter((c) => c.name && temQuantidade(c));
     if (validColors.length === 0) {
       setError("❌ Adicione nome e quantidade para pelo menos uma cor!");
       return;
@@ -133,10 +137,7 @@ export default function PalmiraUploadPage() {
         id: `color_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         name: "",
         hex: "#000000",
-        qty_p: "",
-        qty_m: "",
-        qty_g: "",
-        qty_gg: "",
+        tamanhos: {},
       },
     ]);
   };
@@ -148,6 +149,22 @@ export default function PalmiraUploadPage() {
   const updateColor = (id: string, field: string, value: string) => {
     setColors(
       colors.map((c) => (c.id === id ? { ...c, [field]: value } : c))
+    );
+  };
+
+  // Quantidade de um tamanho dentro da cor (ex.: PP, 46)
+  const updateTamanho = (id: string, tamanho: string, valor: string) => {
+    setColors(
+      colors.map((c) => (c.id === id ? { ...c, tamanhos: { ...c.tamanhos, [tamanho]: valor } } : c))
+    );
+  };
+
+  // Acrescenta um tamanho que não está na lista padrão
+  const adicionarTamanho = (id: string, nome: string) => {
+    const tamanho = nome.trim().toUpperCase();
+    if (!tamanho) return;
+    setColors(
+      colors.map((c) => (c.id === id ? { ...c, tamanhos: { ...c.tamanhos, [tamanho]: c.tamanhos[tamanho] || "" } } : c))
     );
   };
 
@@ -283,10 +300,10 @@ export default function PalmiraUploadPage() {
             id: `color_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             name: v.color_name || v.name || '',
             hex: v.color_hex || v.hex || '#000000',
-            qty_p: v.qty_p?.toString() || '0',
-            qty_m: v.qty_m?.toString() || '0',
-            qty_g: v.qty_g?.toString() || '0',
-            qty_gg: v.qty_gg?.toString() || '0',
+            // Tamanhos já salvos (livres); se não houver, usa as colunas antigas P, M, G, GG
+            tamanhos: v.tamanhos
+              ? Object.fromEntries(Object.entries(v.tamanhos).map(([k, q]) => [k, String(q ?? 0)]))
+              : { P: String(v.qty_p ?? 0), M: String(v.qty_m ?? 0), G: String(v.qty_g ?? 0), GG: String(v.qty_gg ?? 0) },
           }))
         );
       }
@@ -374,13 +391,7 @@ export default function PalmiraUploadPage() {
         throw new Error("❌ Clique em 'Salvar Cores' antes de enviar o produto!");
       }
 
-      const hasQty = colors.some(
-        (c) =>
-          parseInt(c.qty_p) > 0 ||
-          parseInt(c.qty_m) > 0 ||
-          parseInt(c.qty_g) > 0 ||
-          parseInt(c.qty_gg) > 0
-      );
+      const hasQty = colors.some(temQuantidade);
 
       if (!hasQty) {
         throw new Error("❌ Adicione quantidade para pelo menos um tamanho!");
@@ -391,14 +402,22 @@ export default function PalmiraUploadPage() {
         name: formData.name,
         price: parseFloat(formData.price) || 0,
         gender: formData.gender,
-        colors: savedColors.map((c) => ({
-          name: c.name || 'Sem cor',
-          hex: c.hex,
-          qty_p: parseInt(c.qty_p) || 0,
-          qty_m: parseInt(c.qty_m) || 0,
-          qty_g: parseInt(c.qty_g) || 0,
-          qty_gg: parseInt(c.qty_gg) || 0,
-        })),
+        colors: savedColors.map((c) => {
+          // Só envia tamanhos com quantidade maior que zero
+          const tamanhos = Object.fromEntries(
+            Object.entries(c.tamanhos).map(([k, q]) => [k, parseInt(q) || 0]).filter(([, q]) => (q as number) > 0)
+          );
+          return {
+            name: c.name || 'Sem cor',
+            hex: c.hex,
+            tamanhos,
+            // Colunas antigas, mantidas para os locais que ainda leem P, M, G, GG
+            qty_p: tamanhos.P || 0,
+            qty_m: tamanhos.M || 0,
+            qty_g: tamanhos.G || 0,
+            qty_gg: tamanhos.GG || 0,
+          };
+        }),
         images: savedImages,
       };
 
@@ -846,21 +865,34 @@ export default function PalmiraUploadPage() {
                     </div>
 
                     <div className="grid grid-cols-4 gap-2">
-                      {["P", "M", "G", "GG"].map((size) => (
+                      {/* Tamanhos padrão + qualquer tamanho que a cor já tenha */}
+                      {Array.from(new Set([...TAMANHOS_PADRAO, ...Object.keys(color.tamanhos)])).map((size) => (
                         <div key={size} className="flex flex-col">
                           <label className="text-xs font-bold text-gray-700 mb-1">{size}</label>
                           <input
                             type="number"
                             min="0"
                             placeholder="0"
-                            value={color[`qty_${size.toLowerCase()}` as keyof ColorInput] || ""}
-                            onChange={(e) =>
-                              updateColor(color.id, `qty_${size.toLowerCase()}`, e.target.value)
-                            }
+                            value={color.tamanhos[size] || ""}
+                            onChange={(e) => updateTamanho(color.id, size, e.target.value)}
                             className="px-2 py-2 border border-gray-300 rounded-lg text-sm text-center focus:outline-none focus:border-[#7BC9C2]"
                           />
                         </div>
                       ))}
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                      <input
+                        type="text"
+                        placeholder="Outro tamanho (ex.: 52)"
+                        className="flex-1 px-2 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            adicionarTamanho(color.id, (e.target as HTMLInputElement).value);
+                            (e.target as HTMLInputElement).value = "";
+                          }
+                        }}
+                      />
                     </div>
                   </div>
                 ))}

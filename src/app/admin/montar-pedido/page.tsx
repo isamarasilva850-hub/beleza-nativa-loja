@@ -48,13 +48,12 @@ export default function MontarPedidoPage() {
               : (p.colors || []).map((c: any) => ({
                   color: c.color_name,
                   colorHex: c.color_hex || "#000000",
-                  sizes: ["P", "M", "G", "GG"].filter((t) => Number(c[`qty_${t.toLowerCase()}`]) > 0),
-                  stock: {
-                    P: Number(c.qty_p) || 0,
-                    M: Number(c.qty_m) || 0,
-                    G: Number(c.qty_g) || 0,
-                    GG: Number(c.qty_gg) || 0,
-                  },
+                  // Tamanhos livres (PP, P, M, G, GG, 46...); se não houver, usa as colunas antigas
+                  stock: c.tamanhos
+                    ? Object.fromEntries(Object.entries(c.tamanhos).map(([k, q]) => [k, Number(q) || 0]))
+                    : { P: Number(c.qty_p) || 0, M: Number(c.qty_m) || 0, G: Number(c.qty_g) || 0, GG: Number(c.qty_gg) || 0 },
+                  sizes: Object.keys(c.tamanhos ? c.tamanhos : { P: c.qty_p, M: c.qty_m, G: c.qty_g, GG: c.qty_gg })
+                    .filter((t) => Number((c.tamanhos ? c.tamanhos[t] : c[`qty_${t.toLowerCase()}`]) ?? 0) > 0),
                 }));
             return { ...p, price: Number(p.price) || 0, variants };
           })
