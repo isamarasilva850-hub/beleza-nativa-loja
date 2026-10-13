@@ -259,7 +259,7 @@ export async function GET() {
         // Buscar cores
         const { data: colors } = await supabase
           .from('cores_do_produto')
-          .select('nome_da_cor, texto_hex_color, qtd_p, qtd_m, qtd_g, qtd_gg')
+          .select('nome_da_cor, texto_hex_color, qtd_p, qtd_m, qtd_g, qtd_gg, tamanhos')
           .eq('id_do_produto', product.id);
 
         // Buscar imagens 🖼️
@@ -288,6 +288,10 @@ export async function GET() {
             qty_m: c.qtd_m,
             qty_g: c.qtd_g,
             qty_gg: c.qtd_gg,
+            // Tamanhos livres (PP, P, M, G, GG, 46...). Se ainda não migrado, usa as colunas antigas
+            tamanhos: c.tamanhos && Object.keys(c.tamanhos).length > 0
+              ? c.tamanhos
+              : { P: c.qtd_p || 0, M: c.qtd_m || 0, G: c.qtd_g || 0, GG: c.qtd_gg || 0 },
           })) || [],
         };
       })

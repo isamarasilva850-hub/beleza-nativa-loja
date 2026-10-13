@@ -44,12 +44,16 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
           const variantsData = item.colors?.map((color: any) => ({
             color: color.color_name,
             colorHex: color.color_hex || "#000000",
-            sizes: [
-              ...(parseInt(color.qty_p) > 0 ? ['P'] : []),
-              ...(parseInt(color.qty_m) > 0 ? ['M'] : []),
-              ...(parseInt(color.qty_g) > 0 ? ['G'] : []),
-              ...(parseInt(color.qty_gg) > 0 ? ['GG'] : []),
-            ],
+            // Só os tamanhos com quantidade maior que zero, na ordem: PP, P, M, G, GG, depois os números
+            sizes: Object.entries(color.tamanhos || {})
+              .filter(([, qtd]) => Number(qtd) > 0)
+              .map(([tamanho]) => tamanho)
+              .sort((a, b) => {
+                const ordem = ['PP', 'P', 'M', 'G', 'GG'];
+                const ia = ordem.indexOf(a), ib = ordem.indexOf(b);
+                if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+                return Number(a) - Number(b) || a.localeCompare(b);
+              }),
           })) || item.variants || [];
 
           let parsedImages: string[] = [];
