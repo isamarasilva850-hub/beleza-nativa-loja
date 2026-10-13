@@ -188,6 +188,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Lista pública de produtos fica em cache por 60 segundos (reduz a transferência de dados do banco)
+export const dynamic = 'force-static';
 export const revalidate = 60;
 
 export async function GET() {
