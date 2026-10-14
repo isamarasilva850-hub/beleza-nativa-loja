@@ -56,6 +56,9 @@ export function negarSeNaoAdmin(request: { headers: { get: (n: string) => string
   const parte = cabecalho.split(";").map((c) => c.trim()).find((c) => c.startsWith(COOKIE_SESSAO + "="));
   const sessao = lerToken(parte ? decodeURIComponent(parte.slice(COOKIE_SESSAO.length + 1)) : null);
   if (!sessao || !perfis.includes(sessao.perfil)) {
+    // Diagnóstico (sem chave nem cookie): mostra só o motivo da recusa
+    const motivo = !parte ? 'cookie ausente' : !sessao ? 'cookie inválido ou expirado' : `perfil "${sessao.perfil}" não permitido`;
+    console.warn(`[acesso negado] ${motivo}`);
     return { error: "Não autorizado. Entre no admin para continuar.", status: 401 } as const;
   }
   return null;
