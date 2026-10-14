@@ -4,6 +4,16 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
+// A Palmira vê só o próprio painel (o restante do admin é da equipe)
+const secoesPalmira = [
+  {
+    title: "PRODUÇÃO",
+    items: [
+      { href: "/admin/palmira", label: "Painel da Palmira", icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" },
+    ],
+  },
+];
+
 const sections = [
   {
     title: "PRINCIPAL",
@@ -184,7 +194,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-4">
-          {sections.map((section) => (
+          {(perfil === "palmira" ? secoesPalmira : sections).map((section) => (
             <div key={section.title}>
               <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mb-1">{section.title}</p>
               <div className="space-y-0.5">
