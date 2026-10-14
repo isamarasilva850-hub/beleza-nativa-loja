@@ -187,9 +187,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Lista pública de produtos fica em cache por 60 segundos (reduz a transferência de dados do banco)
-export const dynamic = 'force-static';
-export const revalidate = 60;
+// Não usar dynamic/revalidate nesta rota: afetam também o salvar (POST), que precisa ler o cookie de login.
+// O cache da lista pública é feito pelo cabeçalho Cache-Control, no GET.
 
 export async function GET() {
   try {
