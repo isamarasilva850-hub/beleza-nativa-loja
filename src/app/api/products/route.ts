@@ -300,9 +300,26 @@ export async function GET(request: NextRequest) {
 
         // Usar image_base64
         let imageList = images?.map((img: any) => img.image_base64).filter(Boolean) || product.images || [];
+
+        // Foto de cada cor (campo "cor" das fotos). Se o campo ainda não existir, fica vazio e nada quebra.
+        const imagesPorCor: Record<string, string> = {};
+        try {
+          const { data: fotosDaCor } = await supabase
+            .from('product_images')
+            .select('image_base64, cor')
+            .eq('product_id', product.id)
+            .not('cor', 'is', null);
+          (fotosDaCor || []).forEach((f: any) => {
+            if (f.cor && f.image_base64) imagesPorCor[f.cor] = f.image_base64;
+          });
+        } catch {
+          // sem o campo de cor: segue só com as fotos gerais
+        }
         return {
           ...product,
           images: imageList,
+          // Fotos por cor: { "Vinho": "data:..." } (cores sem foto própria não aparecem aqui)
+          imagesPorCor,
           // Ids das fotos guardadas no banco, na mesma ordem (usados para apagar uma foto específica)
           imageIds: (images || []).map((img: any) => img.id),
           colors: colors?.map((c: any) => ({
