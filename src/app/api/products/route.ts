@@ -31,7 +31,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const productId = `${ref}-${Date.now().toString(36)}`;
+    // Produto novo ganha um id novo; produto que já existe mantém o id atual (as fotos apontam para ele)
+    let productId = `${ref}-${Date.now().toString(36)}`;
 
     // 0.5. Se houver produto com essa ref, limpar cores e imagens ANTES de UPSERT
     try {
@@ -42,6 +43,7 @@ export async function POST(request: NextRequest) {
         .maybeSingle();
 
       if (existing) {
+        productId = existing.id;
         console.log(`🧹 Limpando dados antigos do produto ${ref}...`);
         // As cores vêm do formulário e substituem as antigas.
         // As fotos antigas NÃO são apagadas aqui: as novas são acrescentadas e as apagadas pelo ✕ saem no painel.
