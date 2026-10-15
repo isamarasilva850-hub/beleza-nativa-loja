@@ -43,8 +43,9 @@ export async function POST(request: NextRequest) {
 
       if (existing) {
         console.log(`🧹 Limpando dados antigos do produto ${ref}...`);
+        // As cores vêm do formulário e substituem as antigas.
+        // As fotos antigas NÃO são apagadas aqui: as novas são acrescentadas e as apagadas pelo ✕ saem no painel.
         await supabase.from('cores_do_produto').delete().eq('id_do_produto', existing.id);
-        await supabase.from('product_images').delete().eq('product_id', existing.id);
         console.log(`✅ Dados antigos removidos`);
       }
     } catch (e) {
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
       for (let i = 0; i < images.length; i++) {
         try {
           const imageData = {
-            id: `${productData.id}-img-${i}`,
+            id: `${productData.id}-img-${Date.now()}-${i}`,
             product_id: productData.id,
             image_base64: images[i],
           };
