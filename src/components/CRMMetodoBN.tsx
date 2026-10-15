@@ -201,7 +201,12 @@ export default function CRMMetodoBN() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chave: "leads", valor: leads }),
-      }).catch((err) => console.error("Erro ao salvar leads no banco", err));
+      })
+        .then((r) => {
+          // Anotações e leads só são gravados se o servidor aceitar (sessão válida)
+          if (!r.ok) alert("Não foi possível salvar as anotações. Saia do admin e entre de novo.");
+        })
+        .catch(() => alert("Sem conexão: as anotações não foram salvas."));
     }, 800);
     return () => clearTimeout(timer);
   }, [leads]);
