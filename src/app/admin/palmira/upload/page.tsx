@@ -47,16 +47,29 @@ export default function PalmiraUploadPage() {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
   const [savingOrder, setSavingOrder] = useState(false);
+  // Onde a foto fica no quadro 3:4 do card (topo, centro ou base)
+  const [enquadramento, setEnquadramento] = useState<"topo" | "centro" | "base">("centro");
 
-  const optimizeImage = (imgBase64: string): Promise<string> => {
+  // Foto final na proporção 3:4 do card da loja (600 x 800), sem esticar:
+  // a imagem é ampliada para cobrir o quadro e recortada conforme o enquadramento escolhido
+  const optimizeImage = (imgBase64: string, enquadramento: "topo" | "centro" | "base" = "centro"): Promise<string> => {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
+        const largura = 600;
+        const altura = 800;
         const canvas = document.createElement("canvas");
-        canvas.width = 800;
-        canvas.height = 800;
+        canvas.width = largura;
+        canvas.height = altura;
         const ctx = canvas.getContext("2d");
-        if (ctx) ctx.drawImage(img, 0, 0, 800, 800);
+        if (ctx) {
+          const escala = Math.max(largura / img.width, altura / img.height);
+          const w = img.width * escala;
+          const h = img.height * escala;
+          const dx = (largura - w) / 2;
+          const dy = enquadramento === "topo" ? 0 : enquadramento === "base" ? altura - h : (altura - h) / 2;
+          ctx.drawImage(img, dx, dy, w, h);
+        }
         resolve(canvas.toDataURL("image/webp", 0.85));
       };
       img.src = imgBase64;
@@ -76,7 +89,7 @@ export default function PalmiraUploadPage() {
           try {
             const result = event.target?.result as string;
             console.log(`🖼️ Otimizando imagem ${i + 1}/${files.length}...`);
-            const optimized = await optimizeImage(result);
+            const optimized = await optimizeImage(result, enquadramento);
             newImages.push(optimized);
             newPreviews.push(optimized);
             console.log(`✅ Imagem ${i + 1} otimizada: ${Math.round(optimized.length / 1024)}KB`);
@@ -945,6 +958,19 @@ export default function PalmiraUploadPage() {
             <p className="text-sm text-gray-600 mb-3 bg-blue-50 p-3 rounded-lg">
               💡 <strong>Dica:</strong> Você pode selecionar VÁRIAS fotos de uma vez! Clique uma vez e selecione todas!
             </p>
+            <div className="mb-3">
+              <label className="block text-sm font-bold text-gray-700 mb-1">Enquadramento da foto (na vitrine ela fica em 3:4)</label>
+              <select
+                value={enquadramento}
+                onChange={(e) => setEnquadramento(e.target.value as "topo" | "centro" | "base")}
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
+              >
+                <option value="centro">Centro (padrão)</option>
+                <option value="topo">Topo (para mostrar a cabeça da modelo)</option>
+                <option value="base">Base (para mostrar a parte de baixo)</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">Escolha antes de selecionar as fotos. Fotos já salvas precisam ser enviadas de novo.</p>
+            </div>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#7BC9C2] transition-colors">
               <input
                 type="file"
