@@ -47,6 +47,9 @@ export default function PalmiraUploadPage() {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
   const [savingOrder, setSavingOrder] = useState(false);
+  // Cor de cada foto nova (mesma ordem da lista de fotos); "" = foto geral do produto
+  const [coresFotos, setCoresFotos] = useState<string[]>([]);
+  const [coresFotosSalvas, setCoresFotosSalvas] = useState<string[]>([]);
   // Onde a foto fica no quadro 3:4 do card (topo, centro ou base)
   const [enquadramento, setEnquadramento] = useState<"topo" | "centro" | "base">("centro");
   // Ao salvar um produto existente: manter as fotos salvas (padrão) ou substituir todas
@@ -99,6 +102,7 @@ export default function PalmiraUploadPage() {
             if (newImages.length === files.length) {
               console.log(`🎉 Todas ${newImages.length} imagens prontas!`);
               setImages([...images, ...newImages]);
+              setCoresFotos([...coresFotos, ...newImages.map(() => "")]);
               setPreviews([...previews, ...newPreviews]);
               setSuccess(`✅ ${newImages.length} foto(s) adicionada(s)!`);
               setTimeout(() => setSuccess(""), 2000);
@@ -119,6 +123,7 @@ export default function PalmiraUploadPage() {
 
   const removeImage = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
+    setCoresFotos(coresFotos.filter((_, i) => i !== index));
     setPreviews(previews.filter((_, i) => i !== index));
   };
 
@@ -128,6 +133,7 @@ export default function PalmiraUploadPage() {
       return;
     }
     setSavedImages(images);
+    setCoresFotosSalvas(coresFotos);
     setSuccess(`✅ ${images.length} imagem(ns) salva(s)!`);
     setTimeout(() => setSuccess(""), 2000);
   };
@@ -439,6 +445,7 @@ export default function PalmiraUploadPage() {
           };
         }),
         images: savedImages,
+        imagensCor: coresFotosSalvas,
         substituirFotos,
       };
 
@@ -470,6 +477,8 @@ export default function PalmiraUploadPage() {
       setImages([]);
       setPreviews([]);
       setSavedImages([]);
+      setCoresFotos([]);
+      setCoresFotosSalvas([]);
 
       setTimeout(() => setSuccess(""), 4000);
     } catch (err: any) {
@@ -1022,6 +1031,19 @@ export default function PalmiraUploadPage() {
                         alt={`Preview ${index + 1}`}
                         className={`w-full h-24 object-cover rounded-lg border-2 ${savedImages.length > 0 ? 'border-green-500' : 'border-gray-200'}`}
                       />
+                      {/* Cor desta foto: aparece na loja quando a cliente escolhe essa cor */}
+                      <select
+                        value={coresFotos[index] || ""}
+                        onChange={(e) => setCoresFotos(coresFotos.map((c, i) => (i === index ? e.target.value : c)))}
+                        className="w-full mt-1 px-1 py-1 border border-gray-300 rounded text-xs"
+                      >
+                        <option value="">Foto geral</option>
+                        {colors
+                          .filter((c) => c.name.trim())
+                          .map((c) => (
+                            <option key={c.id} value={c.name.trim()}>{c.name.trim()}</option>
+                          ))}
+                      </select>
                       <button
                         type="button"
                         onClick={() => removeImage(index)}

@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     );
 
     const body = await request.json();
-    const { ref, name, price, gender, colors, images, substituirFotos } = body;
+    const { ref, name, price, gender, colors, images, substituirFotos, imagensCor } = body;
 
     console.log('🔍 [POST /api/products] Recebido:');
     console.log(`  ref: ${ref}`);
@@ -142,16 +142,22 @@ export async function POST(request: NextRequest) {
             id: `${productData.id}-img-${Date.now()}-${i}`,
             product_id: productData.id,
             image_base64: images[i],
+            cor: (imagensCor && imagensCor[i]) || null,
           };
 
           const msg2 = `📸 Tentando salvar imagem ${i + 1}: ${imageData.image_base64.length} bytes`;
           console.log(msg2);
           debugLogs.push(msg2);
 
-          const { data: insertResult, error: dbError } = await supabase
+          // Se o campo de cor ainda não existir no banco, grava a foto sem cor (o salvar nunca falha por isso)
+          let { data: insertResult, error: dbError } = await supabase
             .from('product_images')
             .insert([imageData])
             .select();
+          if (dbError && /column|cor/i.test(dbError.message || '')) {
+            const { cor: _cor, ...semCor } = imageData as any;
+            ({ data: insertResult, error: dbError } = await supabase.from('product_images').insert([semCor]).select());
+          }
 
           if (dbError) {
             const errMsg = `❌ ERRO ao salvar imagem ${i + 1}: [${dbError.code}] ${dbError.message} ${dbError.details || ''}`.trim();
