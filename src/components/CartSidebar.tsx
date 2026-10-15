@@ -533,8 +533,14 @@ export default function CartSidebar() {
                   className="flex gap-3 p-3 bg-gray-50 rounded-lg"
                 >
                   {item.image ? (
-                    <div className="w-20 h-20 rounded flex-shrink-0 relative overflow-hidden">
-                      <Image src={item.image} alt={item.name} fill className="object-cover" sizes="80px" />
+                    <div className="relative group flex-shrink-0">
+                      <div className="w-20 h-20 rounded relative overflow-hidden cursor-zoom-in">
+                        <Image src={item.image} alt={item.name} fill className="object-cover" sizes="80px" />
+                      </div>
+                      {/* Prévia ampliada ao passar o mouse (aparece do lado esquerdo do item) */}
+                      <div className="hidden group-hover:block absolute right-full top-0 mr-3 w-56 h-72 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-[70] pointer-events-none">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      </div>
                     </div>
                   ) : (
                     <div className="w-20 h-20 bg-gray-200 rounded flex-shrink-0 flex items-center justify-center text-gray-400 text-xs">
