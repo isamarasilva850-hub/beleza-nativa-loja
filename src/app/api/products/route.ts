@@ -47,12 +47,7 @@ export async function POST(request: NextRequest) {
         console.log(`🧹 Limpando dados antigos do produto ${ref}...`);
         // As cores vêm do formulário e substituem as antigas.
         // As fotos antigas NÃO são apagadas aqui: as novas são acrescentadas e as apagadas pelo ✕ saem no painel.
-        await supabase.from('cores_do_produto').delete().eq('id_do_produto', existing.id);
-        // Substituir: apaga as fotos salvas e usa só as que estão no formulário
-        if (substituirFotos) {
-          await supabase.from('product_images').delete().eq('product_id', existing.id);
-        }
-        console.log(`✅ Dados antigos removidos`);
+        console.log(`✅ Produto existente identificado (cores e fotos serão tratadas após gravar o produto)`);
       }
     } catch (e) {
       console.warn('⚠️ Erro ao limpar antigos (continuando):', e);
@@ -82,6 +77,13 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ Produto criado/atualizado com sucesso:', { id: productData.id, ref: productData.ref });
+
+    // Só depois que o produto foi gravado é que as cores antigas saem (assim, se o produto falhar, nada se perde)
+    await supabase.from('cores_do_produto').delete().eq('id_do_produto', productData.id);
+    // Substituir fotos: apaga as salvas e usa só as que estão no formulário
+    if (substituirFotos) {
+      await supabase.from('product_images').delete().eq('product_id', productData.id);
+    }
 
     // 2. Insert cores em cores_do_produto se houver
     let colorErrors: string[] = [];
