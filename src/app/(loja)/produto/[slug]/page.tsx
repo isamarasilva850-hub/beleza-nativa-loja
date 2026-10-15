@@ -30,7 +30,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
       setLoading(true);
       try {
         console.log('🔄 Fetching /api/products...');
-        const response = await fetch('/api/products');
+        const response = await fetch('/api/products?completo=1');
         console.log('📥 Response recebida, status:', response.status);
 
         if (!response.ok) {

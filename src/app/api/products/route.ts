@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
 // Não usar dynamic/revalidate nesta rota: afetam também o salvar (POST), que precisa ler o cookie de login.
 // O cache da lista pública é feito pelo cabeçalho Cache-Control, no GET.
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // Produtos estáticos do arquivo JSON
     const productsPath = path.join(process.cwd(), 'src', 'data', 'products.json');
@@ -346,8 +346,15 @@ export async function GET() {
       console.log('📊 Produtos estáticos:', staticProducts.length);
     }
 
+    // Lista da loja: só a primeira foto de cada produto (o card usa só ela).
+    // Página do produto e painel da Palmira pedem ?completo=1 para receber todas as fotos.
+    const completo = request.nextUrl.searchParams.get('completo') === '1';
+    const lista = completo
+      ? allProducts
+      : allProducts.map((p: any) => ({ ...p, images: (p.images || []).slice(0, 1) }));
+
     // Cache na Vercel por 60 segundos (e até 5 minutos enquanto atualiza em segundo plano)
-    return NextResponse.json(allProducts, {
+    return NextResponse.json(lista, {
       headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
     });
   } catch (error) {

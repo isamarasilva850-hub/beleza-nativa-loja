@@ -294,7 +294,7 @@ export default function PalmiraUploadPage() {
         throw new Error("❌ Digite a REF do produto para editar!");
       }
 
-      const res = await fetch("/api/products");
+      const res = await fetch("/api/products?completo=1");
       const products = await res.json();
       const product = products.find((p: any) => p.ref === formData.ref);
 
