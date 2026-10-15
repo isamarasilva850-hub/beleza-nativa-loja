@@ -86,6 +86,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
             gender: item.gender || "Feminino",
             variants: variantsData,
             images: parsedImages,
+            imagesPorCor: item.imagesPorCor || {},
           };
         });
 
@@ -183,7 +184,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
       color: variant.color || '',
       colorHex: variant.colorHex || '#000000',
       size: selectedSize,
-      image: product.images[0] || "",
+      image: product.imagesPorCor?.[variant.color] || allImages[0] || product.images[0] || "",
     }, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
@@ -331,7 +332,15 @@ export default function ProdutoPage({ params }: { params: Promise<{ slug: string
               {product.variants?.map((v: any, i: number) => (
                 <button
                   key={i}
-                  onClick={() => { setSelectedVariant(i); setSelectedSize(""); }}
+                  onClick={() => {
+                    setSelectedVariant(i);
+                    setSelectedSize("");
+                    // Foto da cor escolhida vai para o começo da galeria (se a cor tiver foto própria)
+                    const fotoDaCor = product.imagesPorCor?.[v.color];
+                    const fotosGerais: string[] = product.images || [];
+                    setAllImages(fotoDaCor ? [fotoDaCor, ...fotosGerais.filter((x) => x !== fotoDaCor)] : fotosGerais);
+                    setCurrentImageIndex(0);
+                  }}
                   className={`w-10 h-10 rounded-full border-2 transition-all ${
                     selectedVariant === i
                       ? "border-primary scale-110 shadow-md"
