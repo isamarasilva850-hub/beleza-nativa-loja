@@ -68,7 +68,12 @@ export default function CRMMetodoBN() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chave: "followup", valor: atualizado }),
-    }).catch((err) => console.error("Erro ao salvar registros", err));
+    })
+      .then((r) => {
+        // Antes, a recusa do servidor (ex.: sessão vencida) passava despercebida
+        if (!r.ok) alert("Não foi possível salvar a anotação. Saia do admin e entre de novo, depois tente outra vez.");
+      })
+      .catch(() => alert("Sem conexão: a anotação não foi salva. Tente de novo."));
   };
 
   const [editandoDados, setEditandoDados] = useState(false);
