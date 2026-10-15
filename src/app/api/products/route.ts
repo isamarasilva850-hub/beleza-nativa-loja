@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     );
 
     const body = await request.json();
-    const { ref, name, price, gender, colors, images } = body;
+    const { ref, name, price, gender, colors, images, substituirFotos } = body;
 
     console.log('🔍 [POST /api/products] Recebido:');
     console.log(`  ref: ${ref}`);
@@ -46,6 +46,10 @@ export async function POST(request: NextRequest) {
         // As cores vêm do formulário e substituem as antigas.
         // As fotos antigas NÃO são apagadas aqui: as novas são acrescentadas e as apagadas pelo ✕ saem no painel.
         await supabase.from('cores_do_produto').delete().eq('id_do_produto', existing.id);
+        // Substituir: apaga as fotos salvas e usa só as que estão no formulário
+        if (substituirFotos) {
+          await supabase.from('product_images').delete().eq('product_id', existing.id);
+        }
         console.log(`✅ Dados antigos removidos`);
       }
     } catch (e) {

@@ -49,6 +49,8 @@ export default function PalmiraUploadPage() {
   const [savingOrder, setSavingOrder] = useState(false);
   // Onde a foto fica no quadro 3:4 do card (topo, centro ou base)
   const [enquadramento, setEnquadramento] = useState<"topo" | "centro" | "base">("centro");
+  // Ao salvar um produto existente: manter as fotos salvas (padrão) ou substituir todas
+  const [substituirFotos, setSubstituirFotos] = useState(false);
 
   // Foto final na proporção 3:4 do card da loja (600 x 800), sem esticar:
   // a imagem é ampliada para cobrir o quadro e recortada conforme o enquadramento escolhido
@@ -310,9 +312,11 @@ export default function PalmiraUploadPage() {
         price: product.price?.toString() || "",
         gender: product.gender || "Feminino",
       });
-      if (product.variants && product.variants.length > 0) {
+      // Produtos do banco trazem as cores em "colors"; os do catálogo original, em "variants"
+      const coresDoProduto = product.variants?.length ? product.variants : (product.colors || []);
+      if (coresDoProduto.length > 0) {
         setColors(
-          product.variants.map((v: any) => ({
+          coresDoProduto.map((v: any) => ({
             id: `color_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             name: v.color_name || v.name || '',
             hex: v.color_hex || v.hex || '#000000',
@@ -435,6 +439,7 @@ export default function PalmiraUploadPage() {
           };
         }),
         images: savedImages,
+        substituirFotos,
       };
 
       console.log('📤 Enviando:', {
@@ -915,6 +920,21 @@ export default function PalmiraUploadPage() {
               </div>
             )}
           </div>
+
+          {/* Escolha de como as fotos novas entram: manter ou substituir as salvas */}
+          {editMode && (
+            <div className="bg-white p-4 rounded-lg border border-gray-200 space-y-2">
+              <p className="text-sm font-bold text-gray-700">Ao salvar este produto, as fotos:</p>
+              <label className="flex gap-2 items-start text-sm">
+                <input type="radio" name="modoFotos" checked={!substituirFotos} onChange={() => setSubstituirFotos(false)} className="mt-1" />
+                <span>Mantêm as fotos salvas e acrescentam as novas (padrão)</span>
+              </label>
+              <label className="flex gap-2 items-start text-sm">
+                <input type="radio" name="modoFotos" checked={substituirFotos} onChange={() => setSubstituirFotos(true)} className="mt-1" />
+                <span>Substituem todas: apagam as fotos salvas e usam só as novas</span>
+              </label>
+            </div>
+          )}
 
           {/* Fotos já salvas: a Palmira pode apagar uma foto errada sem apagar o produto */}
           {fotosAtuais.length > 0 && (
