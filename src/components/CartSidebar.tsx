@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import ZoomImagem from "@/components/ZoomImagem";
 import Image from "next/image";
 import { useCart, CartItem } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
@@ -538,8 +539,8 @@ export default function CartSidebar() {
                         <Image src={item.image} alt={item.name} fill className="object-cover" sizes="80px" />
                       </div>
                       {/* Prévia ampliada ao passar o mouse (aparece do lado esquerdo do item) */}
-                      <div className="hidden group-hover:block absolute right-full top-0 mr-3 w-56 h-72 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-[70] pointer-events-none">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <div className="hidden group-hover:block absolute right-full top-0 mr-3 w-56 h-72 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-[70]">
+                        <ZoomImagem src={item.image} alt={item.name} />
                       </div>
                     </div>
                   ) : (
