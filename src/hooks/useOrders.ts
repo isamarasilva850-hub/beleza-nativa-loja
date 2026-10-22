@@ -5,6 +5,7 @@ export interface OrderItem {
   ref: string;
   name: string;
   price: number;
+  unitPrice?: number; // pedidos novos do site
   color: string;
   size: string;
   quantity: number;
