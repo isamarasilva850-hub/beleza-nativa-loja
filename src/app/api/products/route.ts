@@ -1,5 +1,6 @@
 import { negarSeNaoAdmin } from '@/lib/sessao';
 import { invalidarCatalogo } from '@/lib/cache-catalogo';
+import { lerOcultos, salvarOcultos } from '@/lib/produtos-ocultos';
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
@@ -29,6 +30,16 @@ export async function POST(request: NextRequest) {
         { error: 'Ref, nome e preço são obrigatórios' },
         { status: 400 }
       );
+    }
+
+    // Cadastrar a REF de novo tira ela da lista de excluídos
+    try {
+      const ocultosAtuais = await lerOcultos(supabase);
+      if (ocultosAtuais.includes(String(ref))) {
+        await salvarOcultos(supabase, ocultosAtuais.filter((r) => r !== String(ref)));
+      }
+    } catch (e) {
+      console.warn('Não foi possível atualizar a lista de excluídos:', e);
     }
 
     // Produto novo ganha um id novo; produto que já existe mantém o id atual (as fotos apontam para ele)
@@ -353,9 +364,11 @@ export async function GET(request: NextRequest) {
     // Se a REF já foi cadastrada no banco (ex.: Palmira), a versão do catálogo original é deixada de fora,
     // para não aparecer duas vezes.
     const refsDoBanco = new Set(productsWithDetails.map((p: any) => String(p.ref)));
+    // Produtos excluídos pela equipe não aparecem na loja nem no painel
+    const ocultosLista = new Set(await lerOcultos(supabase));
     const allProducts = [
-      ...staticProducts.filter((p: any) => !refsDoBanco.has(String(p.ref))),
-      ...productsWithDetails
+      ...staticProducts.filter((p: any) => !refsDoBanco.has(String(p.ref)) && !ocultosLista.has(String(p.ref))),
+      ...productsWithDetails.filter((p: any) => !ocultosLista.has(String(p.ref)))
     ]
       .map((p: any) => (ordemMap.has(p.ref) ? { ...p, display_order: ordemMap.get(p.ref) } : p))
       .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));

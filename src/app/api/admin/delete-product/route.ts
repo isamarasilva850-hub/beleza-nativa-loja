@@ -1,6 +1,7 @@
 import { negarSeNaoAdmin } from '@/lib/sessao';
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { lerOcultos, salvarOcultos } from '@/lib/produtos-ocultos';
 
 export async function POST(request: NextRequest) {
   { const negado = negarSeNaoAdmin(request, ['admin', 'palmira']); if (negado) return NextResponse.json({ error: negado.error }, { status: negado.status }); }
@@ -40,11 +41,11 @@ export async function POST(request: NextRequest) {
 
     if (findError) throw findError;
 
+    // Produto do catálogo original (não está no banco): só entra na lista de ocultos
     if (!products || products.length === 0) {
-      return NextResponse.json(
-        { error: `Produto com REF '${ref}' não encontrado` },
-        { status: 404 }
-      );
+      const ocultos = await lerOcultos(supabase);
+      await salvarOcultos(supabase, [...ocultos, String(ref)]);
+      return NextResponse.json({ success: true, message: `Produto '${ref}' excluído do site.`, ref });
     }
 
     const productId = products[0].id;

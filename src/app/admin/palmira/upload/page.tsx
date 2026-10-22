@@ -555,6 +555,24 @@ export default function PalmiraUploadPage() {
           {/* TAB: Listar Produtos */}
           {activeTab === "listar" && (
             <div className="space-y-6">
+              {/* Excluir produto pela REF (apaga o produto, as cores e as fotos) */}
+              <form onSubmit={handleDelete} className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-2">
+                <p className="text-sm font-bold text-red-700">🗑️ Excluir produto pela REF</p>
+                <p className="text-xs text-red-600">Apaga o produto do site, com as cores e as fotos. Não tem como desfazer.</p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={deleteRef}
+                    onChange={(e) => setDeleteRef(e.target.value)}
+                    placeholder="REF do produto (ex.: 551)"
+                    className="flex-1 px-3 py-2 border border-red-300 rounded-lg text-sm focus:outline-none focus:border-red-500"
+                  />
+                  <button type="submit" disabled={loadingDelete} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold disabled:opacity-50">
+                    {loadingDelete ? "Excluindo..." : "Excluir"}
+                  </button>
+                </div>
+              </form>
+
               <div>
                 <h2 className="text-lg font-bold text-gray-800 mb-4">📋 Meus Produtos</h2>
                 <input
