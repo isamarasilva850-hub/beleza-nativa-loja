@@ -137,13 +137,13 @@ export default function PedidosRevendedoras() {
                     {order.items.map((item, idx) => (
                       <div key={idx} className="text-sm text-gray-700">
                         <span className="font-semibold">REF {item.ref}</span> - {item.name} ({item.color}/{item.size})
-                        <span className="ml-2 text-[#7BC9C2] font-bold">{item.quantity}x R$ {item.price.toFixed(2).replace(".", ",")}</span>
+                        <span className="ml-2 text-[#7BC9C2] font-bold">{item.quantity}x R$ {Number(item.price ?? item.unitPrice ?? 0).toFixed(2).replace(".", ",")}</span>
                       </div>
                     ))}
                   </div>
                   <div className="border-t border-gray-200 mt-3 pt-3 flex justify-between font-bold">
                     <span>Total:</span>
-                    <span className="text-[#7BC9C2] text-lg">R$ {order.total.toFixed(2).replace(".", ",")}</span>
+                    <span className="text-[#7BC9C2] text-lg">R$ {Number(order.total || 0).toFixed(2).replace(".", ",")}</span>
                   </div>
                 </div>
 
@@ -178,7 +178,7 @@ export default function PedidosRevendedoras() {
 
                   <button
                     onClick={() =>
-                      navigator.clipboard.writeText(`📦 PEDIDO DE ${order.partnerName}\n\n${order.items.map((i) => `REF ${i.ref} - ${i.name}\nQtd: ${i.quantity}`).join("\n\n")}\n\nTOTAL: R$ ${order.total.toFixed(2).replace(".", ",")}`)
+                      navigator.clipboard.writeText(`📦 PEDIDO DE ${order.partnerName}\n\n${order.items.map((i) => `REF ${i.ref} - ${i.name}\nQtd: ${i.quantity}`).join("\n\n")}\n\nTOTAL: R$ ${Number(order.total || 0).toFixed(2).replace(".", ",")}`)
                     }
                     className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-bold hover:bg-gray-300"
                   >
