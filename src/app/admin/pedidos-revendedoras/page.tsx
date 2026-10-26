@@ -14,22 +14,30 @@ export default function PedidosRevendedoras() {
     loadOrders();
   }, [loadOrders]);
 
+  // Link assinado da vitrine de cada pedido, buscado ao carregar a lista.
+  // Assim, o clique em enviar abre o WhatsApp na hora (o navegador bloqueia janelas abertas depois de uma espera).
+  const [tokensVitrine, setTokensVitrine] = useState<Record<string, string>>({});
+  useEffect(() => {
+    orders.forEach((o: any) => {
+      fetch(`/api/vitrine/link?pedidoId=${encodeURIComponent(o.id)}`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.k) setTokensVitrine((t) => ({ ...t, [o.id]: d.k }));
+        })
+        .catch(() => {});
+    });
+  }, [orders]);
+
   const sendArtes = async (order: any) => {
-    // Abre a janela já no clique (o navegador bloqueia janelas abertas depois de uma espera)
-    const janela = window.open('', '_blank');
+    const token = tokensVitrine[order.id];
+    if (!token) {
+      alert('Aguarde um instante: preparando o link da vitrine. Tente de novo em alguns segundos.');
+      return;
+    }
 
     // Buscar REFs do pedido
     const refs = [...new Set((order.items || []).map((item: any): string => item.ref))] as string[];
-
-    // Gerar link do catálogo (com a assinatura da equipe, para só ele salvar a vitrine)
-    const respostaLink = await fetch(`/api/vitrine/link?pedidoId=${encodeURIComponent(order.id)}`);
-    const dadosLink = await respostaLink.json();
-    if (!respostaLink.ok || !dadosLink.k) {
-      janela?.close();
-      alert(dadosLink.error || 'Não foi possível gerar o link da vitrine.');
-      return;
-    }
-    const catalogLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/vitrine/${order.id}/editar?k=${dadosLink.k}`;
+    const catalogLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/vitrine/${order.id}/editar?k=${token}`;
 
     // Criar mensagem com legendas de cada peça
     const caixa = '```';
@@ -49,11 +57,7 @@ export default function PedidosRevendedoras() {
 
     // Preenche a janela aberta no clique com o WhatsApp
     const urlWhatsApp = `https://wa.me/${telefoneWhatsApp(order.partnerPhone)}?text=${encodeURIComponent(fullMsg)}`;
-    if (janela) {
-      janela.location.href = urlWhatsApp;
-    } else {
-      window.open(urlWhatsApp, '_blank');
-    }
+    window.open(urlWhatsApp, '_blank');
 
     // Marcar como enviado no Supabase
     try {
