@@ -15,6 +15,9 @@ export default function PedidosRevendedoras() {
   }, [loadOrders]);
 
   const sendArtes = async (order: any) => {
+    // Abre a janela já no clique (o navegador bloqueia janelas abertas depois de uma espera)
+    const janela = window.open('', '_blank');
+
     // Buscar REFs do pedido
     const refs = [...new Set((order.items || []).map((item: any): string => item.ref))] as string[];
 
@@ -22,6 +25,7 @@ export default function PedidosRevendedoras() {
     const respostaLink = await fetch(`/api/vitrine/link?pedidoId=${encodeURIComponent(order.id)}`);
     const dadosLink = await respostaLink.json();
     if (!respostaLink.ok || !dadosLink.k) {
+      janela?.close();
       alert(dadosLink.error || 'Não foi possível gerar o link da vitrine.');
       return;
     }
@@ -43,11 +47,13 @@ export default function PedidosRevendedoras() {
 
     const fullMsg = `Oi! Sua vitrine já está pronta 💛\n\n1️⃣ Primeiro, abra este link para colocar a sua logo e o seu preço de revenda em cada peça:\n${catalogLink}\n\n2️⃣ Depois, mande este link para a sua cliente. Ela vai ver as peças como em uma loja, com foto, cor, tamanho e o seu preço:\n${linkLoja}\n\n📸 Só se quiser postar nas suas redes sociais, baixe as fotos:\n1. Abra o primeiro link acima.\n2. Em cada peça, toque em "Baixar foto". A foto é salva no seu celular.\n3. Se o celular pedir permissão, toque em "Permitir".\n\n📝 Legendas prontas para copiar (use junto com as fotos):\n\n${artesMsg}`;
 
-    // Abrir WhatsApp
-    window.open(
-      `https://wa.me/${telefoneWhatsApp(order.partnerPhone)}?text=${encodeURIComponent(fullMsg)}`,
-      '_blank'
-    );
+    // Preenche a janela aberta no clique com o WhatsApp
+    const urlWhatsApp = `https://wa.me/${telefoneWhatsApp(order.partnerPhone)}?text=${encodeURIComponent(fullMsg)}`;
+    if (janela) {
+      janela.location.href = urlWhatsApp;
+    } else {
+      window.open(urlWhatsApp, '_blank');
+    }
 
     // Marcar como enviado no Supabase
     try {
