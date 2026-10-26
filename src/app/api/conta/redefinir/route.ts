@@ -35,7 +35,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const entrada = String(body.login || '').trim().toLowerCase();
     // Aceita o e-mail da conta ou só o WhatsApp (números), que vira o login do formulário
-    const login = /^\d+$/.test(entrada) ? `${entrada}@belezanativa.local` : entrada;
+    // WhatsApp com espaço, traço ou parênteses também vale: fica só com os números
+    const digitos = entrada.replace(/\D/g, '');
+    const login = !entrada.includes('@') && digitos.length >= 10 ? `${digitos}@belezanativa.local` : entrada;
     if (!login) {
       return NextResponse.json({ error: 'Informe o WhatsApp ou o e-mail da cliente.' }, { status: 400 });
     }
