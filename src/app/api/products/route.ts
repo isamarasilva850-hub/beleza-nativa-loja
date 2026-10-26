@@ -396,7 +396,7 @@ export async function GET(request: NextRequest) {
     const completo = request.nextUrl.searchParams.get('completo') === '1';
     const lista = completo
       ? allProducts
-      : allProducts.map((p: any) => ({ ...p, images: (p.images || []).slice(0, 1) }));
+      : allProducts.map((p: any) => ({ ...p, images: (p.images || []).slice(0, 1), imagesPorCor: {} }));
 
     // Cache na Vercel por 60 segundos (e até 5 minutos enquanto atualiza em segundo plano)
     return NextResponse.json(lista, {
