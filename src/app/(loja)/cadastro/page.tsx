@@ -41,8 +41,9 @@ export default function Cadastro() {
       return;
     }
 
+    // Login da cliente é o WhatsApp (não há mais campo de e-mail)
     const resultado = await register({
-      email: form.email,
+      email: `${form.phone.replace(/\D/g, '')}@belezanativa.local`,
       name: form.name,
       phone: form.phone,
       company: form.company || undefined,
@@ -70,7 +71,7 @@ export default function Cadastro() {
           phone: form.phone,
           company: form.company || null,
           cnpj: form.cnpj || null,
-          email: form.email,
+          email: null,
           city: form.city || null,
           state: form.state || null,
         })
@@ -87,7 +88,7 @@ export default function Cadastro() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nome: form.name,
-          email: form.email,
+          email: null,
           telefone: form.phone,
           origem: 'cadastro_loja',
           status: 'novo',
@@ -100,7 +101,7 @@ export default function Cadastro() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nome: form.name,
-          email: form.email,
+          email: null,
           telefone: form.phone,
           tipo: form.company ? 'empresarial' : 'varejo',
           status: 'ativo',
@@ -118,7 +119,6 @@ export default function Cadastro() {
       form.company ? `Empresa: ${form.company}` : "",
       form.cnpj ? `CNPJ/CPF: ${form.cnpj}` : "",
       `Telefone: ${form.phone}`,
-      `E-mail: ${form.email}`,
       form.city ? `Cidade: ${form.city}/${form.state}` : "",
       form.address ? `Endereço: ${form.address}` : "",
       form.cep ? `CEP: ${form.cep}` : "",
@@ -214,16 +214,6 @@ export default function Cadastro() {
                     value={form.phone}
                     onChange={(e) => update("phone", e.target.value)}
                     placeholder="(00) 00000-0000"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">E-mail *</label>
-                  <input
-                    type="email"
-                    required
-                    value={form.email}
-                    onChange={(e) => update("email", e.target.value)}
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#7BC9C2]"
                   />
                 </div>
