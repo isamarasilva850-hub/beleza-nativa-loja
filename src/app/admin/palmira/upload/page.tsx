@@ -344,6 +344,23 @@ export default function PalmiraUploadPage() {
     }
   };
 
+  // Troca a coleção de um produto direto na lista (sem abrir o formulário)
+  const mudarColecao = async (product: any, colecao: string) => {
+    setError("");
+    const r = await fetch("/api/admin/update-colecao", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ref: product.ref, colecao, name: product.name, price: product.price }),
+    });
+    if (!r.ok) {
+      setError("Não foi possível trocar a coleção.");
+      return;
+    }
+    setSuccess(`✅ Coleção do produto "${product.ref}" alterada para ${colecao}.`);
+    setTimeout(() => setSuccess(""), 3000);
+    loadAllProducts();
+  };
+
   // Apaga direto da lista "Meus Produtos", com confirmação
   const apagarDaLista = async (ref: string) => {
     if (!confirm(`Apagar o produto ${ref}? Esta ação não pode ser desfeita.`)) return;
@@ -602,6 +619,7 @@ export default function PalmiraUploadPage() {
                       <tr>
                         <th className="px-4 py-3 text-left font-bold text-gray-800">REF</th>
                         <th className="px-4 py-3 text-left font-bold text-gray-800">Nome</th>
+                        <th className="px-4 py-3 text-left font-bold text-gray-800">Coleção</th>
                         <th className="px-4 py-3 text-left font-bold text-gray-800">Preço</th>
                         <th className="px-4 py-3 text-left font-bold text-gray-800">Cores</th>
                         <th className="px-4 py-3 text-left font-bold text-gray-800">Fotos</th>
@@ -620,6 +638,17 @@ export default function PalmiraUploadPage() {
                           <tr key={product.id} className="hover:bg-gray-50">
                             <td className="px-4 py-3 font-mono font-bold text-gray-900">{product.ref}</td>
                             <td className="px-4 py-3 text-gray-700">{product.name}</td>
+                            <td className="px-4 py-3">
+                              <select
+                                value={product.collection || "Lingerie"}
+                                onChange={(e) => mudarColecao(product, e.target.value)}
+                                className="px-2 py-1 border border-gray-300 rounded text-xs"
+                              >
+                                <option value="Lingerie">Lingerie</option>
+                                <option value="Moda Praia">Moda Praia</option>
+                                <option value="Linha Noite">Pijamas e Linha Noite</option>
+                              </select>
+                            </td>
                             <td className="px-4 py-3 font-bold text-green-600">R$ {product.price?.toFixed(2).replace(".", ",")}</td>
                             <td className="px-4 py-3 text-center">
                               <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-bold">
