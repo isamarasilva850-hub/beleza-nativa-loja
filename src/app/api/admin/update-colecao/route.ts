@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     );
     const { data, error } = await supabase
       .from('products')
-      .update({ category: colecao })
+      .update({ colecao })
       .eq('ref', String(ref))
       .select('ref')
       .maybeSingle();
@@ -31,7 +31,8 @@ export async function POST(request: NextRequest) {
         ref: String(ref),
         name: String(name || ref),
         price: Number(price) || 0,
-        category: colecao,
+        colecao,
+        category: "Lingerie",
       });
       if (insErr) throw insErr;
     }

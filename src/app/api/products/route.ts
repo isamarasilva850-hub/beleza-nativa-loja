@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
         price: typeof price === 'string' ? parseFloat(price) : price,
         gender: gender || 'Feminino',
         // Coleção escolhida no painel (gravada na categoria, que o site usa para o menu)
-        ...(colecao ? { category: colecao } : {}),
+        ...(colecao ? { colecao } : {}),
       }, { onConflict: 'ref' })
       .select()
       .single();
@@ -385,7 +385,7 @@ export async function GET(request: NextRequest) {
       .map((p: any) => ({
         ...(ordemMap.has(p.ref) ? { ...p, display_order: ordemMap.get(p.ref) } : p),
         // Coleção: a do catálogo original, ou a que a categoria indica (produtos do banco)
-        collection: p.collection || colecaoDaCategoria(p.category),
+        collection: p.colecao || p.collection || colecaoDaCategoria(p.category),
       }))
       .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
 
