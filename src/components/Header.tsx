@@ -140,14 +140,20 @@ export default function Header() {
       <nav className="bg-primary-dark">
         <div className={`max-w-7xl mx-auto ${menuOpen ? "block" : "hidden md:block"}`}>
           <ul className="flex flex-col md:flex-row items-center justify-center gap-0 md:gap-8">
-            {["FEMININO", "INFANTIL", "MASCULINO"].map((item) => (
-              <li key={item}>
+            {[
+              { label: "FEMININO", href: "/?genero=feminino" },
+              { label: "INFANTIL", href: "/?genero=infantil" },
+              { label: "MASCULINO", href: "/?genero=masculino" },
+              { label: "MODA PRAIA", href: "/?colecao=Moda%20Praia" },
+              { label: "PIJAMAS E LINHA NOITE", href: "/?colecao=Linha%20Noite" },
+            ].map((item) => (
+              <li key={item.label}>
                 <Link
-                  href={`/?genero=${item.toLowerCase()}`}
+                  href={item.href}
                   className="block px-4 py-3 text-white text-sm font-semibold tracking-wider hover:bg-white/10 transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
-                  {item}
+                  {item.label}
                 </Link>
               </li>
             ))}

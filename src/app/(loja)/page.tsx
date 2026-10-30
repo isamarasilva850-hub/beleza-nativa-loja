@@ -47,6 +47,8 @@ export default function Home() {
   // Read from custom hook that reliably reads URL query params
   const urlGender = queryParams.genero || null;
   const urlCategory = queryParams.categoria || null;
+  // Coleção do menu: Lingerie, Moda Praia ou Linha Noite (inclui pijamas)
+  const urlColecao = queryParams.colecao || null;
   const urlSearch = queryParams.busca || null;
 
   // Debug: log query params
@@ -58,6 +60,7 @@ export default function Home() {
     ...filters,
     gender: urlGender || filters.gender,
     category: urlCategory || filters.category,
+    collection: urlColecao || filters.collection,
     searchQuery: urlSearch || filters.searchQuery,
   };
 
