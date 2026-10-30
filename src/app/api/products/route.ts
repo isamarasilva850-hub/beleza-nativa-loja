@@ -367,11 +367,20 @@ export async function GET(request: NextRequest) {
     // Se a REF já foi cadastrada no banco (ex.: Palmira), a versão do catálogo original é deixada de fora,
     // para não aparecer duas vezes.
     const refsDoBanco = new Set(productsWithDetails.map((p: any) => String(p.ref)));
+    // Cópias do banco salvas com a categoria padrão ("Lingerie") herdam a coleção do catálogo original
+    const originalPorRef = new Map(staticProducts.map((p: any) => [String(p.ref), p]));
+    const dbComCatalogo = productsWithDetails.map((p: any) => {
+      const original: any = originalPorRef.get(String(p.ref));
+      if (original?.category && (!p.category || p.category === 'Lingerie')) {
+        return { ...p, category: original.category, collection: original.collection };
+      }
+      return p;
+    });
     // Produtos excluídos pela equipe não aparecem na loja nem no painel
     const ocultosLista = new Set(await lerOcultos(supabase));
     const allProducts = [
       ...staticProducts.filter((p: any) => !refsDoBanco.has(String(p.ref)) && !ocultosLista.has(String(p.ref))),
-      ...productsWithDetails.filter((p: any) => !ocultosLista.has(String(p.ref)))
+      ...dbComCatalogo.filter((p: any) => !ocultosLista.has(String(p.ref)))
     ]
       .map((p: any) => ({
         ...(ordemMap.has(p.ref) ? { ...p, display_order: ordemMap.get(p.ref) } : p),
