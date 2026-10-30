@@ -146,6 +146,9 @@ export default function Header() {
               { label: "MASCULINO", href: "/?genero=masculino" },
               { label: "MODA PRAIA", href: "/?colecao=Moda%20Praia" },
               { label: "PIJAMAS E LINHA NOITE", href: "/?colecao=Linha%20Noite" },
+              { label: "CALCINHAS", href: "/?categoria=Calcinhas" },
+              { label: "SUTIÃS", href: "/?categoria=Suti%C3%A3s" },
+              { label: "CONJUNTOS", href: "/?categoria=Conjuntos" },
             ].map((item) => (
               <li key={item.label}>
                 <Link
