@@ -144,20 +144,29 @@ export default function Header() {
               { label: "FEMININO", href: "/?genero=feminino" },
               { label: "INFANTIL", href: "/?genero=infantil" },
               { label: "MASCULINO", href: "/?genero=masculino" },
-              { label: "MODA PRAIA", href: "/?colecao=Moda%20Praia" },
-              { label: "PIJAMAS E LINHA NOITE", href: "/?colecao=Linha%20Noite" },
-              { label: "CALCINHAS", href: "/?categoria=Calcinhas" },
-              { label: "SUTIÃS", href: "/?categoria=Suti%C3%A3s" },
-              { label: "CONJUNTOS", href: "/?categoria=Conjuntos" },
             ].map((item) => (
               <li key={item.label}>
-                <Link
-                  href={item.href}
-                  className="block px-4 py-3 text-white text-sm font-semibold tracking-wider hover:bg-white/10 transition-colors"
-                  onClick={() => setMenuOpen(false)}
-                >
+                <Link href={item.href} className="block px-4 py-3 text-white text-sm font-semibold tracking-wider hover:bg-white/10 transition-colors" onClick={() => setMenuOpen(false)}>
                   {item.label}
                 </Link>
+              </li>
+            ))}
+            {[
+              { label: "LINGERIE", colecao: "Lingerie", categorias: ["Conjuntos", "Sutiãs", "Calcinhas"] },
+              { label: "MODA PRAIA", colecao: "Moda Praia", categorias: ["Biquínis e Maiô", "Saída de Praia"] },
+              { label: "PIJAMAS E LINHA NOITE", colecao: "Linha Noite", categorias: ["Pijamas", "Camisolas e Robes", "Baby Doll e Pijamas", "Linha Noite"] },
+            ].map((grupo) => (
+              <li key={grupo.label} className="relative group">
+                <Link href={`/?colecao=${encodeURIComponent(grupo.colecao)}`} className="block px-4 py-3 text-white text-sm font-semibold tracking-wider hover:bg-white/10 transition-colors" onClick={() => setMenuOpen(false)}>
+                  {grupo.label}
+                </Link>
+                <div className="md:hidden md:group-hover:block md:absolute md:left-0 md:top-full md:min-w-[230px] md:bg-primary-dark md:shadow-lg md:z-50 pl-6 md:pl-0">
+                  {grupo.categorias.map((cat) => (
+                    <Link key={cat} href={`/?categoria=${encodeURIComponent(cat)}`} className="block px-4 py-2 text-white/90 text-xs tracking-wide hover:bg-white/10" onClick={() => setMenuOpen(false)}>
+                      {cat}
+                    </Link>
+                  ))}
+                </div>
               </li>
             ))}
           </ul>
