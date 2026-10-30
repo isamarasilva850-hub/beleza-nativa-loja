@@ -23,6 +23,7 @@ export default function PalmiraUploadPage() {
     name: "",
     price: "",
     gender: "Feminino",
+    colecao: "Lingerie",
   });
 
   const [colors, setColors] = useState<ColorInput[]>([]);
@@ -317,6 +318,7 @@ export default function PalmiraUploadPage() {
         name: product.name,
         price: product.price?.toString() || "",
         gender: product.gender || "Feminino",
+        colecao: product.collection || "Lingerie",
       });
       // Produtos do banco trazem as cores em "colors"; os do catálogo original, em "variants"
       const coresDoProduto = product.variants?.length ? product.variants : (product.colors || []);
@@ -428,6 +430,7 @@ export default function PalmiraUploadPage() {
         name: formData.name,
         price: parseFloat(formData.price) || 0,
         gender: formData.gender,
+        colecao: formData.colecao || "Lingerie",
         colors: savedColors.map((c) => {
           // Só envia tamanhos com quantidade maior que zero
           const tamanhos = Object.fromEntries(
@@ -472,7 +475,7 @@ export default function PalmiraUploadPage() {
 
       const data = await response.json();
       setSuccess(`✅ Produto "${formData.name}" salvo com sucesso! ID: ${data.id}`);
-      setFormData({ ref: "", name: "", price: "", gender: "Feminino" });
+      setFormData({ ref: "", name: "", price: "", gender: "Feminino", colecao: "Lingerie" });
       setColors([]);
       setImages([]);
       setPreviews([]);
@@ -532,7 +535,7 @@ export default function PalmiraUploadPage() {
             type="button"
             onClick={() => {
               // Abrir a aba começa um produto novo (o ✏️ da lista carrega um existente)
-              setFormData({ ref: "", name: "", price: "", gender: "Feminino" });
+              setFormData({ ref: "", name: "", price: "", gender: "Feminino", colecao: "Lingerie" });
               setColors([]);
               setImages([]);
               setPreviews([]);
@@ -639,6 +642,7 @@ export default function PalmiraUploadPage() {
                                       name: product.name,
                                       price: product.price?.toString() || "",
                                       gender: product.gender || "Feminino",
+                                      colecao: product.collection || "Lingerie",
                                     });
                                     setEditMode(true);
                                     setSuccess(`✅ Produto "${product.name}" carregado! Adicione mais fotos/cores.`);
@@ -849,6 +853,16 @@ export default function PalmiraUploadPage() {
                 <option value="Feminino">👧 Feminino</option>
                 <option value="Masculino">👨 Masculino</option>
                 <option value="Infantil">👶 Infantil</option>
+              </select>
+              <select
+                value={formData.colecao}
+                onChange={(e) => setFormData({ ...formData, colecao: e.target.value })}
+                className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+                title="Coleção: onde o produto aparece no menu"
+              >
+                <option value="Lingerie">Lingerie</option>
+                <option value="Moda Praia">Moda Praia</option>
+                <option value="Linha Noite">Pijamas e Linha Noite</option>
               </select>
             </div>
           </div>

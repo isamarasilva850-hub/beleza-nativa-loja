@@ -1,6 +1,7 @@
 import { negarSeNaoAdmin } from '@/lib/sessao';
 import { invalidarCatalogo } from '@/lib/cache-catalogo';
 import { lerOcultos, salvarOcultos } from '@/lib/produtos-ocultos';
+import { colecaoDaCategoria } from '@/lib/colecao';
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
     );
 
     const body = await request.json();
-    const { ref, name, price, gender, colors, images, substituirFotos, imagensCor } = body;
+    const { ref, name, price, gender, colors, images, substituirFotos, imagensCor, colecao } = body;
 
     console.log('🔍 [POST /api/products] Recebido:');
     console.log(`  ref: ${ref}`);
@@ -73,6 +74,8 @@ export async function POST(request: NextRequest) {
         name,
         price: typeof price === 'string' ? parseFloat(price) : price,
         gender: gender || 'Feminino',
+        // Coleção escolhida no painel (gravada na categoria, que o site usa para o menu)
+        ...(colecao ? { category: colecao } : {}),
       }, { onConflict: 'ref' })
       .select()
       .single();
@@ -370,7 +373,11 @@ export async function GET(request: NextRequest) {
       ...staticProducts.filter((p: any) => !refsDoBanco.has(String(p.ref)) && !ocultosLista.has(String(p.ref))),
       ...productsWithDetails.filter((p: any) => !ocultosLista.has(String(p.ref)))
     ]
-      .map((p: any) => (ordemMap.has(p.ref) ? { ...p, display_order: ordemMap.get(p.ref) } : p))
+      .map((p: any) => ({
+        ...(ordemMap.has(p.ref) ? { ...p, display_order: ordemMap.get(p.ref) } : p),
+        // Coleção: a do catálogo original, ou a que a categoria indica (produtos do banco)
+        collection: p.collection || colecaoDaCategoria(p.category),
+      }))
       .sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
 
     // Debug: verificar se produto 444 está lá
