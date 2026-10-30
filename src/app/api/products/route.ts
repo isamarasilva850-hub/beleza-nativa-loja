@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     );
 
     const body = await request.json();
-    const { ref, name, price, gender, colors, images, substituirFotos, imagensCor, colecao } = body;
+    const { ref, name, price, gender, colors, images, substituirFotos, imagensCor, colecao, categoria } = body;
 
     console.log('🔍 [POST /api/products] Recebido:');
     console.log(`  ref: ${ref}`);
@@ -76,6 +76,7 @@ export async function POST(request: NextRequest) {
         gender: gender || 'Feminino',
         // Coleção escolhida no painel (gravada na categoria, que o site usa para o menu)
         ...(colecao ? { colecao } : {}),
+        ...(categoria ? { category: categoria } : {}),
       }, { onConflict: 'ref' })
       .select()
       .single();

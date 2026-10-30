@@ -11,6 +11,13 @@ interface ColorInput {
   tamanhos: Record<string, string>;
 }
 
+// Tipos de peça de cada coleção (aparecem no cadastro)
+const CATEGORIAS_POR_COLECAO: Record<string, string[]> = {
+  "Lingerie": ["Conjuntos", "Sutiãs", "Calcinhas", "Cuecas", "Lingerie"],
+  "Moda Praia": ["Biquínis e Maiô", "Saída de Praia", "Moda Praia"],
+  "Linha Noite": ["Pijamas", "Camisolas e Robes", "Baby Doll e Pijamas", "Linha Noite"],
+};
+
 // Tamanhos que aparecem prontos para a Palmira preencher; ela pode acrescentar outros
 const TAMANHOS_PADRAO = ["PP", "P", "M", "G", "GG", "38", "40", "42", "44", "46", "48", "50"];
 
@@ -24,6 +31,7 @@ export default function PalmiraUploadPage() {
     price: "",
     gender: "Feminino",
     colecao: "Lingerie",
+    categoria: "Conjuntos",
   });
 
   const [colors, setColors] = useState<ColorInput[]>([]);
@@ -319,6 +327,7 @@ export default function PalmiraUploadPage() {
         price: product.price?.toString() || "",
         gender: product.gender || "Feminino",
         colecao: product.collection || "Lingerie",
+        categoria: product.category || "Conjuntos",
       });
       // Produtos do banco trazem as cores em "colors"; os do catálogo original, em "variants"
       const coresDoProduto = product.variants?.length ? product.variants : (product.colors || []);
@@ -448,6 +457,7 @@ export default function PalmiraUploadPage() {
         price: parseFloat(formData.price) || 0,
         gender: formData.gender,
         colecao: formData.colecao || "Lingerie",
+        categoria: formData.categoria || null,
         colors: savedColors.map((c) => {
           // Só envia tamanhos com quantidade maior que zero
           const tamanhos = Object.fromEntries(
@@ -492,7 +502,7 @@ export default function PalmiraUploadPage() {
 
       const data = await response.json();
       setSuccess(`✅ Produto "${formData.name}" salvo com sucesso! ID: ${data.id}`);
-      setFormData({ ref: "", name: "", price: "", gender: "Feminino", colecao: "Lingerie" });
+      setFormData({ ref: "", name: "", price: "", gender: "Feminino", colecao: "Lingerie", categoria: "Conjuntos" });
       setColors([]);
       setImages([]);
       setPreviews([]);
@@ -552,7 +562,7 @@ export default function PalmiraUploadPage() {
             type="button"
             onClick={() => {
               // Abrir a aba começa um produto novo (o ✏️ da lista carrega um existente)
-              setFormData({ ref: "", name: "", price: "", gender: "Feminino", colecao: "Lingerie" });
+              setFormData({ ref: "", name: "", price: "", gender: "Feminino", colecao: "Lingerie", categoria: "Conjuntos" });
               setColors([]);
               setImages([]);
               setPreviews([]);
@@ -672,6 +682,7 @@ export default function PalmiraUploadPage() {
                                       price: product.price?.toString() || "",
                                       gender: product.gender || "Feminino",
                                       colecao: product.collection || "Lingerie",
+        categoria: product.category || "Conjuntos",
                                     });
                                     setEditMode(true);
                                     setSuccess(`✅ Produto "${product.name}" carregado! Adicione mais fotos/cores.`);
@@ -885,13 +896,23 @@ export default function PalmiraUploadPage() {
               </select>
               <select
                 value={formData.colecao}
-                onChange={(e) => setFormData({ ...formData, colecao: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, colecao: e.target.value, categoria: CATEGORIAS_POR_COLECAO[e.target.value]?.[0] || "" })}
                 className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
                 title="Coleção: onde o produto aparece no menu"
               >
                 <option value="Lingerie">Lingerie</option>
                 <option value="Moda Praia">Moda Praia</option>
                 <option value="Linha Noite">Pijamas e Linha Noite</option>
+              </select>
+              <select
+                value={formData.categoria}
+                onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
+                className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7BC9C2]"
+                title="Tipo da peça dentro da coleção"
+              >
+                {(CATEGORIAS_POR_COLECAO[formData.colecao] || []).map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
               </select>
             </div>
           </div>
