@@ -55,9 +55,13 @@ export default function PedidosRevendedoras() {
 
     const fullMsg = `Oi! Sua vitrine já está pronta 💛\n\n1️⃣ Primeiro, abra este link para colocar a sua logo e o seu preço de revenda em cada peça:\n${catalogLink}\n\n2️⃣ Depois, mande este link para a sua cliente. Ela vai ver as peças como em uma loja, com foto, cor, tamanho e o seu preço:\n${linkLoja}\n\n📸 Só se quiser postar nas suas redes sociais, baixe as fotos:\n1. Abra o primeiro link acima.\n2. Em cada peça, toque em "Baixar foto". A foto é salva no seu celular.\n3. Se o celular pedir permissão, toque em "Permitir".\n\n📝 Legendas prontas para copiar (use junto com as fotos):\n\n${artesMsg}`;
 
-    // Preenche a janela aberta no clique com o WhatsApp
-    const urlWhatsApp = `https://wa.me/${telefoneWhatsApp(order.partnerPhone)}?text=${encodeURIComponent(fullMsg)}`;
-    window.open(urlWhatsApp, '_blank');
+    // Abre o WhatsApp só com o número, logo no clique (sem await antes, para o navegador não bloquear).
+    // A mensagem completa vai para a área de transferência e é colada na conversa.
+    window.open(`https://wa.me/${telefoneWhatsApp(order.partnerPhone)}`, '_blank');
+    navigator.clipboard
+      .writeText(fullMsg)
+      .then(() => alert('Mensagem copiada! Na conversa do WhatsApp que abriu, toque no campo de texto, segure e escolha "Colar".'))
+      .catch(() => alert('Não consegui copiar a mensagem. Tente de novo ou avise a equipe.'));
 
     // Marcar como enviado no Supabase
     try {
