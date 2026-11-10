@@ -28,7 +28,10 @@ export default function PedidosRevendedoras() {
     });
   }, [orders]);
 
-  const sendArtes = async (order: any) => {
+  const [mensagemPronta, setMensagemPronta] = useState<{ order: any; texto: string } | null>(null);
+  const [copiadoAgora, setCopiadoAgora] = useState(false);
+
+  const sendArtes = (order: any) => {
     const token = tokensVitrine[order.id];
     if (!token) {
       alert('Aguarde um instante: preparando o link da vitrine. Tente de novo em alguns segundos.');
@@ -55,15 +58,32 @@ export default function PedidosRevendedoras() {
 
     const fullMsg = `Oi! Sua vitrine já está pronta 💛\n\n1️⃣ Primeiro, abra este link para colocar a sua logo e o seu preço de revenda em cada peça:\n${catalogLink}\n\n2️⃣ Depois, mande este link para a sua cliente. Ela vai ver as peças como em uma loja, com foto, cor, tamanho e o seu preço:\n${linkLoja}\n\n📸 Só se quiser postar nas suas redes sociais, baixe as fotos:\n1. Abra o primeiro link acima.\n2. Em cada peça, toque em "Baixar foto". A foto é salva no seu celular.\n3. Se o celular pedir permissão, toque em "Permitir".\n\n📝 Legendas prontas para copiar (use junto com as fotos):\n\n${artesMsg}`;
 
-    // Copia a mensagem primeiro (a página ainda está em foco), depois abre o WhatsApp só com o número.
-    // Abrir a outra aba antes tira o foco e a cópia falha em silêncio.
-    const copiada = navigator.clipboard.writeText(fullMsg);
-    window.open(`https://wa.me/${telefoneWhatsApp(order.partnerPhone)}`, '_blank');
-    copiada
-      .then(() => alert('Mensagem copiada! Na conversa do WhatsApp que abriu, toque no campo de texto, segure e escolha "Colar".'))
-      .catch(() => alert('Não consegui copiar a mensagem. Tente de novo ou avise a equipe.'));
+    // Mostra a mensagem numa caixa na própria página; o envio é feito pelos botões da caixa.
+    setMensagemPronta({ order, texto: fullMsg });
+    setCopiadoAgora(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-    // Marcar como enviado no Supabase
+  const copiarMensagem = async () => {
+    if (!mensagemPronta) return;
+    try {
+      await navigator.clipboard.writeText(mensagemPronta.texto);
+      setCopiadoAgora(true);
+    } catch {
+      // Plano B: seleciona o texto na caixa para copiar à mão
+      const caixa = document.getElementById('texto-mensagem') as HTMLTextAreaElement | null;
+      if (caixa) {
+        caixa.focus();
+        caixa.select();
+      }
+      alert('Não consegui copiar sozinho. O texto ficou selecionado: aperte Ctrl+C (ou segure o texto e toque em Copiar).');
+    }
+  };
+
+  const abrirWhatsApp = async () => {
+    if (!mensagemPronta) return;
+    const { order } = mensagemPronta;
+    window.open(`https://wa.me/${telefoneWhatsApp(order.partnerPhone)}`, '_blank');
     try {
       await updateOrderStatus(order.id, 'artes_enviadas');
     } catch (err) {
@@ -127,6 +147,49 @@ export default function PedidosRevendedoras() {
                 </button>
               ))}
             </div>
+
+            {/* Caixa com a mensagem pronta */}
+            {mensagemPronta && (
+              <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border-2 border-[#7BC9C2]">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-bold text-gray-800">Mensagem para {mensagemPronta.order.partnerName}</h2>
+                  <button
+                    onClick={() => {
+                      setMensagemPronta(null);
+                      setCopiadoAgora(false);
+                    }}
+                    className="text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    Fechar ✕
+                  </button>
+                </div>
+                <p className="text-sm text-gray-600 mb-3">
+                  1. Toque em <strong>Copiar mensagem</strong>. 2. Toque em <strong>Abrir WhatsApp</strong>. 3. Na conversa, cole (segure o campo de texto e escolha Colar) e envie.
+                </p>
+                <textarea
+                  id="texto-mensagem"
+                  readOnly
+                  value={mensagemPronta.texto}
+                  rows={12}
+                  onFocus={(e) => e.currentTarget.select()}
+                  className="w-full border border-gray-300 rounded-lg p-3 text-sm font-mono bg-gray-50"
+                />
+                <div className="flex gap-2 flex-wrap mt-3">
+                  <button
+                    onClick={copiarMensagem}
+                    className="px-4 py-2 bg-[#7BC9C2] text-white rounded-lg text-sm font-bold hover:opacity-90"
+                  >
+                    {copiadoAgora ? '✅ Copiada!' : '📋 Copiar mensagem'}
+                  </button>
+                  <button
+                    onClick={abrirWhatsApp}
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-bold hover:bg-green-600"
+                  >
+                    💬 Abrir WhatsApp
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Pedidos */}
             {filteredOrders.length > 0 ? (
